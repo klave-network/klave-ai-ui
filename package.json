@@ -1,6 +1,7 @@
 {
     "name": "sonar",
     "private": true,
+    "version": "0.0.0",
     "type": "module",
     "scripts": {
         "dev": "vite --port 3000",
@@ -8,10 +9,20 @@
         "build": "vite build && tsc",
         "serve": "vite preview",
         "test": "vitest run",
-        "lint": "eslint",
+        "lint": "eslint .",
+        "lint-staged": "lint-staged",
         "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md,html}\"",
         "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md,html}\"",
-        "check": "prettier --write . && eslint --fix"
+        "check": "prettier --write . && eslint --fix",
+        "prepare": "husky"
+    },
+    "lint-staged": {
+        "src/**/*.{ts,tsx,js,jsx,json}": [
+            "eslint --fix"
+        ],
+        "src/**/*.{ts,tsx,js,jsx,json,css,md,html}": [
+            "prettier --write"
+        ]
     },
     "dependencies": {
         "@tailwindcss/vite": "^4.0.6",
@@ -28,6 +39,8 @@
         "tailwindcss-animate": "^1.0.7"
     },
     "devDependencies": {
+        "@commitlint/cli": "^19.7.1",
+        "@commitlint/config-conventional": "^19.7.1",
         "@tanstack/eslint-config": "^0.1.0",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.2.0",
@@ -35,6 +48,8 @@
         "@types/react-dom": "^19.0.3",
         "@vitejs/plugin-react": "^4.3.4",
         "jsdom": "^26.0.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.4.3",
         "prettier": "^3.5.3",
         "typescript": "^5.7.2",
         "vite": "^6.1.0",
