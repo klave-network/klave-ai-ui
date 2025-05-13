@@ -1,0 +1,59 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ${{ matrix.os-version }}
+    strategy:
+      matrix:
+        node-version: [22.x]
+        os-version: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: |
+          yarn install --network-timeout 1000000 --immutable
+
+      - name: Lint
+        run: yarn lint
+
+  build:
+    name: Build
+    runs-on: ${{ matrix.os-version }}
+    needs: lint
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        os-version: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: |
+          yarn install --network-timeout 1000000 --immutable
+
+      - name: Build
+        run: yarn build
+
+      # Upload dist artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
