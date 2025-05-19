@@ -15,8 +15,8 @@ const getAddressFromUrl = (): string | null => {
     return null;
 };
 
-export const klaveSonarContract =
-    getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_SONAR_CONTRACT;
+export const klaveSanctumContract =
+    getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_SANCTUM_CONTRACT;
 
 export const waitForConnection = () =>
     new Promise<void>((resolve) => {

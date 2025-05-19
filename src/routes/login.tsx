@@ -17,7 +17,7 @@ function RouteComponent() {
                     <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                         <Circle className="size-4" />
                     </div>
-                    Sonar
+                    Sanctum
                 </a>
                 <LoginForm />
             </div>

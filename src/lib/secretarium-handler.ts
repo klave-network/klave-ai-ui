@@ -77,7 +77,7 @@ const printClusterInfo = (): void => {
     );
 
     console.info(
-        'Klave Sonar App now using the following cluster configuration:'
+        'Klave Sanctum App now using the following cluster configuration:'
     );
     console.table(printableConfig);
 };
@@ -136,7 +136,9 @@ const secretariumHandler = {
                 if (config.DK_SERVICES)
                     handlerStore.fileService = config.DK_SERVICES;
                 processClusterConfig(clusterConfigBase);
-                console.info('Klave Sonar App now using config.json overrides');
+                console.info(
+                    'Klave Sanctum App now using config.json overrides'
+                );
             })
             .catch(() => {
                 processClusterConfig(clusterConfigBase);
@@ -216,7 +218,7 @@ const secretariumHandler = {
             const endpoint = cluster[1].gateways?.[nextGateway]?.endpoint;
             if (cluster && endpoint && handlerStore.currentKey) {
                 console.info(
-                    'Klave Sonar App now using the following gateway:',
+                    'Klave Sanctum App now using the following gateway:',
                     endpoint
                 );
                 handlerStore.currentConnection
