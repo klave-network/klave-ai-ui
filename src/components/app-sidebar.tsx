@@ -1,9 +1,6 @@
 import * as React from 'react';
 import {
-    AudioWaveform,
     FolderKanban,
-    Command,
-    GalleryVerticalEnd,
     LifeBuoy,
     Settings,
     MessageCirclePlus,
@@ -31,23 +28,6 @@ const routes = {
         email: 'm@example.com',
         avatar: '/avatars/shadcn.jpg'
     },
-    teams: [
-        {
-            name: 'Acme Inc',
-            logo: GalleryVerticalEnd,
-            plan: 'Enterprise'
-        },
-        {
-            name: 'Acme Corp.',
-            logo: AudioWaveform,
-            plan: 'Startup'
-        },
-        {
-            name: 'Evil Corp.',
-            logo: Command,
-            plan: 'Free'
-        }
-    ],
     navMain: [
         {
             title: 'New chat',
@@ -108,7 +88,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <NavHeader teams={routes.teams} />
+                <NavHeader />
             </SidebarHeader>
             <SidebarContent>
                 <NavAdmin items={routes.navMain} />

@@ -12,7 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root';
 import { Route as LoginImport } from './routes/login';
-import { Route as AuthRouteImport } from './routes/_auth/route';
+import { Route as AuthImport } from './routes/_auth';
 import { Route as AuthIndexImport } from './routes/_auth/index';
 import { Route as AuthTemplatesImport } from './routes/_auth/templates';
 import { Route as AuthSettingsImport } from './routes/_auth/settings';
@@ -32,7 +32,7 @@ const LoginRoute = LoginImport.update({
     getParentRoute: () => rootRoute
 } as any);
 
-const AuthRouteRoute = AuthRouteImport.update({
+const AuthRoute = AuthImport.update({
     id: '/_auth',
     getParentRoute: () => rootRoute
 } as any);
@@ -40,49 +40,49 @@ const AuthRouteRoute = AuthRouteImport.update({
 const AuthIndexRoute = AuthIndexImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthTemplatesRoute = AuthTemplatesImport.update({
     id: '/templates',
     path: '/templates',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthSettingsRoute = AuthSettingsImport.update({
     id: '/settings',
     path: '/settings',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthProjectsRoute = AuthProjectsImport.update({
     id: '/projects',
     path: '/projects',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthProfileRoute = AuthProfileImport.update({
     id: '/profile',
     path: '/profile',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthModelsRoute = AuthModelsImport.update({
     id: '/models',
     path: '/models',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthCommunityRoute = AuthCommunityImport.update({
     id: '/community',
     path: '/community',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthChatRouteRoute = AuthChatRouteImport.update({
     id: '/chat',
     path: '/chat',
-    getParentRoute: () => AuthRouteRoute
+    getParentRoute: () => AuthRoute
 } as any);
 
 const AuthChatIndexRoute = AuthChatIndexImport.update({
@@ -105,7 +105,7 @@ declare module '@tanstack/react-router' {
             id: '/_auth';
             path: '';
             fullPath: '';
-            preLoaderRoute: typeof AuthRouteImport;
+            preLoaderRoute: typeof AuthImport;
             parentRoute: typeof rootRoute;
         };
         '/login': {
@@ -120,56 +120,56 @@ declare module '@tanstack/react-router' {
             path: '/chat';
             fullPath: '/chat';
             preLoaderRoute: typeof AuthChatRouteImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/community': {
             id: '/_auth/community';
             path: '/community';
             fullPath: '/community';
             preLoaderRoute: typeof AuthCommunityImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/models': {
             id: '/_auth/models';
             path: '/models';
             fullPath: '/models';
             preLoaderRoute: typeof AuthModelsImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/profile': {
             id: '/_auth/profile';
             path: '/profile';
             fullPath: '/profile';
             preLoaderRoute: typeof AuthProfileImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/projects': {
             id: '/_auth/projects';
             path: '/projects';
             fullPath: '/projects';
             preLoaderRoute: typeof AuthProjectsImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/settings': {
             id: '/_auth/settings';
             path: '/settings';
             fullPath: '/settings';
             preLoaderRoute: typeof AuthSettingsImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/templates': {
             id: '/_auth/templates';
             path: '/templates';
             fullPath: '/templates';
             preLoaderRoute: typeof AuthTemplatesImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/': {
             id: '/_auth/';
             path: '/';
             fullPath: '/';
             preLoaderRoute: typeof AuthIndexImport;
-            parentRoute: typeof AuthRouteImport;
+            parentRoute: typeof AuthImport;
         };
         '/_auth/chat/$id': {
             id: '/_auth/chat/$id';
@@ -204,7 +204,7 @@ const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
     AuthChatRouteRouteChildren
 );
 
-interface AuthRouteRouteChildren {
+interface AuthRouteChildren {
     AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren;
     AuthCommunityRoute: typeof AuthCommunityRoute;
     AuthModelsRoute: typeof AuthModelsRoute;
@@ -215,7 +215,7 @@ interface AuthRouteRouteChildren {
     AuthIndexRoute: typeof AuthIndexRoute;
 }
 
-const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+const AuthRouteChildren: AuthRouteChildren = {
     AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
     AuthCommunityRoute: AuthCommunityRoute,
     AuthModelsRoute: AuthModelsRoute,
@@ -226,12 +226,10 @@ const AuthRouteRouteChildren: AuthRouteRouteChildren = {
     AuthIndexRoute: AuthIndexRoute
 };
 
-const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
-    AuthRouteRouteChildren
-);
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren);
 
 export interface FileRoutesByFullPath {
-    '': typeof AuthRouteRouteWithChildren;
+    '': typeof AuthRouteWithChildren;
     '/login': typeof LoginRoute;
     '/chat': typeof AuthChatRouteRouteWithChildren;
     '/community': typeof AuthCommunityRoute;
@@ -260,7 +258,7 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
     __root__: typeof rootRoute;
-    '/_auth': typeof AuthRouteRouteWithChildren;
+    '/_auth': typeof AuthRouteWithChildren;
     '/login': typeof LoginRoute;
     '/_auth/chat': typeof AuthChatRouteRouteWithChildren;
     '/_auth/community': typeof AuthCommunityRoute;
@@ -319,12 +317,12 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-    AuthRouteRoute: typeof AuthRouteRouteWithChildren;
+    AuthRoute: typeof AuthRouteWithChildren;
     LoginRoute: typeof LoginRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
-    AuthRouteRoute: AuthRouteRouteWithChildren,
+    AuthRoute: AuthRouteWithChildren,
     LoginRoute: LoginRoute
 };
 
@@ -343,7 +341,7 @@ export const routeTree = rootRoute
       ]
     },
     "/_auth": {
-      "filePath": "_auth/route.tsx",
+      "filePath": "_auth.tsx",
       "children": [
         "/_auth/chat",
         "/_auth/community",

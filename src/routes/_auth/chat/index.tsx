@@ -58,7 +58,7 @@ function RouteComponent() {
                         </div>
                         <TooltipProvider>
                             <Tooltip>
-                                <TooltipTrigger>
+                                <TooltipTrigger asChild>
                                     <Button
                                         size="icon"
                                         className="hover:cursor-pointer"

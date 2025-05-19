@@ -24,6 +24,7 @@ import {
     SidebarMenuItem,
     useSidebar
 } from '@/components/ui/sidebar';
+import secretariumHandler from '@/lib/secretarium-handler';
 
 export function NavFooter({
     user
@@ -119,7 +120,9 @@ export function NavFooter({
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => secretariumHandler.disconnect()}
+                        >
                             <LogOut />
                             Log out
                         </DropdownMenuItem>
