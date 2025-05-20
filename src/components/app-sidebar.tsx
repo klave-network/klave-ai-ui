@@ -24,8 +24,8 @@ import {
 
 const routes = {
     user: {
-        name: 'shadcn',
-        email: 'm@example.com',
+        name: 'damitzi',
+        email: 'damian@secretarium.org',
         avatar: '/avatars/shadcn.jpg'
     },
     navMain: [
@@ -86,19 +86,24 @@ const chats = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar collapsible="icon" {...props}>
-            <SidebarHeader>
-                <NavHeader />
-            </SidebarHeader>
-            <SidebarContent>
-                <NavAdmin items={routes.navMain} />
-                <NavChats items={chats} />
-                <NavSettings items={routes.navSecondary} className="mt-auto" />
-            </SidebarContent>
-            <SidebarFooter>
-                <NavFooter user={routes.user} />
-            </SidebarFooter>
-            <SidebarRail />
-        </Sidebar>
+        <>
+            <Sidebar collapsible="icon" {...props}>
+                <SidebarHeader>
+                    <NavHeader />
+                </SidebarHeader>
+                <SidebarContent>
+                    <NavAdmin items={routes.navMain} />
+                    <NavChats items={chats} />
+                    <NavSettings
+                        items={routes.navSecondary}
+                        className="mt-auto"
+                    />
+                </SidebarContent>
+                <SidebarFooter>
+                    <NavFooter user={routes.user} />
+                </SidebarFooter>
+                <SidebarRail />
+            </Sidebar>
+        </>
     );
 }

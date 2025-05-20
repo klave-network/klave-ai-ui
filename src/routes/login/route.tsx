@@ -1,5 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { LoginForm } from '@/components/login-form';
+import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { Circle } from 'lucide-react';
 
 export const Route = createFileRoute('/login')({
@@ -19,7 +18,7 @@ function RouteComponent() {
                     </div>
                     Sanctum
                 </Link>
-                <LoginForm />
+                <Outlet />
             </div>
         </div>
     );

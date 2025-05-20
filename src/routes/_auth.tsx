@@ -2,21 +2,21 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { LOC_KEY } from '@/lib/constants';
-import { StatusBar } from '@/components/status-bar';
+import secretariumHandler from '@/lib/secretarium-handler';
 
 export const Route = createFileRoute('/_auth')({
     component: RouteComponent,
     beforeLoad: async () => {
         // if there are no user keys in localStorage, redirect to login page
         const userKeys = localStorage.getItem(LOC_KEY);
-        if (!userKeys) {
+        if (!userKeys || !secretariumHandler.isConnected()) {
             throw redirect({ to: '/login' });
         }
     },
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">
             <div className="flex items-center gap-2">
-                <span>Initializing...</span>
+                <span>Loading...</span>
             </div>
         </div>
     ),
@@ -41,7 +41,6 @@ function RouteComponent() {
             <SidebarInset>
                 <div className="flex flex-1 flex-col">
                     <Outlet />
-                    <StatusBar />
                 </div>
             </SidebarInset>
         </SidebarProvider>
