@@ -6,17 +6,16 @@ export const StatusBar = () => {
     return (
         <div
             className={cn(
-                'mt-auto h-6 px-4 text-sm flex items-center',
+                'mt-auto h-6 -mx-2 -mb-2 px-2 text-sm flex items-center justify-center',
                 secretariumHandler.isConnected() ? 'bg-green-400' : 'bg-red-400'
             )}
         >
-            <span className="font-semibold">Connection status:</span>
             {secretariumHandler.isConnected() ? (
-                <span className="ml-4 flex items-center gap-1">
+                <span className="flex items-center gap-1">
                     <CircleCheck className="h-4 w-4" /> Connected
                 </span>
             ) : (
-                <span className="ml-4 flex items-center gap-1">
+                <span className="flex items-center gap-1">
                     Disconnected <CircleX className="h-4 w-4" />
                 </span>
             )}
