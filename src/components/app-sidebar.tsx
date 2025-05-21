@@ -6,7 +6,8 @@ import {
     MessageCirclePlus,
     Users,
     Boxes,
-    FolderCode
+    FolderCode,
+    Video
 } from 'lucide-react';
 
 import { NavHeader } from '@/components/nav/header';
@@ -33,6 +34,11 @@ const routes = {
             title: 'New chat',
             url: '/chat',
             icon: MessageCirclePlus
+        },
+        {
+            title: 'Video chat',
+            url: '/chat/video',
+            icon: Video
         },
         {
             title: 'Projects',
@@ -69,21 +75,6 @@ const routes = {
     ]
 };
 
-const chats = [
-    {
-        title: 'Chat 1',
-        url: '/chat/1'
-    },
-    {
-        title: 'Chat 2',
-        url: '/chat/2'
-    },
-    {
-        title: 'Chat 3',
-        url: '/chat/3'
-    }
-];
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <>
@@ -93,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarHeader>
                 <SidebarContent>
                     <NavAdmin items={routes.navMain} />
-                    <NavChats items={chats} />
+                    <NavChats />
                     <NavSettings
                         items={routes.navSecondary}
                         className="mt-auto"

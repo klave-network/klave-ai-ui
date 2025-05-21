@@ -26,6 +26,7 @@ import { Route as AuthChatRouteImport } from './routes/_auth/chat/route';
 import { Route as AuthModelsIndexImport } from './routes/_auth/models/index';
 import { Route as AuthChatIndexImport } from './routes/_auth/chat/index';
 import { Route as AuthModelsNameImport } from './routes/_auth/models/$name';
+import { Route as AuthChatVideoImport } from './routes/_auth/chat/video';
 import { Route as AuthChatIdImport } from './routes/_auth/chat/$id';
 
 // Create/Update Routes
@@ -117,6 +118,12 @@ const AuthModelsNameRoute = AuthModelsNameImport.update({
     id: '/$name',
     path: '/$name',
     getParentRoute: () => AuthModelsRouteRoute
+} as any);
+
+const AuthChatVideoRoute = AuthChatVideoImport.update({
+    id: '/video',
+    path: '/video',
+    getParentRoute: () => AuthChatRouteRoute
 } as any);
 
 const AuthChatIdRoute = AuthChatIdImport.update({
@@ -220,6 +227,13 @@ declare module '@tanstack/react-router' {
             preLoaderRoute: typeof AuthChatIdImport;
             parentRoute: typeof AuthChatRouteImport;
         };
+        '/_auth/chat/video': {
+            id: '/_auth/chat/video';
+            path: '/video';
+            fullPath: '/chat/video';
+            preLoaderRoute: typeof AuthChatVideoImport;
+            parentRoute: typeof AuthChatRouteImport;
+        };
         '/_auth/models/$name': {
             id: '/_auth/models/$name';
             path: '/$name';
@@ -262,11 +276,13 @@ const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
 
 interface AuthChatRouteRouteChildren {
     AuthChatIdRoute: typeof AuthChatIdRoute;
+    AuthChatVideoRoute: typeof AuthChatVideoRoute;
     AuthChatIndexRoute: typeof AuthChatIndexRoute;
 }
 
 const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
     AuthChatIdRoute: AuthChatIdRoute,
+    AuthChatVideoRoute: AuthChatVideoRoute,
     AuthChatIndexRoute: AuthChatIndexRoute
 };
 
@@ -326,6 +342,7 @@ export interface FileRoutesByFullPath {
     '/': typeof AuthIndexRoute;
     '/login/': typeof LoginIndexRoute;
     '/chat/$id': typeof AuthChatIdRoute;
+    '/chat/video': typeof AuthChatVideoRoute;
     '/models/$name': typeof AuthModelsNameRoute;
     '/chat/': typeof AuthChatIndexRoute;
     '/models/': typeof AuthModelsIndexRoute;
@@ -341,6 +358,7 @@ export interface FileRoutesByTo {
     '/': typeof AuthIndexRoute;
     '/login': typeof LoginIndexRoute;
     '/chat/$id': typeof AuthChatIdRoute;
+    '/chat/video': typeof AuthChatVideoRoute;
     '/models/$name': typeof AuthModelsNameRoute;
     '/chat': typeof AuthChatIndexRoute;
     '/models': typeof AuthModelsIndexRoute;
@@ -361,6 +379,7 @@ export interface FileRoutesById {
     '/_auth/': typeof AuthIndexRoute;
     '/login/': typeof LoginIndexRoute;
     '/_auth/chat/$id': typeof AuthChatIdRoute;
+    '/_auth/chat/video': typeof AuthChatVideoRoute;
     '/_auth/models/$name': typeof AuthModelsNameRoute;
     '/_auth/chat/': typeof AuthChatIndexRoute;
     '/_auth/models/': typeof AuthModelsIndexRoute;
@@ -382,6 +401,7 @@ export interface FileRouteTypes {
         | '/'
         | '/login/'
         | '/chat/$id'
+        | '/chat/video'
         | '/models/$name'
         | '/chat/'
         | '/models/';
@@ -396,6 +416,7 @@ export interface FileRouteTypes {
         | '/'
         | '/login'
         | '/chat/$id'
+        | '/chat/video'
         | '/models/$name'
         | '/chat'
         | '/models';
@@ -414,6 +435,7 @@ export interface FileRouteTypes {
         | '/_auth/'
         | '/login/'
         | '/_auth/chat/$id'
+        | '/_auth/chat/video'
         | '/_auth/models/$name'
         | '/_auth/chat/'
         | '/_auth/models/';
@@ -469,6 +491,7 @@ export const routeTree = rootRoute
       "parent": "/_auth",
       "children": [
         "/_auth/chat/$id",
+        "/_auth/chat/video",
         "/_auth/chat/"
       ]
     },
@@ -514,6 +537,10 @@ export const routeTree = rootRoute
     },
     "/_auth/chat/$id": {
       "filePath": "_auth/chat/$id.tsx",
+      "parent": "/_auth/chat"
+    },
+    "/_auth/chat/video": {
+      "filePath": "_auth/chat/video.tsx",
       "parent": "/_auth/chat"
     },
     "/_auth/models/$name": {
