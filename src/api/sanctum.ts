@@ -152,8 +152,6 @@ export const inferenceGetResponse = async (args: Input): Promise<any> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log('Input: ', args);
-                        console.log('Res: ', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
