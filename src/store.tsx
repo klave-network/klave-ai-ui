@@ -9,7 +9,7 @@ type ChatMessage = {
     timestamp?: number;
 };
 
-type ChatHistory = {
+export type ChatHistory = {
     id: string;
     messages: ChatMessage[];
 };
