@@ -31,6 +31,7 @@ export function NavAdmin({
                                     activeProps={{
                                         className: 'bg-sidebar-accent'
                                     }}
+                                    activeOptions={{ exact: true }}
                                 >
                                     <item.icon />
                                     <span>{item.title}</span>
