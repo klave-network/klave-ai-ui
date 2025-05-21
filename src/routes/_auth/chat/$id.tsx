@@ -142,7 +142,7 @@ function RouteComponent() {
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Text input */}
+            {/* Chat input */}
             <ChatInput
                 userPrompt={userPrompt}
                 setUserPrompt={setUserPrompt}

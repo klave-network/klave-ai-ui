@@ -7,6 +7,12 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger
+} from '@/components/ui/popover';
+import { Link } from '@tanstack/react-router';
 
 interface ChatInputProps {
     userPrompt: string;
@@ -42,13 +48,20 @@ export const ChatInput = ({
                 />
                 <div className="flex justify-between">
                     <div>
-                        <Button
-                            variant="ghost"
-                            className="hover:cursor-pointer"
-                        >
-                            <Paperclip className="h-4 w-4" />
-                            Add files
-                        </Button>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="hover:cursor-pointer"
+                                >
+                                    <Paperclip className="h-4 w-4" />
+                                    Add files
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="text-center">
+                                Feature coming soon!
+                            </PopoverContent>
+                        </Popover>
                         <Button
                             variant="ghost"
                             className="hover:cursor-pointer"
@@ -59,9 +72,12 @@ export const ChatInput = ({
                         <Button
                             variant="ghost"
                             className="hover:cursor-pointer"
+                            asChild
                         >
-                            <Video className="h-4 w-4" />
-                            Use camera
+                            <Link to="/chat/video">
+                                <Video className="h-4 w-4" />
+                                Use camera
+                            </Link>
                         </Button>
                     </div>
                     <TooltipProvider>
