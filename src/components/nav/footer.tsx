@@ -37,6 +37,7 @@ export function NavFooter({
     };
 }) {
     const { isMobile } = useSidebar();
+    const currentUser = localStorage.getItem('currentUser');
 
     return (
         <>
@@ -54,15 +55,15 @@ export function NavFooter({
                                         alt={user.name}
                                     />
                                     <AvatarFallback className="rounded-lg">
-                                        CN
+                                        {currentUser?.charAt(0)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        {user.name}
+                                        User
                                     </span>
                                     <span className="truncate text-xs">
-                                        {user.email}
+                                        {currentUser}
                                     </span>
                                 </div>
                                 <ChevronsUpDown className="ml-auto size-4" />
