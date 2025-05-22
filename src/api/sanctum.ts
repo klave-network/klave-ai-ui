@@ -5,7 +5,8 @@ import type {
     Input,
     Model,
     PromptInput,
-    Tokenizer
+    Tokenizer,
+    ChunkResult
 } from '@/lib/types';
 
 export const getModels = async (): Promise<Model[]> =>
@@ -72,10 +73,6 @@ export const graphInitExecutionContext = async (
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log(
-                            'graphInitExecutionContext result: ',
-                            result
-                        );
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -101,10 +98,6 @@ export const graphDeleteExecutionContext = async (
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log(
-                            'graphDeleteExecutionContext result: ',
-                            result
-                        );
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -128,7 +121,6 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log('inferenceAddPrompt result: ', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -138,25 +130,30 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
                 })
         );
 
-export const inferenceGetResponse = async (args: Input): Promise<any> =>
-    waitForConnection()
-        .then(() =>
-            secretariumHandler.request(
-                klaveSanctumContract,
-                'inferenceGetPiece',
-                args,
-                `inferenceGetPiece-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
-            )
-        )
-        .then(
-            (tx) =>
-                new Promise((resolve, reject) => {
-                    tx.onResult((result: any) => {
-                        resolve(result);
-                    });
-                    tx.onError((error) => {
-                        reject(error);
-                    });
-                    tx.send().catch(reject);
-                })
-        );
+export const inferenceGetResponse = async (
+    args: Input,
+    resolveCallback: (result: ChunkResult) => boolean
+): Promise<void> => {
+    await waitForConnection();
+    const tx = await secretariumHandler.request(
+        klaveSanctumContract,
+        'inferenceGetPieces',
+        args,
+        `inferenceGetPieces-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+    );
+
+    return new Promise<void>((resolve, reject) => {
+        tx.onResult((result: ChunkResult) => {
+            if (resolveCallback(result)) {
+                resolve();
+            }
+        });
+
+        tx.onError((error) => {
+            console.error(`inferenceGetPieces error: ${error.message}`);
+            reject(error);
+        });
+
+        tx.send().catch(reject);
+    });
+};

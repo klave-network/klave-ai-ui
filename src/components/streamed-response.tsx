@@ -1,48 +1,55 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { inferenceGetResponse } from '@/api/sanctum';
 
-export const StreamedResponse = ({
+interface StreamedResponseProps {
+    context_name: string;
+    onComplete: (fullResponse: string) => void;
+}
+
+export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     context_name,
     onComplete
-}: {
-    context_name: string;
-    onComplete?: (fullResponse: string) => void;
 }) => {
     const [response, setResponse] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const isMountedRef = useRef(true);
+    const fullResponseRef = useRef(''); // accumulate full response here
 
     useEffect(() => {
-        let isMounted = true;
+        // console.log('is this streaming again');
+        isMountedRef.current = true;
 
-        async function poll() {
-            let complete = false;
-            while (!complete && isMounted) {
-                try {
-                    const result = await inferenceGetResponse({
-                        context_name
-                    });
-                    const chunk = String.fromCharCode.apply(null, result.piece);
-                    setResponse((prev) => prev + chunk);
-                    complete = result.complete;
-                } catch (e) {
-                    console.error(e);
-                    break;
-                }
+        setResponse('');
+        fullResponseRef.current = '';
+        setLoading(true);
+        setError(null);
+
+        inferenceGetResponse({ context_name }, (result) => {
+            if (!isMountedRef.current) return true; // stop if unmounted
+
+            const chunkText = String.fromCharCode(...result.piece);
+            fullResponseRef.current += chunkText;
+            setResponse(fullResponseRef.current);
+
+            if (result.complete === true) {
+                setLoading(false);
+                onComplete(fullResponseRef.current);
+                isMountedRef.current = false;
             }
-            if (onComplete && isMounted) {
-                onComplete(response);
-            }
-        }
 
-        poll();
-
-        return () => {
-            isMounted = false;
-        };
-    }, [context_name]);
+            return result.complete === true;
+        });
+    }, [context_name, onComplete]);
 
     return (
-        <pre className="whitespace-pre-wrap p-4 border rounded bg-gray-50">
-            {response || 'Loading...'}
-        </pre>
+        <p className="whitespace-pre-wrap">
+            {loading && !response ? (
+                <span className="animate-pulse">Generating...</span>
+            ) : (
+                response
+            )}
+            {error && <span className="text-red-600">Error: {error}</span>}
+        </p>
     );
 };

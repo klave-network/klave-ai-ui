@@ -61,3 +61,8 @@ export type PromptInput = {
 };
 
 export type Input = Pick<PromptInput, 'context_name'>;
+
+export type ChunkResult = {
+    piece: number[];
+    complete: boolean;
+};

@@ -13,7 +13,7 @@ function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('currentUser') ?? '';
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -23,11 +23,13 @@ function RouteComponent() {
 
         setError(null);
 
+        // Create unique context ID for the chat name
         const contextId = generateSimpleId();
         const contextName = `stories_context_${contextId}`;
+
         try {
-            const graphInitInput = {
-                model_name: 'stories',
+            await graphInitExecutionContext({
+                model_name: 'stories15M',
                 context_name: contextName,
                 system_prompt: 'You are a helpful assistant.',
                 temperature: 0.8,
@@ -35,17 +37,15 @@ function RouteComponent() {
                 steps: 256,
                 sliding_window: false,
                 mode: 'generate'
-            };
-            const addPromptInput = {
+            });
+
+            await inferenceAddPrompt({
                 context_name: contextName,
                 user_prompt: userPrompt
-            };
-            const result1 = await graphInitExecutionContext(graphInitInput);
-            const result2 = await inferenceAddPrompt(addPromptInput);
+            });
 
-            console.log('Graph Init Result:', result1);
-            console.log('Add Prompt Result:', result2);
-            storeActions.createChat(currentUser ?? '', contextId, {
+            // Create and add new chat to tanstack store
+            storeActions.createChat(currentUser, contextId, {
                 id: generateSimpleId(),
                 content: userPrompt,
                 role: 'user'
@@ -59,6 +59,7 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col items-center h-full">
+            {/* Welcome screen */}
             <div className="flex flex-col gap-6 items-center justify-center h-full">
                 <h2 className="text-2xl md:text-4xl">
                     Welcome to Sanctum by Klave
@@ -69,6 +70,7 @@ function RouteComponent() {
                     obvious.
                 </p>
             </div>
+
             {/* Chat input */}
             <ChatInput
                 userPrompt={userPrompt}

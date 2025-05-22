@@ -14,7 +14,7 @@ function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const { id: chatId } = Route.useParams();
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem('currentUser') ?? '';
     const chat = useUserChat(currentUser ?? '', chatId);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -31,42 +31,38 @@ function RouteComponent() {
 
         setError(null);
 
-        const userMessageId = generateSimpleId();
-        const aiMessageId = generateSimpleId();
-
-        // Add user message immediately
-        storeActions.addMessage(currentUser ?? '', chatId, {
-            id: userMessageId,
-            content: userPrompt,
-            role: 'user',
-            timestamp: Date.now()
-        });
-
-        // Add AI placeholder message immediately
-        storeActions.addMessage(currentUser ?? '', chatId, {
-            id: aiMessageId,
-            content: '',
-            role: 'ai',
-            timestamp: Date.now()
-        });
-
-        setStreamingMessageId(aiMessageId);
-        setUserPrompt('');
-
-        // Call your API AFTER adding messages so UI updates immediately
         try {
-            const contextName = `stories_context_${chatId}`;
-            const addPromptInput = {
-                context_name: contextName,
-                user_prompt: userPrompt
-            };
-            const result1 = await inferenceAddPrompt(addPromptInput);
-            console.log('Add Prompt Result:', result1);
+            const promptToSend = userPrompt; // Capture prompt before clearing
+            setUserPrompt('');
+
+            await inferenceAddPrompt({
+                context_name: `stories_context_${chatId}`,
+                user_prompt: promptToSend
+            });
+
+            const userMessageId = generateSimpleId();
+            const aiMessageId = generateSimpleId();
+
+            storeActions.addMessage(currentUser, chatId, {
+                id: userMessageId,
+                content: promptToSend,
+                role: 'user',
+                timestamp: Date.now()
+            });
+
+            storeActions.addMessage(currentUser, chatId, {
+                id: aiMessageId,
+                content: '',
+                role: 'ai',
+                timestamp: Date.now()
+            });
+
+            setStreamingMessageId(aiMessageId);
         } catch (error) {
             console.error('Error: ', error);
             setError('Failed to send message');
         }
-    }, [userPrompt]);
+    }, [userPrompt, chatId, currentUser]);
 
     // On mount: if AI message missing, add placeholder and start streaming
     useEffect(() => {
@@ -83,15 +79,13 @@ function RouteComponent() {
             });
             setStreamingMessageId(aiMessageId);
         }
-    }, [chat, chatId, currentUser]);
+    }, []);
 
-    const handleStreamComplete = (fullResponse: string) => {
-        if (!streamingMessageId || !chat || !currentUser) return;
+    const handleStreamComplete = (messageId: string, fullResponse: string) => {
+        if (!chat || !currentUser) return;
 
         const updatedMessages = chat.messages.map((msg) =>
-            msg.id === streamingMessageId
-                ? { ...msg, content: fullResponse }
-                : msg
+            msg.id === messageId ? { ...msg, content: fullResponse } : msg
         );
 
         store.setState((prev) => ({
@@ -101,7 +95,9 @@ function RouteComponent() {
             )
         }));
 
-        setStreamingMessageId(null);
+        if (streamingMessageId === messageId) {
+            setStreamingMessageId(null);
+        }
     };
 
     // Scroll to bottom when messages change
@@ -118,7 +114,6 @@ function RouteComponent() {
                 {chat.messages.map(({ id, role, content }) => {
                     const isStreaming =
                         streamingMessageId === id && role === 'ai';
-
                     return (
                         <div
                             key={id}
@@ -130,8 +125,11 @@ function RouteComponent() {
                         >
                             {isStreaming ? (
                                 <StreamedResponse
+                                    key={`stream-${id}`}
                                     context_name={`stories_context_${chatId}`}
-                                    onComplete={handleStreamComplete}
+                                    onComplete={(fullResponse) =>
+                                        handleStreamComplete(id, fullResponse)
+                                    }
                                 />
                             ) : (
                                 content
