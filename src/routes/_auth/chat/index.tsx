@@ -33,7 +33,8 @@ function RouteComponent() {
                 temperature: 0.8,
                 topp: 0.9,
                 steps: 256,
-                sliding_window: false
+                sliding_window: false,
+                mode: 'generate'
             };
             const addPromptInput = {
                 context_name: contextName,

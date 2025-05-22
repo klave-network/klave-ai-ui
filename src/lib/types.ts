@@ -52,6 +52,7 @@ export type ContextInput = {
     topp: number;
     steps: number;
     sliding_window: boolean;
+    mode: string;
 };
 
 export type PromptInput = {
