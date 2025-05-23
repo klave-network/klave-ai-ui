@@ -6,32 +6,21 @@ import {
     SidebarGroup,
     SidebarGroupContent
 } from '@/components/ui/sidebar';
-import { getModels } from '@/api/sanctum';
+import { useUserModels } from '@/store';
+import { CUR_USER_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/models')({
-    component: RouteComponent,
-    loader: async () => {
-        const models = await getModels();
-
-        console.log(models);
-        return { models };
-    },
-    pendingComponent: () => (
-        <div className="min-h-screen grid place-items-center">
-            <div className="flex items-center gap-2">
-                <span>Loading models...</span>
-            </div>
-        </div>
-    )
+    component: RouteComponent
 });
 
 function RouteComponent() {
-    const { models } = Route.useLoaderData();
+    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const models = useUserModels(currentUser);
     return (
         <div className="flex h-full">
             <Sidebar
                 collapsible="none"
-                className="hidden flex-1 md:flex max-w-[300px] border-r"
+                className="hidden flex-1 md:flex max-w-[300px] border-r shrink-0"
             >
                 <SidebarHeader className="gap-3.5 border-b p-4">
                     <div className="flex w-full items-center">
@@ -43,7 +32,8 @@ function RouteComponent() {
                         <SidebarGroupContent className="flex flex-col">
                             {models.map((model, id) => (
                                 <Link
-                                    to={model.name}
+                                    to="/models/$name"
+                                    params={{ name: model.name }}
                                     key={id}
                                     activeProps={{
                                         className: 'bg-sidebar-accent'

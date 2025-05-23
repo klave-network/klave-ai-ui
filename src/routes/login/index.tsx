@@ -12,7 +12,11 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
-import { LOC_KEY, KLAVE_CONNECTION_KEYPAIR_PWD } from '@/lib/constants';
+import {
+    LOC_KEY,
+    KLAVE_CONNECTION_KEYPAIR_PWD,
+    CUR_USER_KEY
+} from '@/lib/constants';
 import { useLocalStorage } from 'usehooks-ts';
 import { type KeyPair } from '@/lib/types';
 import secretariumHandler from '@/lib/secretarium-handler';
@@ -60,7 +64,7 @@ function RouteComponent() {
             });
 
             await promise; // Wait for the connection to complete
-            localStorage.setItem('currentUser', key.name);
+            localStorage.setItem(CUR_USER_KEY, key.name);
             router.invalidate();
             navigate({ to: '/' });
         }

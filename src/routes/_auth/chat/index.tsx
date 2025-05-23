@@ -4,6 +4,7 @@ import { graphInitExecutionContext, inferenceAddPrompt } from '@/api/sanctum';
 import { generateSimpleId } from '@/lib/utils';
 import { storeActions } from '@/store';
 import { ChatInput } from '@/components/chat-input';
+import { CUR_USER_KEY, CUR_MODEL_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/chat/')({
     component: RouteComponent
@@ -13,7 +14,8 @@ function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const currentUser = localStorage.getItem('currentUser') ?? '';
+    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? '';
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -29,7 +31,7 @@ function RouteComponent() {
 
         try {
             await graphInitExecutionContext({
-                model_name: 'stories15M',
+                model_name: currentModel,
                 context_name: contextName,
                 system_prompt: 'You are a helpful assistant.',
                 temperature: 0.8,

@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import secretariumHandler from '@/lib/secretarium-handler';
 import { StatusBar } from '@/components/status-bar';
+import { CUR_USER_KEY } from '@/lib/constants';
 
 export function NavFooter({
     user
@@ -37,7 +38,7 @@ export function NavFooter({
     };
 }) {
     const { isMobile } = useSidebar();
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem(CUR_USER_KEY);
 
     return (
         <>

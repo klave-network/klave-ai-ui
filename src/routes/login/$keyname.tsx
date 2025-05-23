@@ -14,7 +14,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { LOC_KEY, KLAVE_CONNECTION_KEYPAIR_PWD } from '@/lib/constants';
+import {
+    LOC_KEY,
+    KLAVE_CONNECTION_KEYPAIR_PWD,
+    CUR_USER_KEY
+} from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
 import { toast } from 'sonner';
 import { Key, Utils } from '@secretarium/connector';
@@ -60,7 +64,7 @@ function RouteComponent() {
 
             // Replace loading toast with success
             toast.success(`Connected with ${key.name}.`, { id: toastId });
-            localStorage.setItem('currentUser', key.name);
+            localStorage.setItem(CUR_USER_KEY, key.name);
             router.invalidate();
             navigate({ to: '/' });
         } catch (e) {

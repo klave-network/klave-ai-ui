@@ -19,12 +19,13 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
 import { useUserChatHistory } from '@/store';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { CUR_USER_KEY } from '@/lib/constants';
 
 export function NavChats({
     ...props
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
     const { isMobile } = useSidebar();
-    const currentUser = localStorage.getItem('currentUser');
+    const currentUser = localStorage.getItem(CUR_USER_KEY);
     const chatHistory = useUserChatHistory(currentUser ?? '') ?? [];
 
     const [showAll, setShowAll] = React.useState(false);
