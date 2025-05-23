@@ -2,9 +2,9 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useCallback } from 'react';
 import { graphInitExecutionContext, inferenceAddPrompt } from '@/api/klave-ai';
 import { generateSimpleId } from '@/lib/utils';
-import { storeActions } from '@/store';
+import { storeActions, useUserModels } from '@/store';
 import { ChatInput } from '@/components/chat-input';
-import { CUR_USER_KEY, CUR_MODEL_KEY } from '@/lib/constants';
+import { CUR_USER_KEY, CUR_MODEL_KEY, CUR_MODE_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/chat/')({
     component: RouteComponent
@@ -15,7 +15,9 @@ function RouteComponent() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? '';
+    const models = useUserModels(currentUser);
+    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
+    const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'generate';
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -38,7 +40,7 @@ function RouteComponent() {
                 topp: 0.9,
                 steps: 256,
                 sliding_window: false,
-                mode: 'generate'
+                mode: currentMode
             });
 
             await inferenceAddPrompt({
