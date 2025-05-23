@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getModels } from '@/api/klaive';
+import { getModels } from '@/api/klave-ai';
 import { storeActions } from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
 
@@ -23,9 +23,9 @@ function RouteComponent() {
     return (
         <div className="flex flex-col items-center h-full">
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl">Welcome to Klaive</h2>
+                <h2 className="text-2xl md:text-4xl">Welcome to Klave-AI</h2>
                 <p className="text-center max-w-xl">
-                    Introducing Klaive by Klave – an advanced AI to challenge
+                    Introducing Klave-AI – an advanced AI to challenge
                     assumptions, generate ideas and help you think beyond the
                     obvious.
                 </p>

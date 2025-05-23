@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useUserChat, storeActions, store } from '@/store';
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { inferenceAddPrompt } from '@/api/klaive';
+import { inferenceAddPrompt } from '@/api/klave-ai';
 import { StreamedResponse } from '@/components/streamed-response';
 import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';

@@ -15,8 +15,8 @@ const getAddressFromUrl = (): string | null => {
     return null;
 };
 
-export const klaveKlaiveContract =
-    getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_KLAIVE_CONTRACT;
+export const klaveKlaveAIContract =
+    getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_AI_CONTRACT;
 
 export const waitForConnection = () =>
     new Promise<void>((resolve) => {

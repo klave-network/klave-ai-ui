@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useCallback } from 'react';
-import { graphInitExecutionContext, inferenceAddPrompt } from '@/api/klaive';
+import { graphInitExecutionContext, inferenceAddPrompt } from '@/api/klave-ai';
 import { generateSimpleId } from '@/lib/utils';
 import { storeActions } from '@/store';
 import { ChatInput } from '@/components/chat-input';
@@ -63,9 +63,9 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Welcome screen */}
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl">Welcome to Klaive</h2>
+                <h2 className="text-2xl md:text-4xl">Welcome to Klave-AI</h2>
                 <p className="text-center max-w-xl">
-                    Introducing Klaive by Klave – an advanced AI to challenge
+                    Introducing Klave-AI – an advanced AI to challenge
                     assumptions, generate ideas and help you think beyond the
                     obvious.
                 </p>

@@ -14,7 +14,7 @@ export const Logo = ({ className }: { className?: string }) => {
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
                 <img src={klaveLogo} alt="klave logo" className="size-4" />
             </div>
-            <span className="text-2xl font-semibold">Klaive</span>
+            <span className="text-2xl font-semibold">Klave-AI</span>
         </Link>
     );
 };

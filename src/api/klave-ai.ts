@@ -1,5 +1,5 @@
 import secretariumHandler from '@/lib/secretarium-handler';
-import { klaveKlaiveContract, waitForConnection } from '@/api';
+import { klaveKlaveAIContract, waitForConnection } from '@/api';
 import type {
     ContextInput,
     Input,
@@ -13,7 +13,7 @@ export const getModels = async (): Promise<Model[]> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'getModels',
                 '',
                 `getModels-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -37,7 +37,7 @@ export const getTokenizers = async (): Promise<Tokenizer[]> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'getTokenizers',
                 '',
                 `getTokenizers-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -63,7 +63,7 @@ export const graphInitExecutionContext = async (
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'graphInitExecutionContext',
                 args,
                 `graphInitExecutionContext-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -88,7 +88,7 @@ export const graphDeleteExecutionContext = async (
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'graphDeleteExecutionContext',
                 contextName,
                 `graphDeleteExecutionContext-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -111,7 +111,7 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'inferenceAddPrompt',
                 args,
                 `inferenceAddPrompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -136,7 +136,7 @@ export const inferenceGetResponse = async (
 ): Promise<void> => {
     await waitForConnection();
     const tx = await secretariumHandler.request(
-        klaveKlaiveContract,
+        klaveKlaveAIContract,
         'inferenceGetPieces',
         args,
         `inferenceGetPieces-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`

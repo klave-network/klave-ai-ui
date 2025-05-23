@@ -1,5 +1,5 @@
 import secretariumHandler from '@/lib/secretarium-handler';
-import { klaveKlaiveContract, waitForConnection } from '@/api';
+import { klaveKlaveAIContract, waitForConnection } from '@/api';
 import type {
     BackendVersion,
     QuoteResponse,
@@ -15,7 +15,7 @@ export const getQuote = async ({
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'klave.get_quote',
                 { challenge },
                 `klave.get_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -39,7 +39,7 @@ export const verifyQuote = async (args: VerifyArgs): Promise<VerifyResponse> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'klave.verify_quote',
                 args,
                 `klave.verify_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
@@ -63,7 +63,7 @@ export const getBackendVersion = async (): Promise<BackendVersion> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaiveContract,
+                klaveKlaveAIContract,
                 'klave.version',
                 {},
                 `klave.version-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`

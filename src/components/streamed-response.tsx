@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { inferenceGetResponse } from '@/api/klaive';
+import { inferenceGetResponse } from '@/api/klave-ai';
 
 interface StreamedResponseProps {
     context_name: string;

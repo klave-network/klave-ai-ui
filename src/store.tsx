@@ -15,14 +15,14 @@ export type ChatHistory = {
     messages: ChatMessage[];
 };
 
-type KlaiveState = {
+type KlaveAIState = {
     [userKeyname: string]: {
         chats: ChatHistory[];
         models: Model[];
     };
 };
 
-const initialState: KlaiveState = {};
+const initialState: KlaveAIState = {};
 
 export const store = new Store(initialState);
 
