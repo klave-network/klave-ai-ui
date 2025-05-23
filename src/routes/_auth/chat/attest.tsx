@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getBackendVersion, getQuote, verifyQuote } from '@/api/klave';
 import { Label } from '@/components/ui/label';
 import { Utils } from '@secretarium/connector';
-import { klaveSanctumContract } from '@/api';
+import { klaveKlaiveContract } from '@/api';
 import { SquareArrowOutUpRight } from 'lucide-react';
 
 export const Route = createFileRoute('/_auth/chat/attest')({
@@ -106,7 +106,7 @@ function RouteComponent() {
             <div className="space-y-2">
                 <Label>Quote Information</Label>
                 <a
-                    download={`intel_quote_${klaveSanctumContract}_${currentTime}.bin`}
+                    download={`intel_quote_${klaveKlaiveContract}_${currentTime}.bin`}
                     href={URL.createObjectURL(downloadableQuote)}
                     className="text-blue-400 hover:underline flex align-middle items-center"
                 >

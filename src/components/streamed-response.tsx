@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { inferenceGetResponse } from '@/api/sanctum';
+import { inferenceGetResponse } from '@/api/klaive';
 
 interface StreamedResponseProps {
     context_name: string;
