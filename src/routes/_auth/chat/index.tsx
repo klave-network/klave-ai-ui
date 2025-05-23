@@ -79,6 +79,7 @@ function RouteComponent() {
                 setUserPrompt={setUserPrompt}
                 error={error}
                 onSend={handleCreateContext}
+                isDisabled={false}
             />
         </div>
     );

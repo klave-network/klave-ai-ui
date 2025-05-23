@@ -166,6 +166,7 @@ function RouteComponent() {
                 setUserPrompt={setUserPrompt}
                 error={error}
                 onSend={handleSend}
+                isDisabled={streamingMessageId !== ''}
             />
         </div>
     );

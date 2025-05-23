@@ -19,13 +19,15 @@ interface ChatInputProps {
     setUserPrompt: React.Dispatch<React.SetStateAction<string>>;
     error: string | null;
     onSend: () => void;
+    isDisabled?: boolean;
 }
 
 export const ChatInput = ({
     userPrompt,
     setUserPrompt,
     error,
-    onSend
+    onSend,
+    isDisabled
 }: ChatInputProps) => {
     return (
         <div className="max-w-3xl w-full mt-auto">
@@ -42,8 +44,15 @@ export const ChatInput = ({
                     placeholder="Ask anything..."
                     className="flex-1 focus:outline-none resize-none field-sizing-content max-h-80"
                     rows={2}
+                    disabled={isDisabled}
                     value={userPrompt}
                     onChange={(e) => setUserPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            onSend();
+                        }
+                    }}
                     aria-label="User prompt input"
                 />
                 <div className="flex justify-between">
@@ -87,6 +96,7 @@ export const ChatInput = ({
                                     size="icon"
                                     className="hover:cursor-pointer"
                                     onClick={onSend}
+                                    disabled={isDisabled}
                                 >
                                     <ArrowUp className="h-4 w-4" />
                                 </Button>
