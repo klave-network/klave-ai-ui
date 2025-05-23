@@ -5,23 +5,51 @@ import { inferenceAddPrompt } from '@/api/sanctum';
 import { StreamedResponse } from '@/components/streamed-response';
 import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';
+import { CUR_USER_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
-    component: RouteComponent
+    component: RouteComponent,
+    loader: ({ params }) => {
+        // On mount: if AI message missing, add placeholder and start streaming
+        const { id: chatId } = params;
+        const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+        const chat = store.state[currentUser].chats.find(
+            (chat) => chat.id === chatId
+        );
+
+        if (!chat) return { firstResponseId: '' };
+
+        const aiMessageExists = chat.messages.some((m) => m.role === 'ai');
+        if (!aiMessageExists) {
+            const aiMessageId = generateSimpleId();
+            storeActions.addMessage(currentUser ?? '', chatId, {
+                id: aiMessageId,
+                role: 'ai',
+                content: '',
+                timestamp: Date.now()
+            });
+
+            return {
+                firstResponseId: aiMessageId
+            };
+        }
+
+        return { firstResponseId: '' };
+    }
 });
 
 function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const { id: chatId } = Route.useParams();
-    const currentUser = localStorage.getItem('currentUser') ?? '';
+    const { firstResponseId } = Route.useLoaderData();
+    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const chat = useUserChat(currentUser ?? '', chatId);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Track AI message currently streaming
-    const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-        null
-    );
+    const [streamingMessageId, setStreamingMessageId] =
+        useState<string>(firstResponseId);
 
     const handleSend = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -30,11 +58,10 @@ function RouteComponent() {
         }
 
         setError(null);
+        const promptToSend = userPrompt;
+        setUserPrompt('');
 
         try {
-            const promptToSend = userPrompt; // Capture prompt before clearing
-            setUserPrompt('');
-
             await inferenceAddPrompt({
                 context_name: `stories_context_${chatId}`,
                 user_prompt: promptToSend
@@ -64,39 +91,32 @@ function RouteComponent() {
         }
     }, [userPrompt, chatId, currentUser]);
 
-    // On mount: if AI message missing, add placeholder and start streaming
-    useEffect(() => {
-        if (!chat) return;
-
-        const aiMessageExists = chat.messages.some((m) => m.role === 'ai');
-        if (!aiMessageExists) {
-            const aiMessageId = generateSimpleId();
-            storeActions.addMessage(currentUser ?? '', chatId, {
-                id: aiMessageId,
-                role: 'ai',
-                content: '',
-                timestamp: Date.now()
-            });
-            setStreamingMessageId(aiMessageId);
-        }
-    }, []);
-
     const handleStreamComplete = (messageId: string, fullResponse: string) => {
         if (!chat || !currentUser) return;
 
-        const updatedMessages = chat.messages.map((msg) =>
-            msg.id === messageId ? { ...msg, content: fullResponse } : msg
-        );
+        store.setState((prev) => {
+            const userChats = prev[currentUser]?.chats || [];
+            const updatedChats = userChats.map((c) => {
+                if (c.id !== chatId) return c;
+                const updatedMessages = c.messages.map((msg) =>
+                    msg.id === messageId
+                        ? { ...msg, content: fullResponse }
+                        : msg
+                );
+                return { ...c, messages: updatedMessages };
+            });
 
-        store.setState((prev) => ({
-            ...prev,
-            [currentUser]: prev[currentUser].map((c) =>
-                c.id === chatId ? { ...c, messages: updatedMessages } : c
-            )
-        }));
+            return {
+                ...prev,
+                [currentUser]: {
+                    ...prev[currentUser],
+                    chats: updatedChats
+                }
+            };
+        });
 
         if (streamingMessageId === messageId) {
-            setStreamingMessageId(null);
+            setStreamingMessageId('');
         }
     };
 
