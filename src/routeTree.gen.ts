@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root';
+import { Route as PingImport } from './routes/ping';
 import { Route as AuthImport } from './routes/_auth';
 import { Route as LoginRouteImport } from './routes/login/route';
 import { Route as LoginIndexImport } from './routes/login/index';
@@ -31,6 +32,12 @@ import { Route as AuthChatAttestImport } from './routes/_auth/chat/attest';
 import { Route as AuthChatIdImport } from './routes/_auth/chat/$id';
 
 // Create/Update Routes
+
+const PingRoute = PingImport.update({
+    id: '/ping',
+    path: '/ping',
+    getParentRoute: () => rootRoute
+} as any);
 
 const AuthRoute = AuthImport.update({
     id: '/_auth',
@@ -155,6 +162,13 @@ declare module '@tanstack/react-router' {
             path: '';
             fullPath: '';
             preLoaderRoute: typeof AuthImport;
+            parentRoute: typeof rootRoute;
+        };
+        '/ping': {
+            id: '/ping';
+            path: '/ping';
+            fullPath: '/ping';
+            preLoaderRoute: typeof PingImport;
             parentRoute: typeof rootRoute;
         };
         '/_auth/chat': {
@@ -347,6 +361,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren);
 export interface FileRoutesByFullPath {
     '/login': typeof LoginRouteRouteWithChildren;
     '': typeof AuthRouteWithChildren;
+    '/ping': typeof PingRoute;
     '/chat': typeof AuthChatRouteRouteWithChildren;
     '/models': typeof AuthModelsRouteRouteWithChildren;
     '/community': typeof AuthCommunityRoute;
@@ -366,6 +381,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+    '/ping': typeof PingRoute;
     '/community': typeof AuthCommunityRoute;
     '/profile': typeof AuthProfileRoute;
     '/projects': typeof AuthProjectsRoute;
@@ -386,6 +402,7 @@ export interface FileRoutesById {
     __root__: typeof rootRoute;
     '/login': typeof LoginRouteRouteWithChildren;
     '/_auth': typeof AuthRouteWithChildren;
+    '/ping': typeof PingRoute;
     '/_auth/chat': typeof AuthChatRouteRouteWithChildren;
     '/_auth/models': typeof AuthModelsRouteRouteWithChildren;
     '/_auth/community': typeof AuthCommunityRoute;
@@ -409,6 +426,7 @@ export interface FileRouteTypes {
     fullPaths:
         | '/login'
         | ''
+        | '/ping'
         | '/chat'
         | '/models'
         | '/community'
@@ -427,6 +445,7 @@ export interface FileRouteTypes {
         | '/models/';
     fileRoutesByTo: FileRoutesByTo;
     to:
+        | '/ping'
         | '/community'
         | '/profile'
         | '/projects'
@@ -445,6 +464,7 @@ export interface FileRouteTypes {
         | '__root__'
         | '/login'
         | '/_auth'
+        | '/ping'
         | '/_auth/chat'
         | '/_auth/models'
         | '/_auth/community'
@@ -467,11 +487,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
     LoginRouteRoute: typeof LoginRouteRouteWithChildren;
     AuthRoute: typeof AuthRouteWithChildren;
+    PingRoute: typeof PingRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
     LoginRouteRoute: LoginRouteRouteWithChildren,
-    AuthRoute: AuthRouteWithChildren
+    AuthRoute: AuthRouteWithChildren,
+    PingRoute: PingRoute
 };
 
 export const routeTree = rootRoute
@@ -485,7 +507,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/login",
-        "/_auth"
+        "/_auth",
+        "/ping"
       ]
     },
     "/login": {
@@ -507,6 +530,9 @@ export const routeTree = rootRoute
         "/_auth/templates",
         "/_auth/"
       ]
+    },
+    "/ping": {
+      "filePath": "ping.tsx"
     },
     "/_auth/chat": {
       "filePath": "_auth/chat/route.tsx",
