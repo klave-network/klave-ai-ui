@@ -66,3 +66,40 @@ export type ChunkResult = {
     piece: number[];
     complete: boolean;
 };
+
+export type BackendVersion = {
+    core_version: {
+        major: number;
+        minor: number;
+        patch: number;
+        build_number: number;
+    };
+    wasm_version: {
+        major: number;
+        minor: number;
+        patch: number;
+        build_number: number;
+    };
+};
+
+export type QuoteResponse = {
+    quote: {
+        report_body: {
+            mr_enclave: { m: Array<number> };
+            mr_signer: { m: Array<number> };
+            report_data: Array<number>;
+        };
+    };
+    quote_binary: Array<number>;
+};
+
+export type VerifyResponse = {
+    quote_verification_result: number;
+    quote_verification_result_description: string;
+    sa_list: string;
+};
+
+export type VerifyArgs = {
+    quote: number[];
+    current_time: number;
+};

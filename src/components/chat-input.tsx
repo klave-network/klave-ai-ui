@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, Mic, Video, Paperclip } from 'lucide-react';
+import { ArrowUp, Mic, Video, Paperclip, Lock } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
@@ -89,23 +89,35 @@ export const ChatInput = ({
                             </Link>
                         </Button>
                     </div>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    size="icon"
-                                    className="hover:cursor-pointer"
-                                    onClick={onSend}
-                                    disabled={isDisabled}
-                                >
-                                    <ArrowUp className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Send message</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            className="hover:cursor-pointer hover:bg-green-200 bg-green-300 border border-green-500"
+                            asChild
+                        >
+                            <Link to="/chat/attest">
+                                <Lock className="h-4 w-4" />
+                                Secured
+                            </Link>
+                        </Button>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        size="icon"
+                                        className="hover:cursor-pointer"
+                                        onClick={onSend}
+                                        disabled={isDisabled}
+                                    >
+                                        <ArrowUp className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Send message</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
                 </div>
             </div>
         </div>
