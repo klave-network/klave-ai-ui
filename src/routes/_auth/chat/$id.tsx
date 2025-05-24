@@ -140,7 +140,7 @@ function RouteComponent() {
                             className={`w-fit mb-2 px-4 py-2 rounded-xl ${
                                 role === 'user'
                                     ? 'bg-gray-100 ml-auto'
-                                    : 'bg-blue-100 mr-auto text-blue-900'
+                                    : 'mr-auto'
                             }`}
                         >
                             {isStreaming ? (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { inferenceGetResponse } from '@/api/klave-ai';
+import { LoadingDots } from '@/components/loading-dots';
 
 interface StreamedResponseProps {
     context_name: string;
@@ -42,10 +43,16 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
         });
     }, [context_name, onComplete]);
 
+    // Count words in the current response
+    const wordCount = response.trim().split(/\s+/).filter(Boolean).length;
+
     return (
         <p className="whitespace-pre-wrap">
-            {loading && !response ? (
-                <span className="animate-pulse">Generating...</span>
+            {loading && wordCount < 5 ? (
+                <div className="flex gap-4">
+                    <LoadingDots />
+                    <span className="animate-pulse">Generating...</span>
+                </div>
             ) : (
                 response
             )}
