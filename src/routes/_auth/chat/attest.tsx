@@ -17,10 +17,6 @@ export const Route = createFileRoute('/_auth/chat/attest')({
             current_time: currentTime
         });
 
-        console.log('quote: ', quote);
-        console.log('version: ', version);
-        console.log('verified: ', verification);
-
         return {
             currentTime,
             challenge,
