@@ -6,10 +6,12 @@ import { StreamedResponse } from '@/components/streamed-response';
 import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY } from '@/lib/constants';
+import { Utils } from '@secretarium/connector';
+import { getQuote, verifyQuote } from '@/api/klave';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
     component: RouteComponent,
-    loader: ({ params }) => {
+    loader: async ({ params }) => {
         // On mount: if AI message missing, add placeholder and start streaming
         const { id: chatId } = params;
         const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
@@ -17,7 +19,23 @@ export const Route = createFileRoute('/_auth/chat/$id')({
             (chat) => chat.id === chatId
         );
 
-        if (!chat) return { firstResponseId: '' };
+        // attestation information
+        const challenge = Array.from(Utils.getRandomBytes(64));
+        const currentTime = new Date().getTime();
+        const quote = await getQuote({ challenge });
+        const verification = await verifyQuote({
+            quote: quote.quote_binary,
+            current_time: currentTime
+        });
+
+        if (!chat)
+            return {
+                firstResponseId: '',
+                challenge,
+                currentTime,
+                quote,
+                verification
+            };
 
         const aiMessageExists = chat.messages.some((m) => m.role === 'ai');
         if (!aiMessageExists) {
@@ -30,19 +48,37 @@ export const Route = createFileRoute('/_auth/chat/$id')({
             });
 
             return {
-                firstResponseId: aiMessageId
+                firstResponseId: aiMessageId,
+                challenge,
+                currentTime,
+                quote,
+                verification
             };
         }
 
-        return { firstResponseId: '' };
-    }
+        return {
+            firstResponseId: '',
+            challenge,
+            currentTime,
+            quote,
+            verification
+        };
+    },
+    pendingComponent: () => (
+        <div className="min-h-screen grid place-items-center">
+            <div className="flex items-center gap-2">
+                <span>Creating chat...</span>
+            </div>
+        </div>
+    )
 });
 
 function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const { id: chatId } = Route.useParams();
-    const { firstResponseId } = Route.useLoaderData();
+    const { firstResponseId, challenge, currentTime, quote, verification } =
+        Route.useLoaderData();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const chat = useUserChat(currentUser ?? '', chatId);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -167,6 +203,7 @@ function RouteComponent() {
                 error={error}
                 onSend={handleSend}
                 isDisabled={streamingMessageId !== ''}
+                secureButton={{ currentTime, challenge, quote, verification }}
             />
         </div>
     );

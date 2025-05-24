@@ -5,12 +5,39 @@ import { generateSimpleId } from '@/lib/utils';
 import { storeActions, useUserModels } from '@/store';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY, CUR_MODEL_KEY, CUR_MODE_KEY } from '@/lib/constants';
+import { getQuote, verifyQuote } from '@/api/klave';
+import { Utils } from '@secretarium/connector';
 
 export const Route = createFileRoute('/_auth/chat/')({
-    component: RouteComponent
+    component: RouteComponent,
+    loader: async () => {
+        const challenge = Array.from(Utils.getRandomBytes(64));
+        const currentTime = new Date().getTime();
+        const quote = await getQuote({ challenge });
+        const verification = await verifyQuote({
+            quote: quote.quote_binary,
+            current_time: currentTime
+        });
+
+        return {
+            currentTime,
+            challenge,
+            quote,
+            verification
+        };
+    },
+    pendingComponent: () => (
+        <div className="min-h-screen grid place-items-center">
+            <div className="flex items-center gap-2">
+                <span>Checking...</span>
+            </div>
+        </div>
+    )
 });
 
 function RouteComponent() {
+    const { currentTime, challenge, quote, verification } =
+        Route.useLoaderData();
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -80,6 +107,7 @@ function RouteComponent() {
                 error={error}
                 onSend={handleCreateContext}
                 isDisabled={false}
+                secureButton={{ currentTime, challenge, quote, verification }}
             />
         </div>
     );

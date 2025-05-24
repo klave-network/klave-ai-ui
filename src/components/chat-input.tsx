@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, Mic, Video, Paperclip, Lock } from 'lucide-react';
+import { ArrowUp, Mic, Video, Paperclip } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
@@ -13,21 +13,30 @@ import {
     PopoverTrigger
 } from '@/components/ui/popover';
 import { Link } from '@tanstack/react-router';
+import { SecureButton } from '@/components/secure-button';
+import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
-interface ChatInputProps {
+type ChatInputProps = {
     userPrompt: string;
     setUserPrompt: React.Dispatch<React.SetStateAction<string>>;
     error: string | null;
     onSend: () => void;
     isDisabled?: boolean;
-}
+    secureButton: {
+        currentTime: number;
+        challenge: number[];
+        quote: QuoteResponse;
+        verification: VerifyResponse;
+    };
+};
 
 export const ChatInput = ({
     userPrompt,
     setUserPrompt,
     error,
     onSend,
-    isDisabled
+    isDisabled,
+    secureButton
 }: ChatInputProps) => {
     return (
         <div className="max-w-3xl w-full mt-auto">
@@ -90,16 +99,12 @@ export const ChatInput = ({
                         </Button>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            className="hover:cursor-pointer hover:bg-green-200 bg-green-300 border border-green-500"
-                            asChild
-                        >
-                            <Link to="/chat/attest">
-                                <Lock className="h-4 w-4" />
-                                Secured
-                            </Link>
-                        </Button>
+                        <SecureButton
+                            currentTime={secureButton.currentTime}
+                            challenge={secureButton.challenge}
+                            quote={secureButton.quote}
+                            verification={secureButton.verification}
+                        />
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
