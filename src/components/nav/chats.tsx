@@ -47,6 +47,7 @@ export function NavChats({
                         <SidebarMenuItem key={item.id}>
                             <SidebarMenuButton asChild>
                                 <Link
+                                    search
                                     to={`/chat/$id`}
                                     params={{ id: item.id }}
                                     activeProps={{
@@ -106,6 +107,7 @@ export function NavChats({
                             <SidebarMenuItem key={item.id}>
                                 <SidebarMenuButton asChild>
                                     <Link
+                                        search
                                         to={`/chat/$id`}
                                         params={{ id: item.id }}
                                         activeProps={{

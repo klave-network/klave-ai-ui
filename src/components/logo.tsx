@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 export const Logo = ({ className }: { className?: string }) => {
     return (
         <Link
+            search
             to="/"
             className={cn(
                 'flex items-center gap-2 self-center font-medium',

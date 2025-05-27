@@ -1,7 +1,15 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { Logo } from '@/components/logo';
+import { zodValidator } from '@tanstack/zod-adapter';
+import { z } from 'zod';
+
+const searchSchema = z.object({
+    g: z.string().optional(),
+    d: z.string().optional()
+});
 
 export const Route = createFileRoute('/login')({
+    validateSearch: zodValidator(searchSchema),
     component: RouteComponent
 });
 

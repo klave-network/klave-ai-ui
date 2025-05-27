@@ -29,6 +29,7 @@ export function NavSettings({
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton asChild>
                                 <Link
+                                    search
                                     to={item.url}
                                     activeProps={{
                                         className: 'bg-sidebar-accent'

@@ -66,7 +66,7 @@ function RouteComponent() {
             await promise; // Wait for the connection to complete
             localStorage.setItem(CUR_USER_KEY, key.name);
             router.invalidate();
-            navigate({ to: '/' });
+            navigate({ to: '/', search: true });
         }
     };
 
@@ -98,6 +98,7 @@ function RouteComponent() {
                                             asChild
                                         >
                                             <Link
+                                                search
                                                 to="/login/$keyname"
                                                 params={{
                                                     keyname: encodeURIComponent(

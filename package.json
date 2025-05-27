@@ -41,6 +41,7 @@
         "@tanstack/react-router-devtools": "^1.114.3",
         "@tanstack/react-store": "^0.7.0",
         "@tanstack/router-plugin": "^1.114.3",
+        "@tanstack/zod-adapter": "^1.120.11",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "lucide-react": "^0.510.0",

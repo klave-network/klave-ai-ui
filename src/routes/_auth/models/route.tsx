@@ -32,6 +32,7 @@ function RouteComponent() {
                         <SidebarGroupContent className="flex flex-col">
                             {models.map((model, id) => (
                                 <Link
+                                    search
                                     to="/models/$name"
                                     params={{ name: model.name }}
                                     key={id}

@@ -81,7 +81,7 @@ function RouteComponent() {
                 content: userPrompt,
                 role: 'user'
             });
-            navigate({ to: `/chat/${contextId}` });
+            navigate({ to: `/chat/${contextId}`, search: true });
         } catch (error) {
             console.error('Error: ', error);
             setError('Failed to create context');

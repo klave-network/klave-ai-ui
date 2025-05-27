@@ -66,7 +66,7 @@ function RouteComponent() {
             toast.success(`Connected with ${key.name}.`, { id: toastId });
             localStorage.setItem(CUR_USER_KEY, key.name);
             router.invalidate();
-            navigate({ to: '/' });
+            navigate({ to: '/', search: true });
         } catch (e) {
             console.error(e);
             toast.error(`Failed to connect with ${key.name}.`);
@@ -117,7 +117,9 @@ function RouteComponent() {
                                 variant="secondary"
                                 asChild
                             >
-                                <Link to="/login">Go back</Link>
+                                <Link to="/login" search>
+                                    Go back
+                                </Link>
                             </Button>
                         </div>
                     </form>

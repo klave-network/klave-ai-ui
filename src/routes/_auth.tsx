@@ -3,9 +3,17 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { LOC_KEY } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
+import { zodValidator } from '@tanstack/zod-adapter';
+import { z } from 'zod';
+
+const searchSchema = z.object({
+    g: z.string().optional(),
+    d: z.string().optional()
+});
 
 export const Route = createFileRoute('/_auth')({
     component: RouteComponent,
+    validateSearch: zodValidator(searchSchema),
     beforeLoad: async () => {
         // if there are no user keys in localStorage, redirect to login page
         const userKeys = localStorage.getItem(LOC_KEY);

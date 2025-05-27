@@ -92,7 +92,7 @@ export const ChatInput = ({
                             className="hover:cursor-pointer"
                             asChild
                         >
-                            <Link to="/chat/video">
+                            <Link to="/chat/video" search>
                                 <Video className="h-4 w-4" />
                                 Use camera
                             </Link>
