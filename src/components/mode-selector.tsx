@@ -17,7 +17,7 @@ export const ModeSelector = () => {
             defaultValue={currentModel}
             onValueChange={(value) => localStorage.setItem(CUR_MODE_KEY, value)}
         >
-            <SelectTrigger className="w-[180px] rounded-full">
+            <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Mode" />
             </SelectTrigger>
             <SelectContent>

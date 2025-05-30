@@ -22,7 +22,7 @@ export const ModelSelector = () => {
                 localStorage.setItem(CUR_MODEL_KEY, value)
             }
         >
-            <SelectTrigger className="w-[180px] rounded-full">
+            <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Language model" />
             </SelectTrigger>
             <SelectContent>
