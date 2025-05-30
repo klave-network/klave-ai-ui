@@ -1,18 +1,18 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, Mic, Video, Paperclip } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger
-} from '@/components/ui/popover';
-import { Link } from '@tanstack/react-router';
+// import {
+//     Popover,
+//     PopoverContent,
+//     PopoverTrigger
+// } from '@/components/ui/popover';
+// import { Link } from '@tanstack/react-router';
 import { SecureButton } from '@/components/secure-button';
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
@@ -64,8 +64,8 @@ export const ChatInput = ({
                     }}
                     aria-label="User prompt input"
                 />
-                <div className="flex justify-between">
-                    <div>
+                <div className="flex justify-end">
+                    {/* <div>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
@@ -97,7 +97,7 @@ export const ChatInput = ({
                                 Use camera
                             </Link>
                         </Button>
-                    </div>
+                    </div> */}
                     <div className="flex items-center gap-2">
                         <SecureButton
                             currentTime={secureButton.currentTime}
