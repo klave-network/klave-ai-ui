@@ -22,8 +22,48 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from '@/components/ui/form';
+import { useUserChatSettings } from '@/store';
+import { CUR_USER_KEY } from '@/lib/constants';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+const formSchema = z.object({
+    system_prompt: z.string().min(1, 'System prompt is required'),
+    temperature: z.number().min(0).max(1),
+    topp: z.number().min(0).max(1),
+    steps: z.number().min(256).max(1024),
+    sliding_window: z.boolean(),
+    useRag: z.boolean()
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export const SettingsModal = () => {
+    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
+        useUserChatSettings(currentUser);
+
+    const form = useForm<FormValues>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            system_prompt: systemPrompt,
+            temperature: temperature,
+            topp: topp,
+            steps: steps,
+            sliding_window: slidingWindow,
+            useRag: useRag
+        }
+    });
+
     return (
         <Dialog>
             <DialogTrigger asChild className="ml-auto">
@@ -42,74 +82,141 @@ export const SettingsModal = () => {
                         Configure your settings here.
                     </DialogDescription>
                 </DialogHeader>
-                <form>
-                    <div className="grid gap-6">
-                        <div className="grid gap-3">
-                            <Label htmlFor="system-prompt">System prompt</Label>
-                            <Input
-                                id="system-prompt"
-                                placeholder="Enter your system prompt"
-                            />
-                        </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="temperature">Temperature</Label>
-                            <Slider
-                                id="temperature"
-                                min={0}
-                                max={2}
-                                step={0.01}
-                                defaultValue={[0.8]}
-                            />
-                        </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="topp">Top-p</Label>
-                            <Slider
-                                id="topp"
-                                min={0}
-                                max={1}
-                                step={0.1}
-                                defaultValue={[0.9]}
-                            />
-                        </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="steps">Steps</Label>
-                            <Select defaultValue="256">
-                                <SelectTrigger>
-                                    <SelectValue
-                                        id="steps"
-                                        placeholder="Steps"
-                                    />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="256">256</SelectItem>
-                                        <SelectItem value="512">512</SelectItem>
-                                        <SelectItem value="1024">
-                                            1024
-                                        </SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="sliding-window">
-                                Sliding window
-                            </Label>
-                            <Switch id="sliding-window" />
-                        </div>
-                        <div className="grid gap-3">
-                            <Label>Add new RAG document</Label>
-                            Upload RAG document
-                        </div>
-                        <div className="grid gap-3">
-                            <Label htmlFor="use-rag-document">
-                                Use RAG document
-                            </Label>
-                            <Switch id="use-rag-document" />
-                        </div>
-                    </div>
-                </form>
+                <Form {...form}>
+                    <form className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="system_prompt"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>System prompt</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Enter your system prompt"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="temperature"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Temperature</FormLabel>
+                                    <FormControl>
+                                        <Slider
+                                            id="temperature"
+                                            min={0}
+                                            max={2}
+                                            step={0.01}
+                                            defaultValue={[field.value]}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="topp"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Top-p</FormLabel>
+                                    <FormControl>
+                                        <Slider
+                                            id="topp"
+                                            min={0}
+                                            max={1}
+                                            step={0.1}
+                                            defaultValue={[field.value]}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="steps"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Steps</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            defaultValue={field.value.toString()}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue
+                                                    id="steps"
+                                                    placeholder="Steps"
+                                                />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="256">
+                                                        256
+                                                    </SelectItem>
+                                                    <SelectItem value="512">
+                                                        512
+                                                    </SelectItem>
+                                                    <SelectItem value="1024">
+                                                        1024
+                                                    </SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="sliding_window"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Sliding Window</FormLabel>
+                                    <FormControl>
+                                        <Switch
+                                            id="sliding-window"
+                                            checked={field.value}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="useRag"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Use RAG document</FormLabel>
+                                    <FormControl>
+                                        <Switch
+                                            id="use-rag-document"
+                                            checked={field.value}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </form>
+                </Form>
                 <DialogFooter>
+                    <div className="grid gap-3">
+                        <Label>Add new RAG document</Label>
+                        Upload RAG document
+                    </div>
                     <DialogClose asChild>
                         <Button variant="outline">Close</Button>
                     </DialogClose>

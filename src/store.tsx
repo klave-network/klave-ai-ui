@@ -19,6 +19,14 @@ type KlaveAIState = {
     [userKeyname: string]: {
         chats: ChatHistory[];
         models: Model[];
+        chatSettings: {
+            systemPrompt: string;
+            temperature: number;
+            topp: number;
+            steps: number;
+            slidingWindow: boolean;
+            useRag: boolean;
+        };
     };
 };
 
@@ -55,6 +63,9 @@ export const useUserModel = (keyname: string, modelName: string) =>
     useStore(store, (state) =>
         state[keyname].models.find((model) => model.name === modelName)
     );
+
+export const useUserChatSettings = (keyname: string) =>
+    useStore(store, (state) => state[keyname].chatSettings);
 
 // Actions
 export const storeActions = {
@@ -119,6 +130,8 @@ export const storeActions = {
         }));
     },
 
+    // add models fetched from the backend
+    // and set initial chat settings
     addModels: (userKeyname: string, models: Model[]) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
 
@@ -126,6 +139,14 @@ export const storeActions = {
             ...state,
             [userKeyname]: {
                 ...userData,
+                chatSettings: {
+                    systemPrompt: 'You are a helpful assistant.',
+                    temperature: 0.8,
+                    topp: 0.9,
+                    steps: 256,
+                    slidingWindow: false,
+                    useRag: false
+                },
                 models
             }
         }));
