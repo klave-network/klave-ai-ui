@@ -20,11 +20,11 @@ function RouteComponent() {
         <div className="flex h-full">
             <Sidebar
                 collapsible="none"
-                className="hidden flex-1 md:flex max-w-[300px] border-r shrink-0"
+                className="hidden flex-1 md:flex min-w-[300px] border-r shrink-0"
             >
                 <SidebarHeader className="gap-3.5 border-b p-4">
                     <div className="flex w-full items-center">
-                        <h3 className="text-xl">Models</h3>
+                        <h3 className="text-xl font-medium">Models</h3>
                     </div>
                 </SidebarHeader>
                 <SidebarContent>

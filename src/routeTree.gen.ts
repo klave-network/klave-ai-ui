@@ -23,10 +23,14 @@ import { Route as AuthProjectsImport } from './routes/_auth/projects';
 import { Route as AuthProfileImport } from './routes/_auth/profile';
 import { Route as AuthCommunityImport } from './routes/_auth/community';
 import { Route as AuthModelsRouteImport } from './routes/_auth/models/route';
+import { Route as AuthDataRouteImport } from './routes/_auth/data/route';
 import { Route as AuthChatRouteImport } from './routes/_auth/chat/route';
 import { Route as AuthModelsIndexImport } from './routes/_auth/models/index';
+import { Route as AuthDataIndexImport } from './routes/_auth/data/index';
 import { Route as AuthChatIndexImport } from './routes/_auth/chat/index';
 import { Route as AuthModelsNameImport } from './routes/_auth/models/$name';
+import { Route as AuthDataNewImport } from './routes/_auth/data/new';
+import { Route as AuthDataNameImport } from './routes/_auth/data/$name';
 import { Route as AuthChatVideoImport } from './routes/_auth/chat/video';
 import { Route as AuthChatAttestImport } from './routes/_auth/chat/attest';
 import { Route as AuthChatIdImport } from './routes/_auth/chat/$id';
@@ -104,6 +108,12 @@ const AuthModelsRouteRoute = AuthModelsRouteImport.update({
     getParentRoute: () => AuthRoute
 } as any);
 
+const AuthDataRouteRoute = AuthDataRouteImport.update({
+    id: '/data',
+    path: '/data',
+    getParentRoute: () => AuthRoute
+} as any);
+
 const AuthChatRouteRoute = AuthChatRouteImport.update({
     id: '/chat',
     path: '/chat',
@@ -116,6 +126,12 @@ const AuthModelsIndexRoute = AuthModelsIndexImport.update({
     getParentRoute: () => AuthModelsRouteRoute
 } as any);
 
+const AuthDataIndexRoute = AuthDataIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthDataRouteRoute
+} as any);
+
 const AuthChatIndexRoute = AuthChatIndexImport.update({
     id: '/',
     path: '/',
@@ -126,6 +142,18 @@ const AuthModelsNameRoute = AuthModelsNameImport.update({
     id: '/$name',
     path: '/$name',
     getParentRoute: () => AuthModelsRouteRoute
+} as any);
+
+const AuthDataNewRoute = AuthDataNewImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthDataRouteRoute
+} as any);
+
+const AuthDataNameRoute = AuthDataNameImport.update({
+    id: '/$name',
+    path: '/$name',
+    getParentRoute: () => AuthDataRouteRoute
 } as any);
 
 const AuthChatVideoRoute = AuthChatVideoImport.update({
@@ -176,6 +204,13 @@ declare module '@tanstack/react-router' {
             path: '/chat';
             fullPath: '/chat';
             preLoaderRoute: typeof AuthChatRouteImport;
+            parentRoute: typeof AuthImport;
+        };
+        '/_auth/data': {
+            id: '/_auth/data';
+            path: '/data';
+            fullPath: '/data';
+            preLoaderRoute: typeof AuthDataRouteImport;
             parentRoute: typeof AuthImport;
         };
         '/_auth/models': {
@@ -262,6 +297,20 @@ declare module '@tanstack/react-router' {
             preLoaderRoute: typeof AuthChatVideoImport;
             parentRoute: typeof AuthChatRouteImport;
         };
+        '/_auth/data/$name': {
+            id: '/_auth/data/$name';
+            path: '/$name';
+            fullPath: '/data/$name';
+            preLoaderRoute: typeof AuthDataNameImport;
+            parentRoute: typeof AuthDataRouteImport;
+        };
+        '/_auth/data/new': {
+            id: '/_auth/data/new';
+            path: '/new';
+            fullPath: '/data/new';
+            preLoaderRoute: typeof AuthDataNewImport;
+            parentRoute: typeof AuthDataRouteImport;
+        };
         '/_auth/models/$name': {
             id: '/_auth/models/$name';
             path: '/$name';
@@ -275,6 +324,13 @@ declare module '@tanstack/react-router' {
             fullPath: '/chat/';
             preLoaderRoute: typeof AuthChatIndexImport;
             parentRoute: typeof AuthChatRouteImport;
+        };
+        '/_auth/data/': {
+            id: '/_auth/data/';
+            path: '/';
+            fullPath: '/data/';
+            preLoaderRoute: typeof AuthDataIndexImport;
+            parentRoute: typeof AuthDataRouteImport;
         };
         '/_auth/models/': {
             id: '/_auth/models/';
@@ -320,6 +376,22 @@ const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
     AuthChatRouteRouteChildren
 );
 
+interface AuthDataRouteRouteChildren {
+    AuthDataNameRoute: typeof AuthDataNameRoute;
+    AuthDataNewRoute: typeof AuthDataNewRoute;
+    AuthDataIndexRoute: typeof AuthDataIndexRoute;
+}
+
+const AuthDataRouteRouteChildren: AuthDataRouteRouteChildren = {
+    AuthDataNameRoute: AuthDataNameRoute,
+    AuthDataNewRoute: AuthDataNewRoute,
+    AuthDataIndexRoute: AuthDataIndexRoute
+};
+
+const AuthDataRouteRouteWithChildren = AuthDataRouteRoute._addFileChildren(
+    AuthDataRouteRouteChildren
+);
+
 interface AuthModelsRouteRouteChildren {
     AuthModelsNameRoute: typeof AuthModelsNameRoute;
     AuthModelsIndexRoute: typeof AuthModelsIndexRoute;
@@ -336,6 +408,7 @@ const AuthModelsRouteRouteWithChildren = AuthModelsRouteRoute._addFileChildren(
 
 interface AuthRouteChildren {
     AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren;
+    AuthDataRouteRoute: typeof AuthDataRouteRouteWithChildren;
     AuthModelsRouteRoute: typeof AuthModelsRouteRouteWithChildren;
     AuthCommunityRoute: typeof AuthCommunityRoute;
     AuthProfileRoute: typeof AuthProfileRoute;
@@ -347,6 +420,7 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
     AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
+    AuthDataRouteRoute: AuthDataRouteRouteWithChildren,
     AuthModelsRouteRoute: AuthModelsRouteRouteWithChildren,
     AuthCommunityRoute: AuthCommunityRoute,
     AuthProfileRoute: AuthProfileRoute,
@@ -363,6 +437,7 @@ export interface FileRoutesByFullPath {
     '': typeof AuthRouteWithChildren;
     '/ping': typeof PingRoute;
     '/chat': typeof AuthChatRouteRouteWithChildren;
+    '/data': typeof AuthDataRouteRouteWithChildren;
     '/models': typeof AuthModelsRouteRouteWithChildren;
     '/community': typeof AuthCommunityRoute;
     '/profile': typeof AuthProfileRoute;
@@ -375,8 +450,11 @@ export interface FileRoutesByFullPath {
     '/chat/$id': typeof AuthChatIdRoute;
     '/chat/attest': typeof AuthChatAttestRoute;
     '/chat/video': typeof AuthChatVideoRoute;
+    '/data/$name': typeof AuthDataNameRoute;
+    '/data/new': typeof AuthDataNewRoute;
     '/models/$name': typeof AuthModelsNameRoute;
     '/chat/': typeof AuthChatIndexRoute;
+    '/data/': typeof AuthDataIndexRoute;
     '/models/': typeof AuthModelsIndexRoute;
 }
 
@@ -393,8 +471,11 @@ export interface FileRoutesByTo {
     '/chat/$id': typeof AuthChatIdRoute;
     '/chat/attest': typeof AuthChatAttestRoute;
     '/chat/video': typeof AuthChatVideoRoute;
+    '/data/$name': typeof AuthDataNameRoute;
+    '/data/new': typeof AuthDataNewRoute;
     '/models/$name': typeof AuthModelsNameRoute;
     '/chat': typeof AuthChatIndexRoute;
+    '/data': typeof AuthDataIndexRoute;
     '/models': typeof AuthModelsIndexRoute;
 }
 
@@ -404,6 +485,7 @@ export interface FileRoutesById {
     '/_auth': typeof AuthRouteWithChildren;
     '/ping': typeof PingRoute;
     '/_auth/chat': typeof AuthChatRouteRouteWithChildren;
+    '/_auth/data': typeof AuthDataRouteRouteWithChildren;
     '/_auth/models': typeof AuthModelsRouteRouteWithChildren;
     '/_auth/community': typeof AuthCommunityRoute;
     '/_auth/profile': typeof AuthProfileRoute;
@@ -416,8 +498,11 @@ export interface FileRoutesById {
     '/_auth/chat/$id': typeof AuthChatIdRoute;
     '/_auth/chat/attest': typeof AuthChatAttestRoute;
     '/_auth/chat/video': typeof AuthChatVideoRoute;
+    '/_auth/data/$name': typeof AuthDataNameRoute;
+    '/_auth/data/new': typeof AuthDataNewRoute;
     '/_auth/models/$name': typeof AuthModelsNameRoute;
     '/_auth/chat/': typeof AuthChatIndexRoute;
+    '/_auth/data/': typeof AuthDataIndexRoute;
     '/_auth/models/': typeof AuthModelsIndexRoute;
 }
 
@@ -428,6 +513,7 @@ export interface FileRouteTypes {
         | ''
         | '/ping'
         | '/chat'
+        | '/data'
         | '/models'
         | '/community'
         | '/profile'
@@ -440,8 +526,11 @@ export interface FileRouteTypes {
         | '/chat/$id'
         | '/chat/attest'
         | '/chat/video'
+        | '/data/$name'
+        | '/data/new'
         | '/models/$name'
         | '/chat/'
+        | '/data/'
         | '/models/';
     fileRoutesByTo: FileRoutesByTo;
     to:
@@ -457,8 +546,11 @@ export interface FileRouteTypes {
         | '/chat/$id'
         | '/chat/attest'
         | '/chat/video'
+        | '/data/$name'
+        | '/data/new'
         | '/models/$name'
         | '/chat'
+        | '/data'
         | '/models';
     id:
         | '__root__'
@@ -466,6 +558,7 @@ export interface FileRouteTypes {
         | '/_auth'
         | '/ping'
         | '/_auth/chat'
+        | '/_auth/data'
         | '/_auth/models'
         | '/_auth/community'
         | '/_auth/profile'
@@ -478,8 +571,11 @@ export interface FileRouteTypes {
         | '/_auth/chat/$id'
         | '/_auth/chat/attest'
         | '/_auth/chat/video'
+        | '/_auth/data/$name'
+        | '/_auth/data/new'
         | '/_auth/models/$name'
         | '/_auth/chat/'
+        | '/_auth/data/'
         | '/_auth/models/';
     fileRoutesById: FileRoutesById;
 }
@@ -522,6 +618,7 @@ export const routeTree = rootRoute
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/chat",
+        "/_auth/data",
         "/_auth/models",
         "/_auth/community",
         "/_auth/profile",
@@ -542,6 +639,15 @@ export const routeTree = rootRoute
         "/_auth/chat/attest",
         "/_auth/chat/video",
         "/_auth/chat/"
+      ]
+    },
+    "/_auth/data": {
+      "filePath": "_auth/data/route.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/data/$name",
+        "/_auth/data/new",
+        "/_auth/data/"
       ]
     },
     "/_auth/models": {
@@ -596,6 +702,14 @@ export const routeTree = rootRoute
       "filePath": "_auth/chat/video.tsx",
       "parent": "/_auth/chat"
     },
+    "/_auth/data/$name": {
+      "filePath": "_auth/data/$name.tsx",
+      "parent": "/_auth/data"
+    },
+    "/_auth/data/new": {
+      "filePath": "_auth/data/new.tsx",
+      "parent": "/_auth/data"
+    },
     "/_auth/models/$name": {
       "filePath": "_auth/models/$name.tsx",
       "parent": "/_auth/models"
@@ -603,6 +717,10 @@ export const routeTree = rootRoute
     "/_auth/chat/": {
       "filePath": "_auth/chat/index.tsx",
       "parent": "/_auth/chat"
+    },
+    "/_auth/data/": {
+      "filePath": "_auth/data/index.tsx",
+      "parent": "/_auth/data"
     },
     "/_auth/models/": {
       "filePath": "_auth/models/index.tsx",

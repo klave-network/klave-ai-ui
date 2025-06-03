@@ -28,7 +28,8 @@ function RouteComponent() {
     if (!model) return <div className="p-4">Model not found</div>;
 
     return (
-        <div className="p-4 space-y-2 w-1/3">
+        <div className="p-4 space-y-6 w-full">
+            <h3 className="text-xl font-medium">Model details</h3>
             <div className="space-y-2">
                 <Label>Model name</Label>
                 <div className="flex items-center gap-2">

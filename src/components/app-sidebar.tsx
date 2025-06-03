@@ -3,10 +3,11 @@ import {
     // FolderKanban,
     LifeBuoy,
     Settings,
-    MessageCirclePlus
+    MessageCirclePlus,
+    Database,
     // Users,
     // Boxes,
-    // FolderCode,
+    FolderCode
     // Video
 } from 'lucide-react';
 
@@ -34,7 +35,7 @@ const routes = {
             title: 'New chat',
             url: '/chat',
             icon: MessageCirclePlus
-        }
+        },
         // {
         //     title: 'Video chat',
         //     url: '/chat/video',
@@ -45,11 +46,16 @@ const routes = {
         //     url: '/projects',
         //     icon: FolderKanban
         // },
-        // {
-        //     title: 'Models',
-        //     url: '/models',
-        //     icon: FolderCode
-        // },
+        {
+            title: 'Models',
+            url: '/models',
+            icon: FolderCode
+        },
+        {
+            title: 'Data',
+            url: '/data',
+            icon: Database
+        }
         // {
         //     title: 'Templates',
         //     url: '/templates',
