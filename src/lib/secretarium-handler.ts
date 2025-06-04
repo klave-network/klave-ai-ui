@@ -80,7 +80,7 @@ const printClusterInfo = (): void => {
     console.table(printableConfig);
 };
 
-const processClusterConfig: Window['demoKlaveCluster'] = (config) => {
+const processClusterConfig: Window['appKlaveCluster'] = (config) => {
     if (typeof config === 'string')
         handlerStore.clusters = config
             .split(',')
@@ -270,15 +270,15 @@ if (
             'true') &&
     window
 ) {
-    window['demoKlaveCluster'] = processClusterConfig;
-    window['demoKlaveCommand'] = (dcApp, command, args, id): void => {
+    window['appKlaveCluster'] = processClusterConfig;
+    window['appKlaveCommand'] = (dcApp, command, args, id): void => {
         secretariumHandler
             .request(dcApp, command, args ?? {}, id ?? `${Math.random()}`)
             .then((query) => {
                 query.send();
             });
     };
-    window['demoKlaveHandlerStore'] = handlerStore;
+    window['appKlaveHandlerStore'] = handlerStore;
 }
 
 export default secretariumHandler;

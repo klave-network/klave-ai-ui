@@ -1,13 +1,13 @@
 interface Window {
-    demoKlaveCluster: (config: string | Record<string, unknown>) => void;
-    demoKlaveCommand: (
+    appKlaveCluster: (config: string | Record<string, unknown>) => void;
+    appKlaveCommand: (
         dcApp: string,
         command: string,
         args?: Record<string, unknown>,
         id?: string
     ) => void;
-    demoKlaveHandlerStore: SecretariumClusterConfig;
-    // demoKlaveStore: Store;
-    // demoKlaveGremlin: (enable: boolean) => AynAction;
-    demoKlaveSubscriptions: Record<string, unknown>;
+    appKlaveHandlerStore: SecretariumClusterConfig;
+    // appKlaveStore: Store;
+    // appKlaveGremlin: (enable: boolean) => AynAction;
+    appKlaveSubscriptions: Record<string, unknown>;
 }
