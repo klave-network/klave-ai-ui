@@ -43,6 +43,7 @@
         "@tanstack/react-router": "^1.114.3",
         "@tanstack/react-router-devtools": "^1.114.3",
         "@tanstack/react-store": "0.7.0",
+        "@tanstack/router-devtools": "^1.120.15",
         "@tanstack/router-plugin": "^1.114.3",
         "@tanstack/zod-adapter": "^1.120.11",
         "class-variance-authority": "^0.7.1",
