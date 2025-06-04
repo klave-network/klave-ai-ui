@@ -10,23 +10,26 @@ type ChatMessage = {
     timestamp?: number;
 };
 
+type ChatSettings = {
+    systemPrompt: string;
+    temperature: number;
+    topp: number;
+    steps: number;
+    slidingWindow: boolean;
+    useRag: boolean;
+};
+
 export type ChatHistory = {
     id: string;
     messages: ChatMessage[];
+    chatSettings: ChatSettings;
 };
 
 type KlaveAIState = {
     [userKeyname: string]: {
         chats: ChatHistory[];
         models: Model[];
-        chatSettings: {
-            systemPrompt: string;
-            temperature: number;
-            topp: number;
-            steps: number;
-            slidingWindow: boolean;
-            useRag: boolean;
-        };
+        chatSettings: ChatSettings;
     };
 };
 
@@ -69,11 +72,17 @@ export const useUserChatSettings = (keyname: string) =>
 
 // Actions
 export const storeActions = {
-    createChat: (userKeyname: string, chatId: string, message: ChatMessage) => {
+    createChat: (
+        userKeyname: string,
+        chatId: string,
+        message: ChatMessage,
+        settings: ChatSettings
+    ) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
         const newChat: ChatHistory = {
             id: chatId,
-            messages: [message]
+            messages: [message],
+            chatSettings: settings
         };
 
         store.setState((state) => ({
@@ -81,6 +90,25 @@ export const storeActions = {
             [userKeyname]: {
                 ...userData,
                 chats: [...(userData.chats ?? []), newChat]
+            }
+        }));
+    },
+
+    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            chatSettings: {}
+        };
+
+        store.setState((state) => ({
+            ...state,
+            [userKeyname]: {
+                ...userData,
+                chatSettings: {
+                    ...userData.chatSettings,
+                    ...settings
+                }
             }
         }));
     },
