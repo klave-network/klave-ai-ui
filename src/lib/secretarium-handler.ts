@@ -76,7 +76,7 @@ const printClusterInfo = (): void => {
         }
     );
 
-    console.info('Klave-AI App now using the following cluster configuration:');
+    console.info('Klave for AI App now using the following cluster configuration:');
     console.table(printableConfig);
 };
 
@@ -134,7 +134,7 @@ const secretariumHandler = {
                 if (config.DK_SERVICES)
                     handlerStore.fileService = config.DK_SERVICES;
                 processClusterConfig(clusterConfigBase);
-                console.info('Klave-AI App now using config.json overrides');
+                console.info('Klave for AI App now using config.json overrides');
             })
             .catch(() => {
                 processClusterConfig(clusterConfigBase);
@@ -214,7 +214,7 @@ const secretariumHandler = {
             const endpoint = cluster[1].gateways?.[nextGateway]?.endpoint;
             if (cluster && endpoint && handlerStore.currentKey) {
                 console.info(
-                    'Klave-AI App now using the following gateway:',
+                    'Klave for AI now using the following gateway:',
                     endpoint
                 );
                 handlerStore.currentConnection
@@ -240,7 +240,9 @@ const secretariumHandler = {
             handlerStore.currentConnection?.reset();
             handlerStore.currentConnection?.close();
 
-            handlerStore.currentConnection = new SCP();
+            handlerStore.currentConnection = new SCP({
+                logger: console
+            });
             if (!hold) handlerStore.currentKey = undefined;
             resolve();
         }),
@@ -267,7 +269,7 @@ const secretariumHandler = {
 if (
     (import.meta.env.NODE_ENV === 'development' ||
         import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_OVERWRITABLE ===
-            'true') &&
+        'true') &&
     window
 ) {
     window['demoKlaveCluster'] = processClusterConfig;

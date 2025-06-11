@@ -6,9 +6,10 @@ export const Route = createFileRoute('/_auth/models/')({
 
 function RouteComponent() {
     return (
-        <div className="flex flex-col items-center h-full p-4">
-            <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl ">Select a model</h2>
+        <div className="flex flex-col items-center h-full w-full">
+            <div className="flex flex-col gap-6 items-center justify-center h-full pb-32">
+                <h2 className="text-2xl md:text-3xl">Welcome to <b>Klave for AI</b></h2>
+                <p className="text-center max-w-xl text-gray-500">Select a model</p>
             </div>
         </div>
     );

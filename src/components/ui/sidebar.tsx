@@ -22,6 +22,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
+import { SidebarContext, useSidebar, type SidebarContextProps } from '@/hooks/use-sidebar';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -29,27 +30,6 @@ const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
-
-type SidebarContextProps = {
-    state: 'expanded' | 'collapsed';
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    openMobile: boolean;
-    setOpenMobile: (open: boolean) => void;
-    isMobile: boolean;
-    toggleSidebar: () => void;
-};
-
-const SidebarContext = React.createContext<SidebarContextProps | null>(null);
-
-function useSidebar() {
-    const context = React.useContext(SidebarContext);
-    if (!context) {
-        throw new Error('useSidebar must be used within a SidebarProvider.');
-    }
-
-    return context;
-}
 
 function SidebarProvider({
     defaultOpen = true,
@@ -349,7 +329,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
         <div
             data-slot="sidebar-header"
             data-sidebar="header"
-            className={cn('flex flex-col gap-2 p-2', className)}
+            className={cn('flex flex-col gap-2 p-2 my-5', className)}
             {...props}
         />
     );
@@ -588,7 +568,7 @@ function SidebarMenuAction({
                 'peer-data-[size=lg]/menu-button:top-2.5',
                 'group-data-[collapsible=icon]:hidden',
                 showOnHover &&
-                    'peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0',
+                'peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0',
                 className
             )}
             {...props}
@@ -743,6 +723,5 @@ export {
     SidebarProvider,
     SidebarRail,
     SidebarSeparator,
-    SidebarTrigger,
-    useSidebar
+    SidebarTrigger
 };

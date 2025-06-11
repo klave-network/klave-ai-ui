@@ -24,6 +24,7 @@ import { Key, Utils } from '@secretarium/connector';
 import { toast } from 'sonner';
 import { KeyDropzone } from '@/components/key-dropzone';
 import { KeyRound } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export const Route = createFileRoute('/login/')({
     component: RouteComponent
@@ -45,12 +46,10 @@ function RouteComponent() {
                 .then((key) => key.getRawPublicKey())
                 .then((rawPublicKey) => Utils.hash(rawPublicKey))
                 .then((hashPublicKey) => {
-                    console.log('Hashed public key:', hashPublicKey);
                     (window as any).currentDevicePublicKeyHash = Utils.toBase64(
                         hashPublicKey,
                         true
                     );
-                    console.log('Connecting...');
                     return secretariumHandler.connect();
                 })
                 .catch((e) => {
@@ -70,30 +69,31 @@ function RouteComponent() {
         }
     };
 
+    const hasLoadedKeys = keyPairs.length > 0;
+    const hasManyLoadedKeys = keyPairs.length > 1;
+
     return (
         <div className="flex flex-col gap-6">
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Welcome back</CardTitle>
-                    <CardDescription>
-                        Login with your Secretarium key or create a new one
-                    </CardDescription>
+                    <CardTitle className="text-xl mb-5">
+                        <Logo className='mb-8' />
+                        <span className='text-gray-400'>Welcome{hasLoadedKeys ? ' back' : ''}!</span><br />
+                        <span>Please log in</span>
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form>
                         <div className="grid gap-6">
-                            <KeyDropzone onFileUpload={handleFileUpload} />
-                            <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                                <span className="bg-background text-muted-foreground relative z-10 px-2">
-                                    Or continue with
-                                </span>
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                {keyPairs.length > 0 ? (
-                                    keyPairs.map((keyPair, id) => (
+                            {hasLoadedKeys
+                                ? <>
+                                    <CardDescription className='text-center'>
+                                        You've already logged in with {hasManyLoadedKeys ? 'one of these keys' : 'this key'} before:
+                                    </CardDescription>
+                                    {keyPairs.map((keyPair) => (
                                         <Button
                                             variant="outline"
-                                            key={id}
+                                            key={keyPair.name}
                                             className="hover:cursor-pointer"
                                             asChild
                                         >
@@ -110,14 +110,14 @@ function RouteComponent() {
                                                 {keyPair.name}
                                             </Link>
                                         </Button>
-                                    ))
-                                ) : (
-                                    <i className="text-center text-sm text-muted-foreground">
-                                        There are currently no accounts setup on
-                                        this device.
-                                    </i>
-                                )}
-                            </div>
+                                    ))}
+                                </>
+                                : null}
+                            {hasLoadedKeys ? <><hr /></> : null}
+                            <CardDescription className='text-center'>
+                                {hasLoadedKeys ? 'You can also upload' : 'Upload'} a new key to log in.
+                            </CardDescription>
+                            <KeyDropzone onFileUpload={handleFileUpload} />
                         </div>
                     </form>
                 </CardContent>

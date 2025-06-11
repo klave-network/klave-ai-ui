@@ -9,7 +9,8 @@ import {
     Landmark,
     TriangleAlert,
     FileDigit,
-    SquareArrowOutUpRight
+    SquareArrowOutUpRight,
+    Unplug
 } from 'lucide-react';
 import { klaveKlaveAIContract } from '@/api';
 import {
@@ -23,8 +24,8 @@ import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 type SecureButtonProps = {
     currentTime: number;
     challenge: number[];
-    quote: QuoteResponse;
-    verification: VerifyResponse;
+    quote?: QuoteResponse;
+    verification?: VerifyResponse;
 };
 
 export const SecureButton: React.FC<SecureButtonProps> = ({
@@ -37,17 +38,27 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
         'default' | 'connection' | 'attestation'
     >('default');
 
-    const downloadableQuote = new Blob([new Uint8Array(quote.quote_binary)], {
+    if (!quote || !verification)
+        return <Button
+            variant="ghost"
+            disabled={true}
+            className="hover:cursor-pointer hover:bg-gray-200 bg-gray-300 border border-gray-500"
+        >
+            <Unplug className="h-4 w-4" />
+            Disconnected
+        </Button>
+
+    const downloadableQuote = new Blob([new Uint8Array(quote?.quote_binary ?? [])], {
         type: 'application/octet-stream'
     });
     const mrEnclaveHash = Utils.toBase64(
-        new Uint8Array(quote.quote?.report_body?.mr_enclave?.m ?? [])
+        new Uint8Array(quote?.quote?.report_body?.mr_enclave?.m ?? [])
     );
     const mrSignedHash = Utils.toBase64(
-        new Uint8Array(quote.quote?.report_body?.mr_signer?.m ?? [])
+        new Uint8Array(quote?.quote?.report_body?.mr_signer?.m ?? [])
     );
     const contractIntegrityHash = Utils.toBase64(
-        new Uint8Array(quote.quote?.report_body?.report_data ?? [])
+        new Uint8Array(quote?.quote?.report_body?.report_data ?? [])
     );
 
     const popoverContent = () => {
@@ -72,14 +83,14 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                         </span>
                                         <span>
                                             {
-                                                verification.quote_verification_result_description
+                                                verification?.quote_verification_result_description
                                             }
                                             .{' '}
                                             <a
                                                 href="https://docs.klave.com/learn/confidential-computing/attestation"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"
                                                 target="_blank"
-                                                rel="noreferrer"
+                                                rel="noreferrer noopener"
                                             >
                                                 Learn more.
                                             </a>
@@ -142,7 +153,7 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                         <span className="font-medium">
                                             Applicable Security Advisories
                                         </span>
-                                        {verification.sa_list
+                                        {verification?.sa_list
                                             ?.split(',')
                                             ?.map((sa: string) => (
                                                 <a
@@ -150,7 +161,7 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                                     title={sa}
                                                     href={`https://www.intel.com/content/www/us/en/security-center/advisory/${sa.toLocaleLowerCase()}.html`}
                                                     target="_blank"
-                                                    rel="noreferrer"
+                                                    rel="noreferrer noopener"
                                                     className="text-blue-400 hover:underline flex align-middle items-center"
                                                 >
                                                     {sa}{' '}
@@ -198,7 +209,7 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                                 href="https://docs.klave.com/learn/confidential-computing/tee"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"
                                                 target="_blank"
-                                                rel="noreferrer"
+                                                rel="noreferrer noopener"
                                             >
                                                 Learn more.
                                             </a>
@@ -210,14 +221,14 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                     <div className="flex flex-col text-sm">
                                         <span>
                                             {
-                                                verification.quote_verification_result_description
+                                                verification?.quote_verification_result_description
                                             }
                                             .{' '}
                                             <a
                                                 href="https://docs.klave.com/learn/confidential-computing/attestation"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"
                                                 target="_blank"
-                                                rel="noreferrer"
+                                                rel="noreferrer noopener"
                                             >
                                                 Learn more.
                                             </a>

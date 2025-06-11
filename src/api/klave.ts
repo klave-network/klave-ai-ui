@@ -7,6 +7,9 @@ import type {
     VerifyResponse
 } from '@/lib/types';
 
+export const isConnected = async (): Promise<boolean> =>
+    secretariumHandler.isConnected()
+
 export const getQuote = async ({
     challenge
 }: {
@@ -25,7 +28,7 @@ export const getQuote = async ({
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: QuoteResponse) => {
-                        console.log('klave.get_quote', result);
+                        // console.log('klave.get_quote', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -49,7 +52,7 @@ export const verifyQuote = async (args: VerifyArgs): Promise<VerifyResponse> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: VerifyResponse) => {
-                        console.log('klave.verify_quote', result);
+                        // console.log('klave.verify_quote', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -73,7 +76,7 @@ export const getBackendVersion = async (): Promise<BackendVersion> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: BackendVersion) => {
-                        console.log('klave.version', result);
+                        // console.log('klave.version', result);
                         resolve(result);
                     });
                     tx.onError((error) => {

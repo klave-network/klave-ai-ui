@@ -23,11 +23,10 @@ function RouteComponent() {
     return (
         <div className="flex flex-col items-center h-full">
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl">Welcome to Klave-AI</h2>
-                <p className="text-center max-w-xl">
-                    Introducing Klave-AI – an advanced AI to challenge
-                    assumptions, generate ideas and help you think beyond the
-                    obvious.
+                <h2 className="text-2xl md:text-3xl">Welcome to <b>Klave for AI</b></h2>
+                <p className="text-center max-w-xl text-gray-500">
+                    Introducing Klave for AI<br />
+                    Run your models and generate ideas or get help in total privacy !
                 </p>
             </div>
         </div>

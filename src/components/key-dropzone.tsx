@@ -1,9 +1,5 @@
-import { useCallback } from 'react';
-import {
-    useDropzone,
-    type DropzoneRootProps,
-    type DropzoneInputProps
-} from 'react-dropzone';
+import { useEffect, useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { Card, CardContent } from '@/components/ui/card';
 import { type KeyPair } from '@/lib/types';
 
@@ -12,6 +8,13 @@ type DropzoneProps = {
 };
 
 export const KeyDropzone: React.FC<DropzoneProps> = ({ onFileUpload }) => {
+
+    useEffect(() => {
+
+        return () => {
+        }
+    }, []);
+
     const onDrop = useCallback(
         (acceptedFiles: File[]) => {
             acceptedFiles.forEach((file) => {
@@ -39,24 +42,26 @@ export const KeyDropzone: React.FC<DropzoneProps> = ({ onFileUpload }) => {
     );
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        preventDropOnDocument: false,
+        noDragEventsBubbling: true,
         onDrop,
         accept: {
-            'application/json': ['.secretarium']
+            'application/json': ['.secretarium', '.id', '.keypair']
         }
     });
 
     return (
-        <Card className="w-full border-2 border-dashed bg-muted hover:cursor-pointer hover:border-muted-foreground/50">
+        <Card className="w-full border border-dashed hover:bg-gray-50 hover:cursor-pointer hover:border-muted-foreground/50">
             <CardContent
                 className="flex flex-col items-center justify-center space-y-2 px-2 py-4 text-xs"
-                {...(getRootProps() as DropzoneRootProps)}
+                {...(getRootProps())}
             >
                 <div className="flex items-center justify-center text-muted-foreground">
-                    <input {...(getInputProps() as DropzoneInputProps)} />
+                    <input {...(getInputProps())} />
                     <p className="text-center">
                         {isDragActive
                             ? 'Drop the key here...'
-                            : "Drag 'n' drop some Secretarium keys here, or click to select key"}
+                            : "Drag your key or click to select one"}
                     </p>
                 </div>
             </CardContent>

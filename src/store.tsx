@@ -1,6 +1,5 @@
-import { Store } from '@tanstack/store';
 import { STORE_KEY } from '@/lib/constants';
-import { useStore } from '@tanstack/react-store';
+import { useStore, Store } from '@tanstack/react-store';
 import { type Model } from '@/lib/types';
 
 type ChatMessage = {
@@ -15,12 +14,10 @@ export type ChatHistory = {
     messages: ChatMessage[];
 };
 
-type KlaveAIState = {
-    [userKeyname: string]: {
-        chats: ChatHistory[];
-        models: Model[];
-    };
-};
+type KlaveAIState = Record<string, {
+    chats?: ChatHistory[];
+    models?: Model[];
+}>;
 
 const initialState: KlaveAIState = {};
 
@@ -35,17 +32,17 @@ store.subscribe(() => {
 const savedState = localStorage.getItem(STORE_KEY);
 if (savedState) {
     store.setState(() => ({
-        ...JSON.parse(savedState)
+        ...(JSON.parse(savedState) as KlaveAIState),
     }));
 }
 
 // Hooks
 export const useUserChatHistory = (keyname: string) =>
-    useStore(store, (state) => state[keyname].chats);
+    useStore(store, (state) => state[keyname]?.chats ?? []);
 
 export const useUserChat = (keyname: string, chatId: string) =>
     useStore(store, (state) =>
-        state[keyname].chats.find((chat) => chat.id === chatId)
+        state[keyname]?.chats?.find((chat) => chat.id === chatId)
     );
 
 export const useUserModels = (keyname: string) =>
@@ -53,8 +50,14 @@ export const useUserModels = (keyname: string) =>
 
 export const useUserModel = (keyname: string, modelName: string) =>
     useStore(store, (state) =>
-        state[keyname].models.find((model) => model.name === modelName)
+        state[keyname]?.models?.find((model) => model.name === modelName)
     );
+
+export const useUserDocumentSets = (keyname: string) =>
+    [keyname]
+
+export const useUserDocumentSet = (keyname: string, documentSet: string) =>
+    [keyname, documentSet]
 
 // Actions
 export const storeActions = {
@@ -74,6 +77,19 @@ export const storeActions = {
         }));
     },
 
+    deleteChat: (userKeyname: string, chatId: string) => {
+        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
+        const updatedChats = userData.chats?.filter((chat) => chat.id !== chatId);
+
+        store.setState((prev) => ({
+            ...prev,
+            [userKeyname]: {
+                ...userData,
+                chats: updatedChats
+            }
+        }));
+    },
+
     updateMessage: (
         userKeyname: string,
         chatId: string,
@@ -81,7 +97,7 @@ export const storeActions = {
         updatedContent: Partial<Pick<ChatMessage, 'content' | 'timestamp'>>
     ) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const updatedChats = userData.chats.map((chat) => {
+        const updatedChats = userData.chats?.map((chat) => {
             if (chat.id !== chatId) return chat;
 
             const updatedMessages = chat.messages.map((msg) =>
@@ -104,7 +120,7 @@ export const storeActions = {
         const userData = store.state[userKeyname];
         if (!userData) return;
 
-        const updatedChats = userData.chats.map((chat) =>
+        const updatedChats = userData.chats?.map((chat) =>
             chat.id === chatId
                 ? { ...chat, messages: [...chat.messages, message] }
                 : chat

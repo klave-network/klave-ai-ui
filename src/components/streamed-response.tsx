@@ -47,16 +47,16 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     const wordCount = response.trim().split(/\s+/).filter(Boolean).length;
 
     return (
-        <p className="whitespace-pre-wrap">
+        <div className="whitespace-pre-wrap">
             {loading && wordCount < 5 ? (
-                <div className="flex gap-4">
+                <div className="flex flex-col">
+                    <span className="animate-pulse">Generating</span>
                     <LoadingDots />
-                    <span className="animate-pulse">Generating...</span>
                 </div>
             ) : (
                 response
             )}
             {error && <span className="text-red-600">Error: {error}</span>}
-        </p>
+        </div>
     );
 };

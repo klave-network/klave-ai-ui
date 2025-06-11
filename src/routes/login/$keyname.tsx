@@ -24,6 +24,9 @@ import { toast } from 'sonner';
 import { Key, Utils } from '@secretarium/connector';
 import { useLocalStorage } from 'usehooks-ts';
 import { type KeyPair } from '@/lib/types';
+import { useCallback, useEffect, useRef } from 'react';
+import { Logo } from '@/components/logo';
+import { LoadingDots } from '@/components/loading-dots';
 
 export const Route = createFileRoute('/login/$keyname')({
     component: RouteComponent
@@ -31,12 +34,25 @@ export const Route = createFileRoute('/login/$keyname')({
 
 function RouteComponent() {
     const { keyname } = Route.useParams();
+    const hasSubmitted = useRef(false);
     const router = useRouter();
     const navigate = useNavigate();
     const [keyPairs] = useLocalStorage<KeyPair[]>(LOC_KEY, []);
 
-    const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleLogin = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
+
+        if (hasSubmitted.current)
+            return false;
+
+        hasSubmitted.current = true;
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.nativeEvent.stopImmediatePropagation();
+            e.nativeEvent.stopPropagation();
+            e.nativeEvent.preventDefault();
+        }
+
         const decodedKeyname = decodeURIComponent(keyname);
         const key = keyPairs.find((kp) => kp.name === decodedKeyname);
         if (!key) {
@@ -70,20 +86,36 @@ function RouteComponent() {
         } catch (e) {
             console.error(e);
             toast.error(`Failed to connect with ${key.name}.`);
+            hasSubmitted.current = false;
         }
-    };
+        return false;
+    }, [keyname, keyPairs, router, navigate]);
+
+    useEffect(() => {
+        if (hasSubmitted.current) return;
+        handleLogin()
+    }, [handleLogin, hasSubmitted])
+
+    const hasLoadedKeys = keyPairs.length > 0;
 
     return (
         <div className="flex flex-col gap-6">
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Welcome back</CardTitle>
+                    <CardTitle className="text-xl mb-5">
+                        <Logo className='mb-8' />
+                        <span className='text-gray-400'>Welcome{hasLoadedKeys ? ' back' : ''}!</span><br />
+                        <span>Loggin you in</span>
+                    </CardTitle>
                     <CardDescription>
-                        Login with your Secretarium key
+                        It will only take a few seconds, please wait...
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleLogin}>
+                    <div className="flex flex-col justify-center items-center text-center mb-4">
+                        <LoadingDots />
+                    </div>
+                    <form onSubmit={handleLogin} className='hidden'>
                         <div className="grid gap-6">
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Key Name</Label>
@@ -94,6 +126,7 @@ function RouteComponent() {
                                     defaultValue={decodeURIComponent(keyname)}
                                     disabled
                                     required
+                                    autoComplete='off'
                                 />
                             </div>
                             <div className="grid gap-3">
@@ -104,6 +137,7 @@ function RouteComponent() {
                                     defaultValue={KLAVE_CONNECTION_KEYPAIR_PWD}
                                     disabled
                                     required
+                                    autoComplete='off'
                                 />
                             </div>
                             <Button

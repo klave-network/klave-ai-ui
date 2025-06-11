@@ -8,7 +8,7 @@ export const MicRecorder = () => {
     );
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
     const [recordingTime, setRecordingTime] = useState<number>(0);
-    const timerRef = useRef<number | null>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
     const RECORDING_MAX_DURATION = 240; // 4 minutes in seconds
 
     useEffect(() => {
@@ -19,7 +19,7 @@ export const MicRecorder = () => {
         navigator.mediaDevices
             .getUserMedia({ audio: true, video: true })
             .then((stream) => {
-                console.log('Stream obtained:', stream);
+                // console.log('Stream obtained:', stream);
                 stream
                     .getTracks()
                     .forEach((track) => console.log('Track:', track.kind));
@@ -52,7 +52,7 @@ export const MicRecorder = () => {
                         });
                         setAudioBlob(audioBlob);
                         audioChunks = []; // reset chunks for next recording
-                        console.log('audioBlob', audioBlob);
+                        // console.log('audioBlob', audioBlob);
                     };
                 })
                 .catch((error) => {
