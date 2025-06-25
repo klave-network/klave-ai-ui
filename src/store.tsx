@@ -9,14 +9,25 @@ type ChatMessage = {
     timestamp?: number;
 };
 
+type ChatSettings = {
+    systemPrompt: string;
+    temperature: number;
+    topp: number;
+    steps: number;
+    slidingWindow: boolean;
+    useRag: boolean;
+};
+
 export type ChatHistory = {
     id: string;
     messages: ChatMessage[];
+    chatSettings: ChatSettings;
 };
 
 type KlaveAIState = Record<string, {
     chats?: ChatHistory[];
     models?: Model[];
+    chatSettings: ChatSettings;
 }>;
 
 const initialState: KlaveAIState = {};
@@ -53,19 +64,28 @@ export const useUserModel = (keyname: string, modelName: string) =>
         state[keyname]?.models?.find((model) => model.name === modelName)
     );
 
+export const useUserChatSettings = (keyname: string) =>
+    useStore(store, (state) => state[keyname].chatSettings);
+
 export const useUserDocumentSets = (keyname: string) =>
-    [keyname]
+    [keyname];
 
 export const useUserDocumentSet = (keyname: string, documentSet: string) =>
-    [keyname, documentSet]
+    [keyname, documentSet];
 
 // Actions
 export const storeActions = {
-    createChat: (userKeyname: string, chatId: string, message: ChatMessage) => {
+    createChat: (
+        userKeyname: string,
+        chatId: string,
+        message: ChatMessage,
+        settings: ChatSettings
+    ) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
         const newChat: ChatHistory = {
             id: chatId,
-            messages: [message]
+            messages: [message],
+            chatSettings: settings
         };
 
         store.setState((state) => ({
@@ -74,6 +94,24 @@ export const storeActions = {
                 ...userData,
                 chats: [...(userData.chats ?? []), newChat]
             }
+        }));
+    },
+
+    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            chatSettings: {}
+        };
+
+        store.setState((state) => ({
+            ...state,
+            [userKeyname]: {
+                ...userData,
+                chatSettings: {
+                    ...userData.chatSettings,
+                    ...settings
+                }
         }));
     },
 
@@ -135,6 +173,8 @@ export const storeActions = {
         }));
     },
 
+    // add models fetched from the backend
+    // and set initial chat settings
     addModels: (userKeyname: string, models: Model[]) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
 
@@ -142,6 +182,14 @@ export const storeActions = {
             ...state,
             [userKeyname]: {
                 ...userData,
+                chatSettings: {
+                    systemPrompt: 'You are a helpful assistant.',
+                    temperature: 0.8,
+                    topp: 0.9,
+                    steps: 256,
+                    slidingWindow: false,
+                    useRag: false
+                },
                 models
             }
         }));

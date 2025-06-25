@@ -22,7 +22,7 @@ import {
 import secretariumHandler from '@/lib/secretarium-handler';
 import { toast } from 'sonner';
 import { Key, Utils } from '@secretarium/connector';
-import { useLocalStorage } from 'usehooks-ts';
+import { useState, useEffect } from 'react';
 import { type KeyPair } from '@/lib/types';
 import { useCallback, useEffect, useRef } from 'react';
 import { Logo } from '@/components/logo';
@@ -37,7 +37,20 @@ function RouteComponent() {
     const hasSubmitted = useRef(false);
     const router = useRouter();
     const navigate = useNavigate();
-    const [keyPairs] = useLocalStorage<KeyPair[]>(LOC_KEY, []);
+    const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
+
+    // Load key pairs from localStorage on component mount
+    useEffect(() => {
+        const storedKeyPairs = localStorage.getItem(LOC_KEY);
+        if (storedKeyPairs) {
+            try {
+                setKeyPairs(JSON.parse(storedKeyPairs));
+            } catch (error) {
+                console.error('Failed to parse stored key pairs:', error);
+                setKeyPairs([]);
+            }
+        }
+    }, []);
 
     const handleLogin = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
 

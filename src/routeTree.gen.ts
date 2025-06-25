@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 // Import Routes
-
 import { Route as rootRoute } from './routes/__root'
 import { Route as PingImport } from './routes/ping'
 import { Route as FilesImport } from './routes/files'
@@ -120,6 +119,12 @@ const AuthDocumentsRouteRoute = AuthDocumentsRouteImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 
+const AuthDataRouteRoute = AuthDataRouteImport.update({
+    id: '/data',
+    path: '/data',
+    getParentRoute: () => AuthRoute
+} as any);
+
 const AuthChatRouteRoute = AuthChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -138,6 +143,12 @@ const AuthDocumentsIndexRoute = AuthDocumentsIndexImport.update({
   getParentRoute: () => AuthDocumentsRouteRoute,
 } as any)
 
+const AuthDataIndexRoute = AuthDataIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthDataRouteRoute
+} as any);
+
 const AuthChatIndexRoute = AuthChatIndexImport.update({
   id: '/',
   path: '/',
@@ -155,6 +166,18 @@ const AuthDocumentsSetRoute = AuthDocumentsSetImport.update({
   path: '/$set',
   getParentRoute: () => AuthDocumentsRouteRoute,
 } as any)
+
+const AuthDataNewRoute = AuthDataNewImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthDataRouteRoute
+} as any);
+
+const AuthDataNameRoute = AuthDataNameImport.update({
+    id: '/$name',
+    path: '/$name',
+    getParentRoute: () => AuthDataRouteRoute
+} as any);
 
 const AuthChatVideoRoute = AuthChatVideoImport.update({
   id: '/video',
@@ -388,6 +411,22 @@ const AuthDocumentsRouteRouteChildren: AuthDocumentsRouteRouteChildren = {
 
 const AuthDocumentsRouteRouteWithChildren =
   AuthDocumentsRouteRoute._addFileChildren(AuthDocumentsRouteRouteChildren)
+
+interface AuthDataRouteRouteChildren {
+    AuthDataNameRoute: typeof AuthDataNameRoute;
+    AuthDataNewRoute: typeof AuthDataNewRoute;
+    AuthDataIndexRoute: typeof AuthDataIndexRoute;
+}
+
+const AuthDataRouteRouteChildren: AuthDataRouteRouteChildren = {
+    AuthDataNameRoute: AuthDataNameRoute,
+    AuthDataNewRoute: AuthDataNewRoute,
+    AuthDataIndexRoute: AuthDataIndexRoute
+};
+
+const AuthDataRouteRouteWithChildren = AuthDataRouteRoute._addFileChildren(
+    AuthDataRouteRouteChildren
+);
 
 interface AuthModelsRouteRouteChildren {
   AuthModelsNameRoute: typeof AuthModelsNameRoute

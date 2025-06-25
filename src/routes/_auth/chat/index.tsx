@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useCallback } from 'react';
 import { graphInitExecutionContext, inferenceAddPrompt } from '@/api/klave-ai';
 import { generateSimpleId } from '@/lib/utils';
-import { storeActions, useUserModels } from '@/store';
+import { storeActions, useUserModels, useUserChatSettings } from '@/store';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY, CUR_MODEL_KEY, CUR_MODE_KEY } from '@/lib/constants';
 import { getQuote, verifyQuote, isConnected as isKlaveConnected } from '@/api/klave';
@@ -50,6 +50,8 @@ function RouteComponent() {
     const models = useUserModels(currentUser);
     const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
     const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'generate';
+    const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
+        useUserChatSettings(currentUser);
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -67,11 +69,11 @@ function RouteComponent() {
             await graphInitExecutionContext({
                 model_name: currentModel,
                 context_name: contextName,
-                system_prompt: 'You are a helpful assistant.',
-                temperature: 0.8,
-                topp: 0.9,
-                steps: 256,
-                sliding_window: false,
+                system_prompt: systemPrompt,
+                temperature: temperature,
+                topp: topp,
+                steps: steps,
+                sliding_window: slidingWindow,
                 mode: currentMode
             });
 
@@ -80,12 +82,23 @@ function RouteComponent() {
                 user_prompt: userPrompt
             });
 
-            // Create and add new chat to tanstack store
-            storeActions.createChat(currentUser, contextId, {
+            const message = {
                 id: generateSimpleId(),
                 content: userPrompt,
-                role: 'user'
-            });
+                role: 'user' as const
+            };
+
+            const settings = {
+                systemPrompt: systemPrompt,
+                temperature: temperature,
+                topp: topp,
+                steps: steps,
+                slidingWindow: slidingWindow,
+                useRag: useRag
+            };
+
+            // Create and add new chat to tanstack store
+            storeActions.createChat(currentUser, contextId, message, settings);
             navigate({ to: `/chat/${contextId}`, search: true });
         } catch (error) {
             console.error('Error: ', error);

@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 import { ModelSelector } from '@/components/model-selector';
 import { ModeSelector } from '@/components/mode-selector';
+import { SettingsModal } from '@/components/settings-modal';
 
 export const Route = createFileRoute('/_auth/chat')({
     component: RouteComponent
@@ -13,24 +14,7 @@ function RouteComponent() {
                 <div className="w-full flex items-center gap-2 px-4">
                     <ModelSelector />
                     <ModeSelector />
-                    {/* <SidebarTrigger className="-ml-1" />
-                    <Separator
-                        orientation="vertical"
-                        className="mr-2 h-4"
-                    />
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbLink href="#">
-                                    ABCD
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator className="hidden md:block" />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>EFGH</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb> */}
+                    <SettingsModal />
                 </div>
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

@@ -17,7 +17,7 @@ import {
     KLAVE_CONNECTION_KEYPAIR_PWD,
     CUR_USER_KEY
 } from '@/lib/constants';
-import { useLocalStorage } from 'usehooks-ts';
+import { useState, useEffect } from 'react';
 import { type KeyPair } from '@/lib/types';
 import secretariumHandler from '@/lib/secretarium-handler';
 import { Key, Utils } from '@secretarium/connector';
@@ -33,11 +33,33 @@ export const Route = createFileRoute('/login/')({
 function RouteComponent() {
     const router = useRouter();
     const navigate = useNavigate();
-    const [keyPairs, setKeyPairs] = useLocalStorage<KeyPair[]>(LOC_KEY, []);
+    const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
+
+    // Load key pairs from localStorage on component mount
+    useEffect(() => {
+        const storedKeyPairs = localStorage.getItem(LOC_KEY);
+        if (storedKeyPairs) {
+            try {
+                setKeyPairs(JSON.parse(storedKeyPairs));
+            } catch (error) {
+                console.error('Failed to parse stored key pairs:', error);
+                // Initialize with empty array if parsing fails
+                localStorage.setItem(LOC_KEY, JSON.stringify([]));
+            }
+        } else {
+            // Initialize with empty array if no key pairs are stored
+            localStorage.setItem(LOC_KEY, JSON.stringify([]));
+        }
+    }, []);
 
     const handleFileUpload = async (key: KeyPair | null) => {
         if (key) {
-            setKeyPairs((prevKeyPairs) => [...prevKeyPairs, key]);
+            // Update state
+            const updatedKeyPairs = [...keyPairs, key];
+            setKeyPairs(updatedKeyPairs);
+
+            // Update localStorage directly
+            localStorage.setItem(LOC_KEY, JSON.stringify(updatedKeyPairs));
 
             await secretariumHandler.disconnect();
             const promise = secretariumHandler
