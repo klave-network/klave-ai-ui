@@ -4,9 +4,10 @@ import {
     LifeBuoy,
     Settings,
     MessageCirclePlus,
+    Database,
     // Users,
     // Boxes,
-    // FolderCode,
+    FolderCode
     // Video
 } from 'lucide-react';
 
@@ -37,6 +38,16 @@ const routes = {
             icon: MessageCirclePlus,
             className: 'bg-gradient-to-br from-kcy to-kbl/90 text-white'
         },
+        {
+            title: 'Models',
+            url: '/models',
+            icon: FolderCode
+        },
+        {
+            title: 'Data',
+            url: '/data',
+            icon: Database
+        }
         // {
         //     title: 'Lense',
         //     url: '/chat/video',
