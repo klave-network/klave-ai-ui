@@ -17,7 +17,7 @@ import {
     KLAVE_CONNECTION_KEYPAIR_PWD,
     CUR_USER_KEY
 } from '@/lib/constants';
-import { useLocalStorage } from 'usehooks-ts';
+import { useState, useEffect } from 'react';
 import { type KeyPair } from '@/lib/types';
 import secretariumHandler from '@/lib/secretarium-handler';
 import { Key, Utils } from '@secretarium/connector';
@@ -33,11 +33,33 @@ export const Route = createFileRoute('/login/')({
 function RouteComponent() {
     const router = useRouter();
     const navigate = useNavigate();
-    const [keyPairs, setKeyPairs] = useLocalStorage<KeyPair[]>(LOC_KEY, []);
+    const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
+
+    // Load key pairs from localStorage on component mount
+    useEffect(() => {
+        const storedKeyPairs = localStorage.getItem(LOC_KEY);
+        if (storedKeyPairs) {
+            try {
+                setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
+            } catch (error) {
+                console.error('Failed to parse stored key pairs:', error);
+                // Initialize with empty array if parsing fails
+                localStorage.setItem(LOC_KEY, JSON.stringify([]));
+            }
+        } else {
+            // Initialize with empty array if no key pairs are stored
+            localStorage.setItem(LOC_KEY, JSON.stringify([]));
+        }
+    }, []);
 
     const handleFileUpload = async (key: KeyPair | null) => {
         if (key) {
-            setKeyPairs((prevKeyPairs) => [...prevKeyPairs, key]);
+            // Update state
+            const updatedKeyPairs = [...keyPairs, key];
+            setKeyPairs(updatedKeyPairs);
+
+            // Update localStorage directly
+            localStorage.setItem(LOC_KEY, JSON.stringify(updatedKeyPairs));
 
             await secretariumHandler.disconnect();
             const promise = secretariumHandler
@@ -77,18 +99,25 @@ function RouteComponent() {
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl mb-5">
-                        <Logo className='mb-8' />
-                        <span className='text-gray-400'>Welcome{hasLoadedKeys ? ' back' : ''}!</span><br />
+                        <Logo className="mb-8" />
+                        <span className="text-gray-400">
+                            Welcome{hasLoadedKeys ? ' back' : ''}!
+                        </span>
+                        <br />
                         <span>Please log in</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form>
                         <div className="grid gap-6">
-                            {hasLoadedKeys
-                                ? <>
-                                    <CardDescription className='text-center'>
-                                        You've already logged in with {hasManyLoadedKeys ? 'one of these keys' : 'this key'} before:
+                            {hasLoadedKeys ? (
+                                <>
+                                    <CardDescription className="text-center">
+                                        You've already logged in with{' '}
+                                        {hasManyLoadedKeys
+                                            ? 'one of these keys'
+                                            : 'this key'}{' '}
+                                        before:
                                     </CardDescription>
                                     {keyPairs.map((keyPair) => (
                                         <Button
@@ -112,10 +141,17 @@ function RouteComponent() {
                                         </Button>
                                     ))}
                                 </>
-                                : null}
-                            {hasLoadedKeys ? <><hr /></> : null}
-                            <CardDescription className='text-center'>
-                                {hasLoadedKeys ? 'You can also upload' : 'Upload'} a new key to log in.
+                            ) : null}
+                            {hasLoadedKeys ? (
+                                <>
+                                    <hr />
+                                </>
+                            ) : null}
+                            <CardDescription className="text-center">
+                                {hasLoadedKeys
+                                    ? 'You can also upload'
+                                    : 'Upload'}{' '}
+                                a new key to log in.
                             </CardDescription>
                             <KeyDropzone onFileUpload={handleFileUpload} />
                         </div>
