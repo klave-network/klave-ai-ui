@@ -56,20 +56,22 @@ export type ContextInput = {
     embeddings: boolean;
 };
 
-export type PromptInput = {
+// Base context type
+type BaseContext = {
     context_name: string;
+};
+
+export type Input = BaseContext;
+
+export type PromptInput = BaseContext & {
     user_prompt: string;
 };
 
-export type Input = Pick<PromptInput, 'context_name'>;
-
-export type InferenceResponseInput = {
-    context_name: string;
+export type InferenceResponseInput = BaseContext & {
     nb_pieces: number;
 };
 
-export type PromptInputRag = {
-    context_name: string;
+export type PromptInputRag = BaseContext & {
     user_prompt: string;
     rag_id: string;
     n_rag_chunks: number;
@@ -116,4 +118,32 @@ export type VerifyResponse = {
 export type VerifyArgs = {
     quote: number[];
     current_time: number;
+};
+
+export type PgsqlCreateInput = {
+    host: string;
+    dbname: string;
+    user: string;
+    password: string;
+};
+
+export type RagCreateInput = {
+    database_id: string;
+    rag_name: string;
+    model_name: string;
+    chunk_length?: number;
+};
+
+export type RagDocumentInput = {
+    rag_id: string;
+    document: any; // Replace with proper document metadata type
+};
+
+export type RagDeleteDocumentInput = {
+    rag_id: string;
+    document_id: string;
+};
+
+export type RagDocumentListInput = {
+    rag_id: string;
 };

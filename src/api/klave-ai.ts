@@ -7,7 +7,11 @@ import type {
     PromptInput,
     Tokenizer,
     ChunkResult,
-    PromptInputRag
+    PromptInputRag,
+    RagCreateInput,
+    RagDocumentInput,
+    RagDeleteDocumentInput,
+    RagDocumentListInput
 } from '@/lib/types';
 
 export const getModels = async (): Promise<Model[]> =>
@@ -24,7 +28,7 @@ export const getModels = async (): Promise<Model[]> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        const parsedResult = JSON.parse(result);
+                        const parsedResult = JSON.parse(result) as Model[];
                         resolve(parsedResult);
                     });
                     tx.onError((error) => {
@@ -48,7 +52,7 @@ export const getTokenizers = async (): Promise<Tokenizer[]> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        const parsedResult = JSON.parse(result);
+                        const parsedResult = JSON.parse(result) as Tokenizer[];
                         resolve(parsedResult);
                     });
                     tx.onError((error) => {
@@ -183,3 +187,122 @@ export const inferenceGetResponse = async (
         tx.send().catch(reject);
     });
 };
+
+export const ragCreate = async (args: RagCreateInput): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'rag_create',
+                { ...args, chunk_length: args.chunk_length ?? 255 },
+                `rag_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const ragAddDocument = async (args: RagDocumentInput): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'rag_add_document',
+                args,
+                `rag_add_document-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const ragDeleteDocument = async (
+    args: RagDeleteDocumentInput
+): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'rag_delete_document',
+                args,
+                `rag_delete_document-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const ragDocumentList = async (
+    args: RagDocumentListInput
+): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'rag_document_list',
+                args,
+                `rag_document_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const ragList = async (): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'rag_list',
+                '',
+                `rag_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
