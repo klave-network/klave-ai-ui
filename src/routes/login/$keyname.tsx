@@ -22,9 +22,8 @@ import {
 import secretariumHandler from '@/lib/secretarium-handler';
 import { toast } from 'sonner';
 import { Key, Utils } from '@secretarium/connector';
-import { useState, useEffect } from 'react';
 import { type KeyPair } from '@/lib/types';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { Logo } from '@/components/logo';
 import { LoadingDots } from '@/components/loading-dots';
 
@@ -52,62 +51,63 @@ function RouteComponent() {
         }
     }, []);
 
-    const handleLogin = useCallback(async (e?: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = useCallback(
+        async (e?: React.FormEvent<HTMLFormElement>) => {
+            if (hasSubmitted.current) return false;
 
-        if (hasSubmitted.current)
+            hasSubmitted.current = true;
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.nativeEvent.stopImmediatePropagation();
+                e.nativeEvent.stopPropagation();
+                e.nativeEvent.preventDefault();
+            }
+
+            const decodedKeyname = decodeURIComponent(keyname);
+            const key = keyPairs.find((kp) => kp.name === decodedKeyname);
+            if (!key) {
+                toast.error('A user with this key does not exist');
+                return;
+            }
+
+            try {
+                await secretariumHandler.disconnect();
+                const importedKey = await secretariumHandler
+                    .use(key, KLAVE_CONNECTION_KEYPAIR_PWD)
+                    .then(Key.importKey);
+                const rawPublicKey = await importedKey.getRawPublicKey();
+                const hashPublicKey = await Utils.hash(rawPublicKey);
+
+                (window as any).currentDevicePublicKeyHash = Utils.toBase64(
+                    hashPublicKey,
+                    true
+                );
+
+                // Show loading toast and keep its ID
+                const toastId = toast.loading('Connecting...');
+
+                await secretariumHandler.connect();
+
+                // Replace loading toast with success
+                toast.success(`Connected with ${key.name}.`, { id: toastId });
+                localStorage.setItem(CUR_USER_KEY, key.name);
+                router.invalidate();
+                navigate({ to: '/', search: true });
+            } catch (e) {
+                console.error(e);
+                toast.error(`Failed to connect with ${key.name}.`);
+                hasSubmitted.current = false;
+            }
             return false;
-
-        hasSubmitted.current = true;
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.nativeEvent.stopImmediatePropagation();
-            e.nativeEvent.stopPropagation();
-            e.nativeEvent.preventDefault();
-        }
-
-        const decodedKeyname = decodeURIComponent(keyname);
-        const key = keyPairs.find((kp) => kp.name === decodedKeyname);
-        if (!key) {
-            toast.error('A user with this key does not exist');
-            return;
-        }
-
-        try {
-            await secretariumHandler.disconnect();
-            const importedKey = await secretariumHandler
-                .use(key, KLAVE_CONNECTION_KEYPAIR_PWD)
-                .then(Key.importKey);
-            const rawPublicKey = await importedKey.getRawPublicKey();
-            const hashPublicKey = await Utils.hash(rawPublicKey);
-
-            (window as any).currentDevicePublicKeyHash = Utils.toBase64(
-                hashPublicKey,
-                true
-            );
-
-            // Show loading toast and keep its ID
-            const toastId = toast.loading('Connecting...');
-
-            await secretariumHandler.connect();
-
-            // Replace loading toast with success
-            toast.success(`Connected with ${key.name}.`, { id: toastId });
-            localStorage.setItem(CUR_USER_KEY, key.name);
-            router.invalidate();
-            navigate({ to: '/', search: true });
-        } catch (e) {
-            console.error(e);
-            toast.error(`Failed to connect with ${key.name}.`);
-            hasSubmitted.current = false;
-        }
-        return false;
-    }, [keyname, keyPairs, router, navigate]);
+        },
+        [keyname, keyPairs, router, navigate]
+    );
 
     useEffect(() => {
         if (hasSubmitted.current) return;
-        handleLogin()
-    }, [handleLogin, hasSubmitted])
+        handleLogin();
+    }, [handleLogin, hasSubmitted]);
 
     const hasLoadedKeys = keyPairs.length > 0;
 
@@ -116,8 +116,11 @@ function RouteComponent() {
             <Card>
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl mb-5">
-                        <Logo className='mb-8' />
-                        <span className='text-gray-400'>Welcome{hasLoadedKeys ? ' back' : ''}!</span><br />
+                        <Logo className="mb-8" />
+                        <span className="text-gray-400">
+                            Welcome{hasLoadedKeys ? ' back' : ''}!
+                        </span>
+                        <br />
                         <span>Loggin you in</span>
                     </CardTitle>
                     <CardDescription>
@@ -128,7 +131,7 @@ function RouteComponent() {
                     <div className="flex flex-col justify-center items-center text-center mb-4">
                         <LoadingDots />
                     </div>
-                    <form onSubmit={handleLogin} className='hidden'>
+                    <form onSubmit={handleLogin} className="hidden">
                         <div className="grid gap-6">
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Key Name</Label>
@@ -139,7 +142,7 @@ function RouteComponent() {
                                     defaultValue={decodeURIComponent(keyname)}
                                     disabled
                                     required
-                                    autoComplete='off'
+                                    autoComplete="off"
                                 />
                             </div>
                             <div className="grid gap-3">
@@ -150,7 +153,7 @@ function RouteComponent() {
                                     defaultValue={KLAVE_CONNECTION_KEYPAIR_PWD}
                                     disabled
                                     required
-                                    autoComplete='off'
+                                    autoComplete="off"
                                 />
                             </div>
                             <Button
