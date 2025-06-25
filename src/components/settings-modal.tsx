@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Slider } from '@/components/ui/slider';
+import { SliderTooltip } from '@/components/ui/slider-tooltip';
 import {
     Dialog,
     DialogClose,
@@ -106,14 +106,18 @@ export const SettingsModal = () => {
                             name="temperature"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Temperature</FormLabel>
+                                    {/* <FormLabel>Temperature</FormLabel> */}
                                     <FormControl>
-                                        <Slider
+                                        <SliderTooltip
                                             id="temperature"
                                             min={0}
                                             max={2}
                                             step={0.01}
+                                            showTooltip={true}
                                             defaultValue={[field.value]}
+                                            labelFor="temperature"
+                                            labelTitle="Temperature"
+                                            labelValue={field.value}
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -126,14 +130,18 @@ export const SettingsModal = () => {
                             name="topp"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Top-p</FormLabel>
+                                    {/* <FormLabel>Top-p</FormLabel> */}
                                     <FormControl>
-                                        <Slider
+                                        <SliderTooltip
                                             id="topp"
                                             min={0}
                                             max={1}
                                             step={0.1}
+                                            showTooltip={true}
                                             defaultValue={[field.value]}
+                                            labelFor="topp"
+                                            labelTitle="Top-p"
+                                            labelValue={field.value}
                                         />
                                     </FormControl>
                                     <FormMessage />
