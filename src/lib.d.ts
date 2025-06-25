@@ -1,15 +1,15 @@
 interface Window {
-    demoKlaveCluster: (config: string | Record<string, unknown>) => void;
-    demoKlaveCommand: (
+    appKlaveCluster: (config: string | Record<string, unknown>) => void;
+    appKlaveCommand: (
         dcApp: string,
         command: string,
         args?: Record<string, unknown>,
         id?: string
     ) => void;
-    demoKlaveHandlerStore: SecretariumClusterConfig;
-    // demoKlaveStore: Store;
-    // demoKlaveGremlin: (enable: boolean) => AynAction;
-    demoKlaveSubscriptions: Record<string, unknown>;
+    appKlaveHandlerStore: SecretariumClusterConfig;
+    // appKlaveStore: Store;
+    // appKlaveGremlin: (enable: boolean) => AynAction;
+    appKlaveSubscriptions: Record<string, unknown>;
 }
 
 declare module '@cubone/react-file-manager' {
@@ -49,14 +49,25 @@ declare module '@cubone/react-file-manager' {
         onError?: (error: Error) => void;
         onFileOpen?: (file: File) => void;
         onFileUploaded?: (response: Record<string, unknown>) => void;
-        onFileUploading?: (file: File, parentFolder: File) => Record<string, unknown>;
+        onFileUploading?: (
+            file: File,
+            parentFolder: File
+        ) => Record<string, unknown>;
         onLayoutChange?: (layout: 'grid' | 'list') => void;
         onPaste?: (files: File[], targetFolder: File) => void;
         onRefresh?: () => void;
         onRename?: (file: File, newName: string) => void;
         onSelect?: (files: File[]) => void;
-        permissions?: { create?: boolean; upload?: boolean; move?: boolean; copy?: boolean; rename?: boolean; download?: boolean; delete?: boolean; };
+        permissions?: {
+            create?: boolean;
+            upload?: boolean;
+            move?: boolean;
+            copy?: boolean;
+            rename?: boolean;
+            download?: boolean;
+            delete?: boolean;
+        };
         primaryColor?: string;
         width?: string | number;
     };
-};
+}

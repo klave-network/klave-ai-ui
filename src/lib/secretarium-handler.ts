@@ -76,11 +76,13 @@ const printClusterInfo = (): void => {
         }
     );
 
-    console.info('Klave for AI App now using the following cluster configuration:');
+    console.info(
+        'Klave for AI App now using the following cluster configuration:'
+    );
     console.table(printableConfig);
 };
 
-const processClusterConfig: Window['demoKlaveCluster'] = (config) => {
+const processClusterConfig: Window['appKlaveCluster'] = (config) => {
     if (typeof config === 'string')
         handlerStore.clusters = config
             .split(',')
@@ -134,7 +136,9 @@ const secretariumHandler = {
                 if (config.DK_SERVICES)
                     handlerStore.fileService = config.DK_SERVICES;
                 processClusterConfig(clusterConfigBase);
-                console.info('Klave for AI App now using config.json overrides');
+                console.info(
+                    'Klave for AI App now using config.json overrides'
+                );
             })
             .catch(() => {
                 processClusterConfig(clusterConfigBase);
@@ -269,18 +273,18 @@ const secretariumHandler = {
 if (
     (import.meta.env.NODE_ENV === 'development' ||
         import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_OVERWRITABLE ===
-        'true') &&
+            'true') &&
     window
 ) {
-    window['demoKlaveCluster'] = processClusterConfig;
-    window['demoKlaveCommand'] = (dcApp, command, args, id): void => {
+    window['appKlaveCluster'] = processClusterConfig;
+    window['appKlaveCommand'] = (dcApp, command, args, id): void => {
         secretariumHandler
             .request(dcApp, command, args ?? {}, id ?? `${Math.random()}`)
             .then((query) => {
                 query.send();
             });
     };
-    window['demoKlaveHandlerStore'] = handlerStore;
+    window['appKlaveHandlerStore'] = handlerStore;
 }
 
 export default secretariumHandler;
