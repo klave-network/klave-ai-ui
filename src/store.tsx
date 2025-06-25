@@ -24,11 +24,14 @@ export type ChatHistory = {
     chatSettings: ChatSettings;
 };
 
-type KlaveAIState = Record<string, {
-    chats?: ChatHistory[];
-    models?: Model[];
-    chatSettings: ChatSettings;
-}>;
+type KlaveAIState = Record<
+    string,
+    {
+        chats?: ChatHistory[];
+        models?: Model[];
+        chatSettings: ChatSettings;
+    }
+>;
 
 const initialState: KlaveAIState = {};
 
@@ -43,7 +46,7 @@ store.subscribe(() => {
 const savedState = localStorage.getItem(STORE_KEY);
 if (savedState) {
     store.setState(() => ({
-        ...(JSON.parse(savedState) as KlaveAIState),
+        ...(JSON.parse(savedState) as KlaveAIState)
     }));
 }
 
@@ -67,11 +70,12 @@ export const useUserModel = (keyname: string, modelName: string) =>
 export const useUserChatSettings = (keyname: string) =>
     useStore(store, (state) => state[keyname].chatSettings);
 
-export const useUserDocumentSets = (keyname: string) =>
-    [keyname];
+export const useUserDocumentSets = (keyname: string) => [keyname];
 
-export const useUserDocumentSet = (keyname: string, documentSet: string) =>
-    [keyname, documentSet];
+export const useUserDocumentSet = (keyname: string, documentSet: string) => [
+    keyname,
+    documentSet
+];
 
 // Actions
 export const storeActions = {
@@ -112,12 +116,15 @@ export const storeActions = {
                     ...userData.chatSettings,
                     ...settings
                 }
+            }
         }));
     },
 
     deleteChat: (userKeyname: string, chatId: string) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const updatedChats = userData.chats?.filter((chat) => chat.id !== chatId);
+        const updatedChats = userData.chats?.filter(
+            (chat) => chat.id !== chatId
+        );
 
         store.setState((prev) => ({
             ...prev,
