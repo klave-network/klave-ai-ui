@@ -21,11 +21,11 @@ import {
 import {
     SidebarMenu,
     SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar
+    SidebarMenuItem
 } from '@/components/ui/sidebar';
+import { useSidebar } from '@/hooks/use-sidebar';
 import secretariumHandler from '@/lib/secretarium-handler';
-import { StatusBar } from '@/components/status-bar';
+// import { StatusBar } from '@/components/status-bar';
 import { CUR_USER_KEY } from '@/lib/constants';
 
 export function NavFooter({
@@ -43,7 +43,7 @@ export function NavFooter({
     return (
         <>
             <SidebarMenu>
-                <SidebarMenuItem>
+                <SidebarMenuItem className='hidden'>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuButton
@@ -134,7 +134,7 @@ export function NavFooter({
                     </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>
-            <StatusBar />
+            {/* <StatusBar /> */}
         </>
     );
 }

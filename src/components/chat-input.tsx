@@ -25,8 +25,8 @@ type ChatInputProps = {
     secureButton: {
         currentTime: number;
         challenge: number[];
-        quote: QuoteResponse;
-        verification: VerifyResponse;
+        quote?: QuoteResponse;
+        verification?: VerifyResponse;
     };
 };
 
@@ -35,11 +35,15 @@ export const ChatInput = ({
     setUserPrompt,
     error,
     onSend,
-    isDisabled,
+    isDisabled: isParentDisabling,
     secureButton
 }: ChatInputProps) => {
+
+    const isDisconnected = !secureButton.quote || !secureButton.verification;
+    const isDisabled = isParentDisabling || isDisconnected;
+
     return (
-        <div className="max-w-3xl w-full mt-auto">
+        <div className="max-w-xl w-full mt-auto">
             {error && (
                 <p
                     className="bg-red-100 border border-red-500 rounded-xl p-4 text-red-500 text-sm font-semibold mb-2"
@@ -48,24 +52,25 @@ export const ChatInput = ({
                     {error}
                 </p>
             )}
-            <div className="flex flex-col gap-4 rounded-xl border p-4">
-                <textarea
-                    placeholder="Ask anything..."
-                    className="flex-1 focus:outline-none resize-none field-sizing-content max-h-80"
-                    rows={2}
-                    disabled={isDisabled}
-                    value={userPrompt}
-                    onChange={(e) => setUserPrompt(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            onSend();
-                        }
-                    }}
-                    aria-label="User prompt input"
-                />
-                <div className="flex justify-end">
-                    {/* <div>
+            <div className="rounded-xl p-[1px] bg-gradient-to-r from-kor via-kbl to-kcy shadow-centered shadow-gray/50">
+                <div className="flex flex-col gap-4 rounded-[calc(0.9rem-1px)] bg-white border p-4">
+                    <textarea
+                        placeholder={isDisconnected ? "It looks like you might be disconnected :(" : "Ask anything..."}
+                        className="flex-1 focus:outline-none resize-none field-sizing-content max-h-80"
+                        rows={2}
+                        disabled={isDisabled}
+                        value={userPrompt}
+                        onChange={(e) => setUserPrompt(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                onSend();
+                            }
+                        }}
+                        aria-label="User prompt input"
+                    />
+                    <div className="flex justify-end">
+                        {/* <div>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
@@ -98,30 +103,31 @@ export const ChatInput = ({
                             </Link>
                         </Button>
                     </div> */}
-                    <div className="flex items-center gap-2">
-                        <SecureButton
-                            currentTime={secureButton.currentTime}
-                            challenge={secureButton.challenge}
-                            quote={secureButton.quote}
-                            verification={secureButton.verification}
-                        />
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        size="icon"
-                                        className="hover:cursor-pointer"
-                                        onClick={onSend}
-                                        disabled={isDisabled}
-                                    >
-                                        <ArrowUp className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Send message</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <div className="flex items-center gap-2">
+                            <SecureButton
+                                currentTime={secureButton.currentTime}
+                                challenge={secureButton.challenge}
+                                quote={secureButton.quote}
+                                verification={secureButton.verification}
+                            />
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            size="icon"
+                                            className="hover:cursor-pointer"
+                                            onClick={onSend}
+                                            disabled={isDisabled}
+                                        >
+                                            <ArrowUp className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Send message</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                     </div>
                 </div>
             </div>

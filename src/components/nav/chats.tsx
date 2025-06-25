@@ -6,9 +6,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuAction,
-    useSidebar
+    SidebarMenuAction
 } from '@/components/ui/sidebar';
+import { useSidebar } from '@/hooks/use-sidebar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,8 +17,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Link } from '@tanstack/react-router';
-import { useUserChatHistory } from '@/store';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { useUserChatHistory, storeActions } from '@/store';
+import { MoreHorizontal, Text, Trash2 } from 'lucide-react';
 import { CUR_USER_KEY } from '@/lib/constants';
 
 export function NavChats({
@@ -33,6 +33,14 @@ export function NavChats({
     // Reverse the array to have the most recent chats first
     const reversedChats = [...chatHistory].reverse();
 
+    if (!reversedChats.length)
+        return null;
+
+    const handleDeleteChat = (chatId: string) => {
+        if (currentUser)
+            storeActions.deleteChat(currentUser, chatId);
+    }
+
     // Split into first 5 and remaining
     const firstFive = reversedChats.slice(0, 5);
     const remaining = reversedChats.slice(5);
@@ -42,6 +50,20 @@ export function NavChats({
             <SidebarGroupLabel>Chats</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
+                    {/* <SidebarMenuItem key="new-chat">
+                        <SidebarMenuButton asChild>
+                            <Link
+                                search
+                                to={`/chat`}
+                                activeProps={{
+                                    className: 'bg-sidebar-accent flex'
+                                }}
+                            >
+                                <MessageCirclePlus />
+                                <span>New Chat</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem> */}
                     {/* Render first 5 (most recent) */}
                     {firstFive.map((item) => (
                         <SidebarMenuItem key={item.id}>
@@ -54,6 +76,7 @@ export function NavChats({
                                         className: 'bg-sidebar-accent'
                                     }}
                                 >
+                                    <Text />
                                     <span>{item.messages[0].content}</span>
                                 </Link>
                             </SidebarMenuButton>
@@ -69,7 +92,7 @@ export function NavChats({
                                     side={isMobile ? 'bottom' : 'right'}
                                     align={isMobile ? 'end' : 'start'}
                                 >
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleDeleteChat(item.id)}>
                                         <Trash2 className="text-muted-foreground" />
                                         <span>Delete Chat</span>
                                     </DropdownMenuItem>

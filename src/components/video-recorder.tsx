@@ -23,7 +23,7 @@ export const VideoRecorder = () => {
         navigator.mediaDevices
             .getUserMedia({ audio: true, video: true })
             .then((stream) => {
-                console.log('Stream obtained:', stream);
+                // console.log('Stream obtained:', stream);
                 stream
                     .getTracks()
                     .forEach((track) => console.log('Track:', track.kind));
@@ -110,7 +110,7 @@ export const VideoRecorder = () => {
     };
 
     const handleToggleRecording = (e: React.MouseEvent<HTMLButtonElement>) => {
-        console.log('handleToggleRecording');
+        // console.log('handleToggleRecording');
         e.preventDefault();
         if (isRecording) {
             stopRecording();
@@ -126,7 +126,7 @@ export const VideoRecorder = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-4">
+        <div className="max-w-xl mx-auto p-4">
             <video
                 ref={videoPreviewRef}
                 className="w-full rounded border border-gray-300 mb-4"

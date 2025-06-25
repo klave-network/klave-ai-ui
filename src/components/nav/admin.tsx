@@ -2,12 +2,12 @@ import type { LucideIcon } from 'lucide-react';
 import {
     SidebarGroup,
     SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 export function NavAdmin({
     items
@@ -16,11 +16,11 @@ export function NavAdmin({
         title: string;
         url: string;
         icon: LucideIcon;
+        className?: string;
     }[];
 }) {
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Admin</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {items.map((item) => (
@@ -29,12 +29,15 @@ export function NavAdmin({
                                 <Link
                                     search
                                     to={item.url}
+                                    className='h-12'
                                     activeProps={{
                                         className: 'bg-sidebar-accent'
                                     }}
                                     activeOptions={{ exact: true }}
                                 >
-                                    <item.icon />
+                                    <div className={cn('rounded-md w-8 h-8 p-1 flex justify-center items-center', item.className)}>
+                                        <item.icon className='h-5 w-5' />
+                                    </div>
                                     <span>{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>

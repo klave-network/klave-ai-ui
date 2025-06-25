@@ -7,7 +7,8 @@ import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { Utils } from '@secretarium/connector';
-import { getQuote, verifyQuote } from '@/api/klave';
+import { getQuote, verifyQuote, isConnected as isKlaveConnected } from '@/api/klave';
+import { LoadingDots } from '@/components/loading-dots';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
     component: RouteComponent,
@@ -15,18 +16,19 @@ export const Route = createFileRoute('/_auth/chat/$id')({
         // On mount: if AI message missing, add placeholder and start streaming
         const { id: chatId } = params;
         const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-        const chat = store.state[currentUser].chats.find(
+        const chat = store.state[currentUser]?.chats?.find(
             (chat) => chat.id === chatId
         );
 
         // attestation information
         const challenge = Array.from(Utils.getRandomBytes(64));
         const currentTime = new Date().getTime();
-        const quote = await getQuote({ challenge });
-        const verification = await verifyQuote({
+        const isConnected = await isKlaveConnected();
+        const quote = isConnected ? await getQuote({ challenge }) : undefined;
+        const verification = isConnected && quote ? await verifyQuote({
             quote: quote.quote_binary,
             current_time: currentTime
-        });
+        }) : undefined;
 
         if (!chat)
             return {
@@ -66,8 +68,11 @@ export const Route = createFileRoute('/_auth/chat/$id')({
     },
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">
-            <div className="flex items-center gap-2">
-                <span>Creating chat...</span>
+            <div className="flex flex-col  items-center gap-2">
+                <span>Creating chat</span>
+                <div className="flex flex-col justify-center items-center text-center mb-4">
+                    <LoadingDots />
+                </div>
             </div>
         </div>
     )
@@ -166,18 +171,17 @@ function RouteComponent() {
     return (
         <div className="flex flex-col items-center h-full">
             {/* Chat */}
-            <div className="max-w-3xl flex-1 overflow-auto mb-4 w-full">
+            <div className="max-w-xl flex-1 overflow-auto mb-4 w-full">
                 {chat.messages.map(({ id, role, content }) => {
                     const isStreaming =
                         streamingMessageId === id && role === 'ai';
                     return (
                         <div
                             key={id}
-                            className={`w-fit mb-2 px-4 py-2 rounded-xl ${
-                                role === 'user'
-                                    ? 'bg-gray-100 ml-auto'
-                                    : 'mr-auto'
-                            }`}
+                            className={`w-fit mb-2 px-4 py-2 rounded-xl ${role === 'user'
+                                ? 'bg-gray-100 ml-auto'
+                                : 'mr-auto'
+                                }`}
                         >
                             {isStreaming ? (
                                 <StreamedResponse

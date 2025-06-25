@@ -5,7 +5,9 @@ export function NavHeader() {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <Logo className="p-2" />
+                <div className='pl-2 flex gap-2 items-start justify-start'>
+                    <Logo type='horizontal' className="h-6" /><span className='text-2xl'>for AI</span>
+                </div>
             </SidebarMenuItem>
         </SidebarMenu>
     );
