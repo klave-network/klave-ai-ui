@@ -5,7 +5,11 @@ import { generateSimpleId } from '@/lib/utils';
 import { storeActions, useUserModels } from '@/store';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY, CUR_MODEL_KEY, CUR_MODE_KEY } from '@/lib/constants';
-import { getQuote, verifyQuote, isConnected as isKlaveConnected } from '@/api/klave';
+import {
+    getQuote,
+    verifyQuote,
+    isConnected as isKlaveConnected
+} from '@/api/klave';
 import { Utils } from '@secretarium/connector';
 import { LoadingDots } from '@/components/loading-dots';
 
@@ -16,10 +20,13 @@ export const Route = createFileRoute('/_auth/chat/')({
         const currentTime = new Date().getTime();
         const isConnected = await isKlaveConnected();
         const quote = isConnected ? await getQuote({ challenge }) : undefined;
-        const verification = isConnected && quote ? await verifyQuote({
-            quote: quote.quote_binary,
-            current_time: currentTime
-        }) : undefined;
+        const verification =
+            isConnected && quote
+                ? await verifyQuote({
+                      quote: quote.quote_binary,
+                      current_time: currentTime
+                  })
+                : undefined;
 
         return {
             currentTime,
@@ -72,7 +79,8 @@ function RouteComponent() {
                 topp: 0.9,
                 steps: 256,
                 sliding_window: false,
-                mode: currentMode
+                mode: currentMode,
+                embeddings: false
             });
 
             await inferenceAddPrompt({
@@ -97,7 +105,9 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Welcome screen */}
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl bg-gradient-to-r from-kor via-kbl to-kcy inline-block text-transparent bg-clip-text font-bold">Hello, let's chat</h2>
+                <h2 className="text-2xl md:text-4xl bg-gradient-to-r from-kor via-kbl to-kcy inline-block text-transparent bg-clip-text font-bold">
+                    Hello, let's chat
+                </h2>
             </div>
 
             {/* Chat input */}

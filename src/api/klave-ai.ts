@@ -2,11 +2,12 @@ import secretariumHandler from '@/lib/secretarium-handler';
 import { klaveKlaveAIContract, waitForConnection } from '@/api';
 import type {
     ContextInput,
-    Input,
+    InferenceResponseInput,
     Model,
     PromptInput,
     Tokenizer,
-    ChunkResult
+    ChunkResult,
+    PromptInputRag
 } from '@/lib/types';
 
 export const getModels = async (): Promise<Model[]> =>
@@ -14,9 +15,9 @@ export const getModels = async (): Promise<Model[]> =>
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
-                'getModels',
+                'graph_models',
                 '',
-                `getModels-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `graph_models-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
             )
         )
         .then(
@@ -38,9 +39,9 @@ export const getTokenizers = async (): Promise<Tokenizer[]> =>
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
-                'getTokenizers',
+                'graph_tokenizers',
                 '',
-                `getTokenizers-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `graph_tokenizers-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
             )
         )
         .then(
@@ -64,9 +65,9 @@ export const graphInitExecutionContext = async (
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
-                'graphInitExecutionContext',
+                'graph_init_execution_context',
                 args,
-                `graphInitExecutionContext-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `graph_init_execution_context-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
             )
         )
         .then(
@@ -89,9 +90,9 @@ export const graphDeleteExecutionContext = async (
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
-                'graphDeleteExecutionContext',
+                'graph_delete_execution_context',
                 contextName,
-                `graphDeleteExecutionContext-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `graph_delete_execution_context-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
             )
         )
         .then(
@@ -112,9 +113,34 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
-                'inferenceAddPrompt',
+                'inference_add_prompt',
                 args,
-                `inferenceAddPrompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `inference_add_prompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const inferenceAddRagPrompt = async (
+    args: PromptInputRag
+): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'inference_rag_add_prompt',
+                args,
+                `inference_rag_add_prompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
             )
         )
         .then(
@@ -131,15 +157,15 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
         );
 
 export const inferenceGetResponse = async (
-    args: Input,
+    args: InferenceResponseInput,
     resolveCallback: (result: ChunkResult) => boolean
 ): Promise<void> => {
     await waitForConnection();
     const tx = await secretariumHandler.request(
         klaveKlaveAIContract,
-        'inferenceGetPieces',
+        'inference_get_pieces',
         args,
-        `inferenceGetPieces-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+        `inference_get_pieces-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
     );
 
     return new Promise<void>((resolve, reject) => {
@@ -150,7 +176,7 @@ export const inferenceGetResponse = async (
         });
 
         tx.onError((error) => {
-            console.error(`inferenceGetPieces error: ${error.message}`);
+            console.error(`inference_get_pieces error: ${error.message}`);
             reject(error);
         });
 

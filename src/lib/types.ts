@@ -53,6 +53,7 @@ export type ContextInput = {
     steps: number;
     sliding_window: boolean;
     mode: string;
+    embeddings: boolean;
 };
 
 export type PromptInput = {
@@ -61,6 +62,19 @@ export type PromptInput = {
 };
 
 export type Input = Pick<PromptInput, 'context_name'>;
+
+export type InferenceResponseInput = {
+    context_name: string;
+    nb_pieces: number;
+};
+
+export type PromptInputRag = {
+    context_name: string;
+    user_prompt: string;
+    rag_id: string;
+    n_rag_chunks: number;
+    n_max_augmentations: number;
+};
 
 export type ChunkResult = {
     piece: number[];
