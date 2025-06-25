@@ -97,5 +97,6 @@
         "vite": "^6.3.5",
         "vitest": "^3.2.3",
         "web-vitals": "^4.2.4"
-    }
+    },
+    "packageManager": "yarn@4.9.2"
 }
