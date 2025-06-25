@@ -42,7 +42,6 @@ function RouteComponent() {
     // Load key pairs from localStorage on component mount
     useEffect(() => {
         const storedKeyPairs = localStorage.getItem(LOC_KEY);
-        console.log(storedKeyPairs);
         if (storedKeyPairs) {
             try {
                 setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
@@ -69,8 +68,7 @@ function RouteComponent() {
 
             const decodedKeyname = decodeURIComponent(keyname);
             const key = keyPairs.find((kp) => kp.name === decodedKeyname);
-            console.log('keyPairs', keyPairs);
-            console.log('decodedKeyname', decodedKeyname);
+
             if (!key) {
                 toast.error('A user with this key does not exist');
                 return;

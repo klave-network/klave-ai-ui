@@ -9,9 +9,19 @@ type ChatMessage = {
     timestamp?: number;
 };
 
+type ChatSettings = {
+    systemPrompt: string;
+    temperature: number;
+    topp: number;
+    steps: number;
+    slidingWindow: boolean;
+    useRag: boolean;
+};
+
 export type ChatHistory = {
     id: string;
     messages: ChatMessage[];
+    chatSettings: ChatSettings;
 };
 
 type KlaveAIState = Record<
@@ -19,14 +29,7 @@ type KlaveAIState = Record<
     {
         chats?: ChatHistory[];
         models?: Model[];
-        chatSettings: {
-            systemPrompt: string;
-            temperature: number;
-            topp: number;
-            steps: number;
-            slidingWindow: boolean;
-            useRag: boolean;
-        };
+        chatSettings: ChatSettings;
     }
 >;
 
@@ -76,18 +79,54 @@ export const useUserDocumentSet = (keyname: string, documentSet: string) => [
 
 // Actions
 export const storeActions = {
-    createChat: (userKeyname: string, chatId: string, message: ChatMessage) => {
-        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const newChat: ChatHistory = {
-            id: chatId,
-            messages: [message]
+    createChat: (
+        userKeyname: string,
+        chatId: string,
+        message: ChatMessage,
+        settings: ChatSettings
+    ) => {
+        store.setState((state) => {
+            const userData = state[userKeyname] ?? { chats: [], models: [] };
+
+            // Check if chat already exists
+            const existingChat = userData.chats?.find(
+                (chat) => chat.id === chatId
+            );
+            if (existingChat) {
+                return state; // Don't create duplicate
+            }
+
+            const newChat: ChatHistory = {
+                id: chatId,
+                messages: [message],
+                chatSettings: settings
+            };
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chats: [...(userData.chats ?? []), newChat]
+                }
+            };
+        });
+    },
+
+    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            chatSettings: {}
         };
 
         store.setState((state) => ({
             ...state,
             [userKeyname]: {
                 ...userData,
-                chats: [...(userData.chats ?? []), newChat]
+                chatSettings: {
+                    ...userData.chatSettings,
+                    ...settings
+                }
             }
         }));
     },
