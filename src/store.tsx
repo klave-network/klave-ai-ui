@@ -1,6 +1,6 @@
 import { STORE_KEY } from '@/lib/constants';
 import { useStore, Store } from '@tanstack/react-store';
-import { type Model } from '@/lib/types';
+import { type Model, type Rag } from '@/lib/types';
 
 type ChatMessage = {
     id: string;
@@ -29,6 +29,7 @@ type KlaveAIState = Record<
     {
         chats?: ChatHistory[];
         models?: Model[];
+        ragDataSets?: Rag[];
         chatSettings: ChatSettings;
     }
 >;
@@ -65,6 +66,14 @@ export const useUserModels = (keyname: string) =>
 export const useUserModel = (keyname: string, modelName: string) =>
     useStore(store, (state) =>
         state[keyname]?.models?.find((model) => model.name === modelName)
+    );
+
+export const useUserRagDataSets = (keyname: string) =>
+    useStore(store, (state) => state[keyname]?.ragDataSets ?? []);
+
+export const useUserRagDataSet = (keyname: string, ragId: string) =>
+    useStore(store, (state) =>
+        state[keyname]?.ragDataSets?.find((rag) => rag.rag_id === ragId)
     );
 
 export const useUserChatSettings = (keyname: string) =>
@@ -116,6 +125,7 @@ export const storeActions = {
         const userData = store.state[userKeyname] ?? {
             chats: [],
             models: [],
+            ragDataSets: [],
             chatSettings: {}
         };
 
@@ -209,6 +219,23 @@ export const storeActions = {
                     useRag: false
                 },
                 models
+            }
+        }));
+    },
+
+    // add RAG data sets fetched from the backend
+    addRagDataSets: (userKeyname: string, ragDataSets: Rag[]) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            ragDataSets: []
+        };
+
+        store.setState((state) => ({
+            ...state,
+            [userKeyname]: {
+                ...userData,
+                ragDataSets
             }
         }));
     }

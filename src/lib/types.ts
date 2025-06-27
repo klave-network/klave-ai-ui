@@ -147,3 +147,21 @@ export type RagDeleteDocumentInput = {
 export type RagDocumentListInput = {
     rag_id: string;
 };
+
+export type Rag = {
+    chunk_length: number;
+    database_id: string;
+    model_name: string;
+    rag_id: string;
+    table_name: string;
+};
+
+export type Document = {
+    id: string;
+    url: string;
+    version: string;
+    length: number;
+    date: string;
+    content_type: string;
+    controller_public_key: string;
+};

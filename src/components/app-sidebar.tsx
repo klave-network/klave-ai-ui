@@ -1,21 +1,10 @@
 import * as React from 'react';
-import {
-    // FolderKanban,
-    LifeBuoy,
-    Settings,
-    MessageCirclePlus,
-    Database,
-    // Users,
-    // Boxes,
-    FolderCode
-    // Video
-} from 'lucide-react';
+import { LifeBuoy, Settings, MessageCirclePlus } from 'lucide-react';
 
 import { NavHeader } from '@/components/nav/header';
 import { NavAdmin } from '@/components/nav/admin';
 import { NavChats } from '@/components/nav/chats';
 import { NavAdministration } from '@/components/nav/administration';
-// import { NavSettings } from '@/components/nav/settings';
 import { NavFooter } from '@/components/nav/footer';
 import {
     Sidebar,
@@ -37,16 +26,6 @@ const routes = {
             url: '/chat',
             icon: MessageCirclePlus,
             className: 'bg-gradient-to-br from-kcy to-kbl/90 text-white'
-        },
-        {
-            title: 'Models',
-            url: '/models',
-            icon: FolderCode
-        },
-        {
-            title: 'Data',
-            url: '/data',
-            icon: Database
         }
         // {
         //     title: 'Lense',

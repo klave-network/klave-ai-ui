@@ -11,7 +11,9 @@ import type {
     RagCreateInput,
     RagDocumentInput,
     RagDeleteDocumentInput,
-    RagDocumentListInput
+    RagDocumentListInput,
+    Rag,
+    Document
 } from '@/lib/types';
 
 export const getModels = async (): Promise<Model[]> =>
@@ -151,6 +153,7 @@ export const inferenceAddRagPrompt = async (
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
+                        console.log('Result:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -261,7 +264,7 @@ export const ragDeleteDocument = async (
 
 export const ragDocumentList = async (
     args: RagDocumentListInput
-): Promise<any> =>
+): Promise<Document[]> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -284,7 +287,7 @@ export const ragDocumentList = async (
                 })
         );
 
-export const ragList = async (): Promise<any> =>
+export const getRagList = async (): Promise<Rag[]> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(

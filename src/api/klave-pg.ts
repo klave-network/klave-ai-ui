@@ -16,8 +16,7 @@ export const pgsqlCreate = async (args: PgsqlCreateInput): Promise<any> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        const parsedResult = JSON.parse(result);
-                        resolve(parsedResult);
+                        resolve(result);
                     });
                     tx.onError((error) => {
                         reject(error);
@@ -40,8 +39,7 @@ export const pgsqlList = async (): Promise<any> =>
             (tx) =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        const parsedResult = JSON.parse(result);
-                        resolve(parsedResult);
+                        resolve(result);
                     });
                     tx.onError((error) => {
                         reject(error);
