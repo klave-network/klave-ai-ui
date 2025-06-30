@@ -32,31 +32,6 @@ const routes = {
         //     url: '/chat/video',
         //     icon: Video,
         //     className: 'bg-gradient-to-br from-kbl to-kor/90 text-white'
-        // },
-        // {
-        //     title: 'Projects',
-        //     url: '/projects',
-        //     icon: FolderKanban
-        // },
-        {
-            title: 'Models',
-            url: '/models',
-            icon: FolderCode
-        },
-        {
-            title: 'Data',
-            url: '/data',
-            icon: Database
-        }
-        // {
-        //     title: 'Templates',
-        //     url: '/templates',
-        //     icon: Boxes
-        // },
-        // {
-        //     title: 'Community',
-        //     url: '/community',
-        //     icon: Users
         // }
     ],
     navSecondary: [
