@@ -38,11 +38,16 @@ const routes = {
         //     url: '/projects',
         //     icon: FolderKanban
         // },
-        // {
-        //     title: 'Models',
-        //     url: '/models',
-        //     icon: FolderCode
-        // },
+        {
+            title: 'Models',
+            url: '/models',
+            icon: FolderCode
+        },
+        {
+            title: 'Data',
+            url: '/data',
+            icon: Database
+        }
         // {
         //     title: 'Templates',
         //     url: '/templates',

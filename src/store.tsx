@@ -141,6 +141,25 @@ export const storeActions = {
         }));
     },
 
+    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            chatSettings: {}
+        };
+
+        store.setState((state) => ({
+            ...state,
+            [userKeyname]: {
+                ...userData,
+                chatSettings: {
+                    ...userData.chatSettings,
+                    ...settings
+                }
+            }
+        }));
+    },
+
     deleteChat: (userKeyname: string, chatId: string) => {
         const userData = store.state[userKeyname] ?? { chats: [], models: [] };
         const updatedChats = userData.chats?.filter(
