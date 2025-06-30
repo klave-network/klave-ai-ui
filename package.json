@@ -27,7 +27,7 @@
     },
     "dependencies": {
         "@cubone/react-file-manager": "^1.24.0",
-        "@hookform/resolvers": "^5.0.1",
+        "@hookform/resolvers": "^5.1.1",
         "@radix-ui/react-avatar": "^1.1.10",
         "@radix-ui/react-collapsible": "^1.1.11",
         "@radix-ui/react-dialog": "^1.1.14",
@@ -60,7 +60,7 @@
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-dropzone": "^14.3.8",
-        "react-hook-form": "^7.56.4",
+        "react-hook-form": "^7.58.1",
         "react-markdown": "^10.1.0",
         "remark-gfm": "^4.0.1",
         "sonner": "^2.0.5",
@@ -72,7 +72,7 @@
         "usehooks-ts": "^3.1.1",
         "uuid": "^11.1.0",
         "vite-plugin-mkcert": "^1.17.8",
-        "zod": "^3.25.42"
+        "zod": "^3.25.67"
     },
     "devDependencies": {
         "@commitlint/cli": "^19.8.1",

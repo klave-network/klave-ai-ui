@@ -82,7 +82,7 @@ export const SettingsModal = () => {
     useEffect(() => {
         if (isDialogOpen) {
             // Use currentChat settings if available, otherwise fall back to global settings
-            const settings = currentChat
+            const settings = currentChat?.chatSettings
                 ? currentChat.chatSettings
                 : {
                       systemPrompt,
@@ -164,7 +164,7 @@ export const SettingsModal = () => {
                 <Button
                     size="icon"
                     variant="outline"
-                    className="hover:cursor-pointer"
+                    className="hover:cursor-pointer rounded-full"
                 >
                     <Settings2 className="text-gray-500" />
                 </Button>

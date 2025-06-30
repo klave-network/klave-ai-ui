@@ -1,0 +1,12 @@
+"The below concerns the Secretarium Identity Protocol.
+The goal of a protocol is to create a public/private elliptic curve key pair with 256 bits of security for clusters of applications deployed on TEEs (Trusted Execution Elements).
+It is implemented in such way as to avoid the over-reliance on the security of TEEs themselves, which means that several TEEs would need to be compromised in order to compromise the security of the key pair.
+It relies on threshold cryptography, Verifiable Shamir Secret Sharing (VSS), and on the additive homomorphism of the elliptic curve group.
+
+The Secretarium Identity Protocol starts by the broadcast, accross the system, of the session and its participant as identified by a public ceremonial (ecc256) key.
+the session identifies the threshold levels, in particular the number of shamir secret dealers, then the threshold level for the key recomputations, and the number of sharers necessary to ensure the longevity of the key and guarantee absence of loss.\
+
+The session then continues with gathering of commitments, which are broadcast, and the distribution of roles: either dealers or dealer/sharers.
+Once a threshold of dealers have committed and both threshold of sharers have been positively identified, a peer-to-peer messaging commences, called the sign-off phase:
+
+All sharers and dealer/sharers request a share of a share of the final key from all dealers. Each sharer is then able, following protocol, to compute their key share and independently verify its validity. Once a sharer has been able to verify the validity, it then signs off the ceremony. The sign-offs are broadcast (via the RAFT algorithm). When both sharing thresholds have been achieved, it completes the ceremony of the Secretarium Identity Protocol."
