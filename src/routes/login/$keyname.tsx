@@ -37,18 +37,20 @@ function RouteComponent() {
     const router = useRouter();
     const navigate = useNavigate();
     const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
+    const [keyPairsLoaded, setKeyPairsLoaded] = useState(false);
 
     // Load key pairs from localStorage on component mount
     useEffect(() => {
         const storedKeyPairs = localStorage.getItem(LOC_KEY);
         if (storedKeyPairs) {
             try {
-                setKeyPairs(JSON.parse(storedKeyPairs));
+                setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
             } catch (error) {
                 console.error('Failed to parse stored key pairs:', error);
                 setKeyPairs([]);
             }
         }
+        setKeyPairsLoaded(true);
     }, []);
 
     const handleLogin = useCallback(
@@ -66,6 +68,7 @@ function RouteComponent() {
 
             const decodedKeyname = decodeURIComponent(keyname);
             const key = keyPairs.find((kp) => kp.name === decodedKeyname);
+
             if (!key) {
                 toast.error('A user with this key does not exist');
                 return;
@@ -105,9 +108,9 @@ function RouteComponent() {
     );
 
     useEffect(() => {
-        if (hasSubmitted.current) return;
+        if (hasSubmitted.current || !keyPairsLoaded) return;
         handleLogin();
-    }, [handleLogin, hasSubmitted]);
+    }, [handleLogin, keyPairsLoaded]);
 
     const hasLoadedKeys = keyPairs.length > 0;
 

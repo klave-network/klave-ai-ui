@@ -8,7 +8,7 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { Link } from '@tanstack/react-router';
-import { Cog, Puzzle } from 'lucide-react';
+import { Cog, Puzzle, Folder } from 'lucide-react';
 
 export function NavAdministration({
     ...props
@@ -32,20 +32,20 @@ export function NavAdministration({
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    {/* <SidebarMenuItem key="manage-documents">
+                    <SidebarMenuItem key="manage-data">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to={`/documents`}
+                                to={`/data`}
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
                             >
-                                <Files />
-                                <span>Manage Documents</span>
+                                <Folder />
+                                <span>Manage Data</span>
                             </Link>
                         </SidebarMenuButton>
-                    </SidebarMenuItem> */}
+                    </SidebarMenuItem>
                     <SidebarMenuItem key="manage-settings">
                         <SidebarMenuButton asChild>
                             <Link

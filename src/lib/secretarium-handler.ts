@@ -76,7 +76,9 @@ const printClusterInfo = (): void => {
         }
     );
 
-    console.info('Klave for AI App now using the following cluster configuration:');
+    console.info(
+        'Klave for AI App now using the following cluster configuration:'
+    );
     console.table(printableConfig);
 };
 
@@ -134,7 +136,9 @@ const secretariumHandler = {
                 if (config.DK_SERVICES)
                     handlerStore.fileService = config.DK_SERVICES;
                 processClusterConfig(clusterConfigBase);
-                console.info('Klave for AI App now using config.json overrides');
+                console.info(
+                    'Klave for AI App now using config.json overrides'
+                );
             })
             .catch(() => {
                 processClusterConfig(clusterConfigBase);
@@ -269,7 +273,7 @@ const secretariumHandler = {
 if (
     (import.meta.env.NODE_ENV === 'development' ||
         import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_OVERWRITABLE ===
-        'true') &&
+            'true') &&
     window
 ) {
     window['appKlaveCluster'] = processClusterConfig;

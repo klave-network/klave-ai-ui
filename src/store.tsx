@@ -1,6 +1,6 @@
 import { STORE_KEY } from '@/lib/constants';
 import { useStore, Store } from '@tanstack/react-store';
-import { type Model } from '@/lib/types';
+import { type Model, type Rag } from '@/lib/types';
 
 type ChatMessage = {
     id: string;
@@ -29,6 +29,7 @@ type KlaveAIState = Record<
     {
         chats?: ChatHistory[];
         models?: Model[];
+        ragDataSets?: Rag[];
         chatSettings: ChatSettings;
     }
 >;
@@ -67,6 +68,14 @@ export const useUserModel = (keyname: string, modelName: string) =>
         state[keyname]?.models?.find((model) => model.name === modelName)
     );
 
+export const useUserRagDataSets = (keyname: string) =>
+    useStore(store, (state) => state[keyname]?.ragDataSets ?? []);
+
+export const useUserRagDataSet = (keyname: string, ragId: string) =>
+    useStore(store, (state) =>
+        state[keyname]?.ragDataSets?.find((rag) => rag.rag_id === ragId)
+    );
+
 export const useUserChatSettings = (keyname: string) =>
     useStore(store, (state) => state[keyname].chatSettings);
 
@@ -85,18 +94,49 @@ export const storeActions = {
         message: ChatMessage,
         settings: ChatSettings
     ) => {
-        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const newChat: ChatHistory = {
-            id: chatId,
-            messages: [message],
-            chatSettings: settings
+        store.setState((state) => {
+            const userData = state[userKeyname] ?? { chats: [], models: [] };
+
+            // Check if chat already exists
+            const existingChat = userData.chats?.find(
+                (chat) => chat.id === chatId
+            );
+            if (existingChat) {
+                return state; // Don't create duplicate
+            }
+
+            const newChat: ChatHistory = {
+                id: chatId,
+                messages: [message],
+                chatSettings: settings
+            };
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chats: [...(userData.chats ?? []), newChat]
+                }
+            };
+        });
+    },
+
+    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            ragDataSets: [],
+            chatSettings: {}
         };
 
         store.setState((state) => ({
             ...state,
             [userKeyname]: {
                 ...userData,
-                chats: [...(userData.chats ?? []), newChat]
+                chatSettings: {
+                    ...userData.chatSettings,
+                    ...settings
+                }
             }
         }));
     },
@@ -198,6 +238,23 @@ export const storeActions = {
                     useRag: false
                 },
                 models
+            }
+        }));
+    },
+
+    // add RAG data sets fetched from the backend
+    addRagDataSets: (userKeyname: string, ragDataSets: Rag[]) => {
+        const userData = store.state[userKeyname] ?? {
+            chats: [],
+            models: [],
+            ragDataSets: []
+        };
+
+        store.setState((state) => ({
+            ...state,
+            [userKeyname]: {
+                ...userData,
+                ragDataSets
             }
         }));
     }

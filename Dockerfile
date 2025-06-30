@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24-alpine AS build
+FROM node:22-alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -7,6 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 COPY yarn.lock ./
+RUN echo 'nodeLinker: "node-modules"' > ./.yarnrc.yml
+RUN corepack enable && yarn --frozen-lockfile
 
 # Install dependencies
 RUN yarn install
