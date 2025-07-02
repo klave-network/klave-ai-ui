@@ -68,7 +68,7 @@ export type PromptInput = BaseContext & {
 };
 
 export type InferenceResponseInput = BaseContext & {
-    nb_pieces: number;
+    nb_pieces?: number;
 };
 
 export type PromptInputRag = BaseContext & {
@@ -76,6 +76,10 @@ export type PromptInputRag = BaseContext & {
     rag_id: string;
     n_rag_chunks: number;
     n_max_augmentations: number;
+};
+
+export type FrameInput = BaseContext & {
+    frame_bytes: Uint8Array;
 };
 
 export type ChunkResult = {

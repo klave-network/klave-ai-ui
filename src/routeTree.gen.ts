@@ -8,840 +8,644 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as PingRouteImport } from './routes/ping'
+import { Route as FilesRouteImport } from './routes/files'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as LoginRouteRouteImport } from './routes/login/route'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as AuthIndexRouteImport } from './routes/_auth/index'
+import { Route as LoginKeynameRouteImport } from './routes/login/$keyname'
+import { Route as AuthTemplatesRouteImport } from './routes/_auth/templates'
+import { Route as AuthSettingsRouteImport } from './routes/_auth/settings'
+import { Route as AuthProjectsRouteImport } from './routes/_auth/projects'
+import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
+import { Route as AuthCommunityRouteImport } from './routes/_auth/community'
+import { Route as AuthModelsRouteRouteImport } from './routes/_auth/models/route'
+import { Route as AuthDocumentsRouteRouteImport } from './routes/_auth/documents/route'
+import { Route as AuthDataRouteRouteImport } from './routes/_auth/data/route'
+import { Route as AuthChatRouteRouteImport } from './routes/_auth/chat/route'
+import { Route as AuthModelsIndexRouteImport } from './routes/_auth/models/index'
+import { Route as AuthDocumentsIndexRouteImport } from './routes/_auth/documents/index'
+import { Route as AuthDataIndexRouteImport } from './routes/_auth/data/index'
+import { Route as AuthChatIndexRouteImport } from './routes/_auth/chat/index'
+import { Route as AuthModelsNameRouteImport } from './routes/_auth/models/$name'
+import { Route as AuthDocumentsSetRouteImport } from './routes/_auth/documents/$set'
+import { Route as AuthDataNewRouteImport } from './routes/_auth/data/new'
+import { Route as AuthDataNameRouteImport } from './routes/_auth/data/$name'
+import { Route as AuthChatVideoRouteImport } from './routes/_auth/chat/video'
+import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
+import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
 
-import { Route as rootRoute } from './routes/__root';
-import { Route as PingImport } from './routes/ping';
-import { Route as FilesImport } from './routes/files';
-import { Route as AuthImport } from './routes/_auth';
-import { Route as LoginRouteImport } from './routes/login/route';
-import { Route as LoginIndexImport } from './routes/login/index';
-import { Route as AuthIndexImport } from './routes/_auth/index';
-import { Route as LoginKeynameImport } from './routes/login/$keyname';
-import { Route as AuthTemplatesImport } from './routes/_auth/templates';
-import { Route as AuthSettingsImport } from './routes/_auth/settings';
-import { Route as AuthProjectsImport } from './routes/_auth/projects';
-import { Route as AuthProfileImport } from './routes/_auth/profile';
-import { Route as AuthCommunityImport } from './routes/_auth/community';
-import { Route as AuthModelsRouteImport } from './routes/_auth/models/route';
-import { Route as AuthDocumentsRouteImport } from './routes/_auth/documents/route';
-import { Route as AuthDataRouteImport } from './routes/_auth/data/route';
-import { Route as AuthChatRouteImport } from './routes/_auth/chat/route';
-import { Route as AuthModelsIndexImport } from './routes/_auth/models/index';
-import { Route as AuthDocumentsIndexImport } from './routes/_auth/documents/index';
-import { Route as AuthDataIndexImport } from './routes/_auth/data/index';
-import { Route as AuthChatIndexImport } from './routes/_auth/chat/index';
-import { Route as AuthModelsNameImport } from './routes/_auth/models/$name';
-import { Route as AuthDocumentsSetImport } from './routes/_auth/documents/$set';
-import { Route as AuthDataNewImport } from './routes/_auth/data/new';
-import { Route as AuthDataNameImport } from './routes/_auth/data/$name';
-import { Route as AuthChatVideoImport } from './routes/_auth/chat/video';
-import { Route as AuthChatAttestImport } from './routes/_auth/chat/attest';
-import { Route as AuthChatIdImport } from './routes/_auth/chat/$id';
-
-// Create/Update Routes
-
-const PingRoute = PingImport.update({
-    id: '/ping',
-    path: '/ping',
-    getParentRoute: () => rootRoute
-} as any);
-
-const FilesRoute = FilesImport.update({
-    id: '/files',
-    path: '/files',
-    getParentRoute: () => rootRoute
-} as any);
-
-const AuthRoute = AuthImport.update({
-    id: '/_auth',
-    getParentRoute: () => rootRoute
-} as any);
-
-const LoginRouteRoute = LoginRouteImport.update({
-    id: '/login',
-    path: '/login',
-    getParentRoute: () => rootRoute
-} as any);
-
-const LoginIndexRoute = LoginIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => LoginRouteRoute
-} as any);
-
-const AuthIndexRoute = AuthIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const LoginKeynameRoute = LoginKeynameImport.update({
-    id: '/$keyname',
-    path: '/$keyname',
-    getParentRoute: () => LoginRouteRoute
-} as any);
-
-const AuthTemplatesRoute = AuthTemplatesImport.update({
-    id: '/templates',
-    path: '/templates',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthSettingsRoute = AuthSettingsImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthProjectsRoute = AuthProjectsImport.update({
-    id: '/projects',
-    path: '/projects',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthProfileRoute = AuthProfileImport.update({
-    id: '/profile',
-    path: '/profile',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthCommunityRoute = AuthCommunityImport.update({
-    id: '/community',
-    path: '/community',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthModelsRouteRoute = AuthModelsRouteImport.update({
-    id: '/models',
-    path: '/models',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthDocumentsRouteRoute = AuthDocumentsRouteImport.update({
-    id: '/documents',
-    path: '/documents',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthDataRouteRoute = AuthDataRouteImport.update({
-    id: '/data',
-    path: '/data',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthChatRouteRoute = AuthChatRouteImport.update({
-    id: '/chat',
-    path: '/chat',
-    getParentRoute: () => AuthRoute
-} as any);
-
-const AuthModelsIndexRoute = AuthModelsIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthModelsRouteRoute
-} as any);
-
-const AuthDocumentsIndexRoute = AuthDocumentsIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthDocumentsRouteRoute
-} as any);
-
-const AuthDataIndexRoute = AuthDataIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthDataRouteRoute
-} as any);
-
-const AuthChatIndexRoute = AuthChatIndexImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthChatRouteRoute
-} as any);
-
-const AuthModelsNameRoute = AuthModelsNameImport.update({
-    id: '/$name',
-    path: '/$name',
-    getParentRoute: () => AuthModelsRouteRoute
-} as any);
-
-const AuthDocumentsSetRoute = AuthDocumentsSetImport.update({
-    id: '/$set',
-    path: '/$set',
-    getParentRoute: () => AuthDocumentsRouteRoute
-} as any);
-
-const AuthDataNewRoute = AuthDataNewImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthDataRouteRoute
-} as any);
-
-const AuthDataNameRoute = AuthDataNameImport.update({
-    id: '/$name',
-    path: '/$name',
-    getParentRoute: () => AuthDataRouteRoute
-} as any);
-
-const AuthChatVideoRoute = AuthChatVideoImport.update({
-    id: '/video',
-    path: '/video',
-    getParentRoute: () => AuthChatRouteRoute
-} as any);
-
-const AuthChatAttestRoute = AuthChatAttestImport.update({
-    id: '/attest',
-    path: '/attest',
-    getParentRoute: () => AuthChatRouteRoute
-} as any);
-
-const AuthChatIdRoute = AuthChatIdImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthChatRouteRoute
-} as any);
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-    interface FileRoutesByPath {
-        '/login': {
-            id: '/login';
-            path: '/login';
-            fullPath: '/login';
-            preLoaderRoute: typeof LoginRouteImport;
-            parentRoute: typeof rootRoute;
-        };
-        '/_auth': {
-            id: '/_auth';
-            path: '';
-            fullPath: '';
-            preLoaderRoute: typeof AuthImport;
-            parentRoute: typeof rootRoute;
-        };
-        '/files': {
-            id: '/files';
-            path: '/files';
-            fullPath: '/files';
-            preLoaderRoute: typeof FilesImport;
-            parentRoute: typeof rootRoute;
-        };
-        '/ping': {
-            id: '/ping';
-            path: '/ping';
-            fullPath: '/ping';
-            preLoaderRoute: typeof PingImport;
-            parentRoute: typeof rootRoute;
-        };
-        '/_auth/chat': {
-            id: '/_auth/chat';
-            path: '/chat';
-            fullPath: '/chat';
-            preLoaderRoute: typeof AuthChatRouteImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/data': {
-            id: '/_auth/data';
-            path: '/data';
-            fullPath: '/data';
-            preLoaderRoute: typeof AuthDataRouteImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/documents': {
-            id: '/_auth/documents';
-            path: '/documents';
-            fullPath: '/documents';
-            preLoaderRoute: typeof AuthDocumentsRouteImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/models': {
-            id: '/_auth/models';
-            path: '/models';
-            fullPath: '/models';
-            preLoaderRoute: typeof AuthModelsRouteImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/community': {
-            id: '/_auth/community';
-            path: '/community';
-            fullPath: '/community';
-            preLoaderRoute: typeof AuthCommunityImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/profile': {
-            id: '/_auth/profile';
-            path: '/profile';
-            fullPath: '/profile';
-            preLoaderRoute: typeof AuthProfileImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/projects': {
-            id: '/_auth/projects';
-            path: '/projects';
-            fullPath: '/projects';
-            preLoaderRoute: typeof AuthProjectsImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/settings': {
-            id: '/_auth/settings';
-            path: '/settings';
-            fullPath: '/settings';
-            preLoaderRoute: typeof AuthSettingsImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/_auth/templates': {
-            id: '/_auth/templates';
-            path: '/templates';
-            fullPath: '/templates';
-            preLoaderRoute: typeof AuthTemplatesImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/login/$keyname': {
-            id: '/login/$keyname';
-            path: '/$keyname';
-            fullPath: '/login/$keyname';
-            preLoaderRoute: typeof LoginKeynameImport;
-            parentRoute: typeof LoginRouteImport;
-        };
-        '/_auth/': {
-            id: '/_auth/';
-            path: '/';
-            fullPath: '/';
-            preLoaderRoute: typeof AuthIndexImport;
-            parentRoute: typeof AuthImport;
-        };
-        '/login/': {
-            id: '/login/';
-            path: '/';
-            fullPath: '/login/';
-            preLoaderRoute: typeof LoginIndexImport;
-            parentRoute: typeof LoginRouteImport;
-        };
-        '/_auth/chat/$id': {
-            id: '/_auth/chat/$id';
-            path: '/$id';
-            fullPath: '/chat/$id';
-            preLoaderRoute: typeof AuthChatIdImport;
-            parentRoute: typeof AuthChatRouteImport;
-        };
-        '/_auth/chat/attest': {
-            id: '/_auth/chat/attest';
-            path: '/attest';
-            fullPath: '/chat/attest';
-            preLoaderRoute: typeof AuthChatAttestImport;
-            parentRoute: typeof AuthChatRouteImport;
-        };
-        '/_auth/chat/video': {
-            id: '/_auth/chat/video';
-            path: '/video';
-            fullPath: '/chat/video';
-            preLoaderRoute: typeof AuthChatVideoImport;
-            parentRoute: typeof AuthChatRouteImport;
-        };
-        '/_auth/data/$name': {
-            id: '/_auth/data/$name';
-            path: '/$name';
-            fullPath: '/data/$name';
-            preLoaderRoute: typeof AuthDataNameImport;
-            parentRoute: typeof AuthDataRouteImport;
-        };
-        '/_auth/data/new': {
-            id: '/_auth/data/new';
-            path: '/new';
-            fullPath: '/data/new';
-            preLoaderRoute: typeof AuthDataNewImport;
-            parentRoute: typeof AuthDataRouteImport;
-        };
-        '/_auth/documents/$set': {
-            id: '/_auth/documents/$set';
-            path: '/$set';
-            fullPath: '/documents/$set';
-            preLoaderRoute: typeof AuthDocumentsSetImport;
-            parentRoute: typeof AuthDocumentsRouteImport;
-        };
-        '/_auth/models/$name': {
-            id: '/_auth/models/$name';
-            path: '/$name';
-            fullPath: '/models/$name';
-            preLoaderRoute: typeof AuthModelsNameImport;
-            parentRoute: typeof AuthModelsRouteImport;
-        };
-        '/_auth/chat/': {
-            id: '/_auth/chat/';
-            path: '/';
-            fullPath: '/chat/';
-            preLoaderRoute: typeof AuthChatIndexImport;
-            parentRoute: typeof AuthChatRouteImport;
-        };
-        '/_auth/data/': {
-            id: '/_auth/data/';
-            path: '/';
-            fullPath: '/data/';
-            preLoaderRoute: typeof AuthDataIndexImport;
-            parentRoute: typeof AuthDataRouteImport;
-        };
-        '/_auth/documents/': {
-            id: '/_auth/documents/';
-            path: '/';
-            fullPath: '/documents/';
-            preLoaderRoute: typeof AuthDocumentsIndexImport;
-            parentRoute: typeof AuthDocumentsRouteImport;
-        };
-        '/_auth/models/': {
-            id: '/_auth/models/';
-            path: '/';
-            fullPath: '/models/';
-            preLoaderRoute: typeof AuthModelsIndexImport;
-            parentRoute: typeof AuthModelsRouteImport;
-        };
-    }
-}
-
-// Create and export the route tree
-
-interface LoginRouteRouteChildren {
-    LoginKeynameRoute: typeof LoginKeynameRoute;
-    LoginIndexRoute: typeof LoginIndexRoute;
-}
-
-const LoginRouteRouteChildren: LoginRouteRouteChildren = {
-    LoginKeynameRoute: LoginKeynameRoute,
-    LoginIndexRoute: LoginIndexRoute
-};
-
-const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
-    LoginRouteRouteChildren
-);
-
-interface AuthChatRouteRouteChildren {
-    AuthChatIdRoute: typeof AuthChatIdRoute;
-    AuthChatAttestRoute: typeof AuthChatAttestRoute;
-    AuthChatVideoRoute: typeof AuthChatVideoRoute;
-    AuthChatIndexRoute: typeof AuthChatIndexRoute;
-}
-
-const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
-    AuthChatIdRoute: AuthChatIdRoute,
-    AuthChatAttestRoute: AuthChatAttestRoute,
-    AuthChatVideoRoute: AuthChatVideoRoute,
-    AuthChatIndexRoute: AuthChatIndexRoute
-};
-
-const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
-    AuthChatRouteRouteChildren
-);
-
-interface AuthDataRouteRouteChildren {
-    AuthDataNameRoute: typeof AuthDataNameRoute;
-    AuthDataNewRoute: typeof AuthDataNewRoute;
-    AuthDataIndexRoute: typeof AuthDataIndexRoute;
-}
-
-const AuthDataRouteRouteChildren: AuthDataRouteRouteChildren = {
-    AuthDataNameRoute: AuthDataNameRoute,
-    AuthDataNewRoute: AuthDataNewRoute,
-    AuthDataIndexRoute: AuthDataIndexRoute
-};
-
-const AuthDataRouteRouteWithChildren = AuthDataRouteRoute._addFileChildren(
-    AuthDataRouteRouteChildren
-);
-
-interface AuthDocumentsRouteRouteChildren {
-    AuthDocumentsSetRoute: typeof AuthDocumentsSetRoute;
-    AuthDocumentsIndexRoute: typeof AuthDocumentsIndexRoute;
-}
-
-const AuthDocumentsRouteRouteChildren: AuthDocumentsRouteRouteChildren = {
-    AuthDocumentsSetRoute: AuthDocumentsSetRoute,
-    AuthDocumentsIndexRoute: AuthDocumentsIndexRoute
-};
-
-const AuthDocumentsRouteRouteWithChildren =
-    AuthDocumentsRouteRoute._addFileChildren(AuthDocumentsRouteRouteChildren);
-
-interface AuthModelsRouteRouteChildren {
-    AuthModelsNameRoute: typeof AuthModelsNameRoute;
-    AuthModelsIndexRoute: typeof AuthModelsIndexRoute;
-}
-
-const AuthModelsRouteRouteChildren: AuthModelsRouteRouteChildren = {
-    AuthModelsNameRoute: AuthModelsNameRoute,
-    AuthModelsIndexRoute: AuthModelsIndexRoute
-};
-
-const AuthModelsRouteRouteWithChildren = AuthModelsRouteRoute._addFileChildren(
-    AuthModelsRouteRouteChildren
-);
-
-interface AuthRouteChildren {
-    AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren;
-    AuthDataRouteRoute: typeof AuthDataRouteRouteWithChildren;
-    AuthDocumentsRouteRoute: typeof AuthDocumentsRouteRouteWithChildren;
-    AuthModelsRouteRoute: typeof AuthModelsRouteRouteWithChildren;
-    AuthCommunityRoute: typeof AuthCommunityRoute;
-    AuthProfileRoute: typeof AuthProfileRoute;
-    AuthProjectsRoute: typeof AuthProjectsRoute;
-    AuthSettingsRoute: typeof AuthSettingsRoute;
-    AuthTemplatesRoute: typeof AuthTemplatesRoute;
-    AuthIndexRoute: typeof AuthIndexRoute;
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-    AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
-    AuthDataRouteRoute: AuthDataRouteRouteWithChildren,
-    AuthDocumentsRouteRoute: AuthDocumentsRouteRouteWithChildren,
-    AuthModelsRouteRoute: AuthModelsRouteRouteWithChildren,
-    AuthCommunityRoute: AuthCommunityRoute,
-    AuthProfileRoute: AuthProfileRoute,
-    AuthProjectsRoute: AuthProjectsRoute,
-    AuthSettingsRoute: AuthSettingsRoute,
-    AuthTemplatesRoute: AuthTemplatesRoute,
-    AuthIndexRoute: AuthIndexRoute
-};
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren);
+const PingRoute = PingRouteImport.update({
+  id: '/ping',
+  path: '/ping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesRoute = FilesRouteImport.update({
+  id: '/files',
+  path: '/files',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRouteRoute = LoginRouteRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LoginRouteRoute,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const LoginKeynameRoute = LoginKeynameRouteImport.update({
+  id: '/$keyname',
+  path: '/$keyname',
+  getParentRoute: () => LoginRouteRoute,
+} as any)
+const AuthTemplatesRoute = AuthTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsRoute = AuthSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthProjectsRoute = AuthProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthProfileRoute = AuthProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthCommunityRoute = AuthCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthModelsRouteRoute = AuthModelsRouteRouteImport.update({
+  id: '/models',
+  path: '/models',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthDocumentsRouteRoute = AuthDocumentsRouteRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthDataRouteRoute = AuthDataRouteRouteImport.update({
+  id: '/data',
+  path: '/data',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthChatRouteRoute = AuthChatRouteRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthModelsIndexRoute = AuthModelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthModelsRouteRoute,
+} as any)
+const AuthDocumentsIndexRoute = AuthDocumentsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthDocumentsRouteRoute,
+} as any)
+const AuthDataIndexRoute = AuthDataIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthDataRouteRoute,
+} as any)
+const AuthChatIndexRoute = AuthChatIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthChatRouteRoute,
+} as any)
+const AuthModelsNameRoute = AuthModelsNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => AuthModelsRouteRoute,
+} as any)
+const AuthDocumentsSetRoute = AuthDocumentsSetRouteImport.update({
+  id: '/$set',
+  path: '/$set',
+  getParentRoute: () => AuthDocumentsRouteRoute,
+} as any)
+const AuthDataNewRoute = AuthDataNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthDataRouteRoute,
+} as any)
+const AuthDataNameRoute = AuthDataNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => AuthDataRouteRoute,
+} as any)
+const AuthChatVideoRoute = AuthChatVideoRouteImport.update({
+  id: '/video',
+  path: '/video',
+  getParentRoute: () => AuthChatRouteRoute,
+} as any)
+const AuthChatAttestRoute = AuthChatAttestRouteImport.update({
+  id: '/attest',
+  path: '/attest',
+  getParentRoute: () => AuthChatRouteRoute,
+} as any)
+const AuthChatIdRoute = AuthChatIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthChatRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-    '/login': typeof LoginRouteRouteWithChildren;
-    '': typeof AuthRouteWithChildren;
-    '/files': typeof FilesRoute;
-    '/ping': typeof PingRoute;
-    '/chat': typeof AuthChatRouteRouteWithChildren;
-    '/data': typeof AuthDataRouteRouteWithChildren;
-    '/documents': typeof AuthDocumentsRouteRouteWithChildren;
-    '/models': typeof AuthModelsRouteRouteWithChildren;
-    '/community': typeof AuthCommunityRoute;
-    '/profile': typeof AuthProfileRoute;
-    '/projects': typeof AuthProjectsRoute;
-    '/settings': typeof AuthSettingsRoute;
-    '/templates': typeof AuthTemplatesRoute;
-    '/login/$keyname': typeof LoginKeynameRoute;
-    '/': typeof AuthIndexRoute;
-    '/login/': typeof LoginIndexRoute;
-    '/chat/$id': typeof AuthChatIdRoute;
-    '/chat/attest': typeof AuthChatAttestRoute;
-    '/chat/video': typeof AuthChatVideoRoute;
-    '/data/$name': typeof AuthDataNameRoute;
-    '/data/new': typeof AuthDataNewRoute;
-    '/documents/$set': typeof AuthDocumentsSetRoute;
-    '/models/$name': typeof AuthModelsNameRoute;
-    '/chat/': typeof AuthChatIndexRoute;
-    '/data/': typeof AuthDataIndexRoute;
-    '/documents/': typeof AuthDocumentsIndexRoute;
-    '/models/': typeof AuthModelsIndexRoute;
+  '/login': typeof LoginRouteRouteWithChildren
+  '/files': typeof FilesRoute
+  '/ping': typeof PingRoute
+  '/chat': typeof AuthChatRouteRouteWithChildren
+  '/data': typeof AuthDataRouteRouteWithChildren
+  '/documents': typeof AuthDocumentsRouteRouteWithChildren
+  '/models': typeof AuthModelsRouteRouteWithChildren
+  '/community': typeof AuthCommunityRoute
+  '/profile': typeof AuthProfileRoute
+  '/projects': typeof AuthProjectsRoute
+  '/settings': typeof AuthSettingsRoute
+  '/templates': typeof AuthTemplatesRoute
+  '/login/$keyname': typeof LoginKeynameRoute
+  '/': typeof AuthIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/chat/$id': typeof AuthChatIdRoute
+  '/chat/attest': typeof AuthChatAttestRoute
+  '/chat/video': typeof AuthChatVideoRoute
+  '/data/$name': typeof AuthDataNameRoute
+  '/data/new': typeof AuthDataNewRoute
+  '/documents/$set': typeof AuthDocumentsSetRoute
+  '/models/$name': typeof AuthModelsNameRoute
+  '/chat/': typeof AuthChatIndexRoute
+  '/data/': typeof AuthDataIndexRoute
+  '/documents/': typeof AuthDocumentsIndexRoute
+  '/models/': typeof AuthModelsIndexRoute
 }
-
 export interface FileRoutesByTo {
-    '/files': typeof FilesRoute;
-    '/ping': typeof PingRoute;
-    '/community': typeof AuthCommunityRoute;
-    '/profile': typeof AuthProfileRoute;
-    '/projects': typeof AuthProjectsRoute;
-    '/settings': typeof AuthSettingsRoute;
-    '/templates': typeof AuthTemplatesRoute;
-    '/login/$keyname': typeof LoginKeynameRoute;
-    '/': typeof AuthIndexRoute;
-    '/login': typeof LoginIndexRoute;
-    '/chat/$id': typeof AuthChatIdRoute;
-    '/chat/attest': typeof AuthChatAttestRoute;
-    '/chat/video': typeof AuthChatVideoRoute;
-    '/data/$name': typeof AuthDataNameRoute;
-    '/data/new': typeof AuthDataNewRoute;
-    '/documents/$set': typeof AuthDocumentsSetRoute;
-    '/models/$name': typeof AuthModelsNameRoute;
-    '/chat': typeof AuthChatIndexRoute;
-    '/data': typeof AuthDataIndexRoute;
-    '/documents': typeof AuthDocumentsIndexRoute;
-    '/models': typeof AuthModelsIndexRoute;
+  '/files': typeof FilesRoute
+  '/ping': typeof PingRoute
+  '/community': typeof AuthCommunityRoute
+  '/profile': typeof AuthProfileRoute
+  '/projects': typeof AuthProjectsRoute
+  '/settings': typeof AuthSettingsRoute
+  '/templates': typeof AuthTemplatesRoute
+  '/login/$keyname': typeof LoginKeynameRoute
+  '/': typeof AuthIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/chat/$id': typeof AuthChatIdRoute
+  '/chat/attest': typeof AuthChatAttestRoute
+  '/chat/video': typeof AuthChatVideoRoute
+  '/data/$name': typeof AuthDataNameRoute
+  '/data/new': typeof AuthDataNewRoute
+  '/documents/$set': typeof AuthDocumentsSetRoute
+  '/models/$name': typeof AuthModelsNameRoute
+  '/chat': typeof AuthChatIndexRoute
+  '/data': typeof AuthDataIndexRoute
+  '/documents': typeof AuthDocumentsIndexRoute
+  '/models': typeof AuthModelsIndexRoute
 }
-
 export interface FileRoutesById {
-    __root__: typeof rootRoute;
-    '/login': typeof LoginRouteRouteWithChildren;
-    '/_auth': typeof AuthRouteWithChildren;
-    '/files': typeof FilesRoute;
-    '/ping': typeof PingRoute;
-    '/_auth/chat': typeof AuthChatRouteRouteWithChildren;
-    '/_auth/data': typeof AuthDataRouteRouteWithChildren;
-    '/_auth/documents': typeof AuthDocumentsRouteRouteWithChildren;
-    '/_auth/models': typeof AuthModelsRouteRouteWithChildren;
-    '/_auth/community': typeof AuthCommunityRoute;
-    '/_auth/profile': typeof AuthProfileRoute;
-    '/_auth/projects': typeof AuthProjectsRoute;
-    '/_auth/settings': typeof AuthSettingsRoute;
-    '/_auth/templates': typeof AuthTemplatesRoute;
-    '/login/$keyname': typeof LoginKeynameRoute;
-    '/_auth/': typeof AuthIndexRoute;
-    '/login/': typeof LoginIndexRoute;
-    '/_auth/chat/$id': typeof AuthChatIdRoute;
-    '/_auth/chat/attest': typeof AuthChatAttestRoute;
-    '/_auth/chat/video': typeof AuthChatVideoRoute;
-    '/_auth/data/$name': typeof AuthDataNameRoute;
-    '/_auth/data/new': typeof AuthDataNewRoute;
-    '/_auth/documents/$set': typeof AuthDocumentsSetRoute;
-    '/_auth/models/$name': typeof AuthModelsNameRoute;
-    '/_auth/chat/': typeof AuthChatIndexRoute;
-    '/_auth/data/': typeof AuthDataIndexRoute;
-    '/_auth/documents/': typeof AuthDocumentsIndexRoute;
-    '/_auth/models/': typeof AuthModelsIndexRoute;
+  __root__: typeof rootRouteImport
+  '/login': typeof LoginRouteRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
+  '/files': typeof FilesRoute
+  '/ping': typeof PingRoute
+  '/_auth/chat': typeof AuthChatRouteRouteWithChildren
+  '/_auth/data': typeof AuthDataRouteRouteWithChildren
+  '/_auth/documents': typeof AuthDocumentsRouteRouteWithChildren
+  '/_auth/models': typeof AuthModelsRouteRouteWithChildren
+  '/_auth/community': typeof AuthCommunityRoute
+  '/_auth/profile': typeof AuthProfileRoute
+  '/_auth/projects': typeof AuthProjectsRoute
+  '/_auth/settings': typeof AuthSettingsRoute
+  '/_auth/templates': typeof AuthTemplatesRoute
+  '/login/$keyname': typeof LoginKeynameRoute
+  '/_auth/': typeof AuthIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/_auth/chat/$id': typeof AuthChatIdRoute
+  '/_auth/chat/attest': typeof AuthChatAttestRoute
+  '/_auth/chat/video': typeof AuthChatVideoRoute
+  '/_auth/data/$name': typeof AuthDataNameRoute
+  '/_auth/data/new': typeof AuthDataNewRoute
+  '/_auth/documents/$set': typeof AuthDocumentsSetRoute
+  '/_auth/models/$name': typeof AuthModelsNameRoute
+  '/_auth/chat/': typeof AuthChatIndexRoute
+  '/_auth/data/': typeof AuthDataIndexRoute
+  '/_auth/documents/': typeof AuthDocumentsIndexRoute
+  '/_auth/models/': typeof AuthModelsIndexRoute
 }
-
 export interface FileRouteTypes {
-    fileRoutesByFullPath: FileRoutesByFullPath;
-    fullPaths:
-        | '/login'
-        | ''
-        | '/files'
-        | '/ping'
-        | '/chat'
-        | '/data'
-        | '/documents'
-        | '/models'
-        | '/community'
-        | '/profile'
-        | '/projects'
-        | '/settings'
-        | '/templates'
-        | '/login/$keyname'
-        | '/'
-        | '/login/'
-        | '/chat/$id'
-        | '/chat/attest'
-        | '/chat/video'
-        | '/data/$name'
-        | '/data/new'
-        | '/documents/$set'
-        | '/models/$name'
-        | '/chat/'
-        | '/data/'
-        | '/documents/'
-        | '/models/';
-    fileRoutesByTo: FileRoutesByTo;
-    to:
-        | '/files'
-        | '/ping'
-        | '/community'
-        | '/profile'
-        | '/projects'
-        | '/settings'
-        | '/templates'
-        | '/login/$keyname'
-        | '/'
-        | '/login'
-        | '/chat/$id'
-        | '/chat/attest'
-        | '/chat/video'
-        | '/data/$name'
-        | '/data/new'
-        | '/documents/$set'
-        | '/models/$name'
-        | '/chat'
-        | '/data'
-        | '/documents'
-        | '/models';
-    id:
-        | '__root__'
-        | '/login'
-        | '/_auth'
-        | '/files'
-        | '/ping'
-        | '/_auth/chat'
-        | '/_auth/data'
-        | '/_auth/documents'
-        | '/_auth/models'
-        | '/_auth/community'
-        | '/_auth/profile'
-        | '/_auth/projects'
-        | '/_auth/settings'
-        | '/_auth/templates'
-        | '/login/$keyname'
-        | '/_auth/'
-        | '/login/'
-        | '/_auth/chat/$id'
-        | '/_auth/chat/attest'
-        | '/_auth/chat/video'
-        | '/_auth/data/$name'
-        | '/_auth/data/new'
-        | '/_auth/documents/$set'
-        | '/_auth/models/$name'
-        | '/_auth/chat/'
-        | '/_auth/data/'
-        | '/_auth/documents/'
-        | '/_auth/models/';
-    fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/login'
+    | '/files'
+    | '/ping'
+    | '/chat'
+    | '/data'
+    | '/documents'
+    | '/models'
+    | '/community'
+    | '/profile'
+    | '/projects'
+    | '/settings'
+    | '/templates'
+    | '/login/$keyname'
+    | '/'
+    | '/login/'
+    | '/chat/$id'
+    | '/chat/attest'
+    | '/chat/video'
+    | '/data/$name'
+    | '/data/new'
+    | '/documents/$set'
+    | '/models/$name'
+    | '/chat/'
+    | '/data/'
+    | '/documents/'
+    | '/models/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/files'
+    | '/ping'
+    | '/community'
+    | '/profile'
+    | '/projects'
+    | '/settings'
+    | '/templates'
+    | '/login/$keyname'
+    | '/'
+    | '/login'
+    | '/chat/$id'
+    | '/chat/attest'
+    | '/chat/video'
+    | '/data/$name'
+    | '/data/new'
+    | '/documents/$set'
+    | '/models/$name'
+    | '/chat'
+    | '/data'
+    | '/documents'
+    | '/models'
+  id:
+    | '__root__'
+    | '/login'
+    | '/_auth'
+    | '/files'
+    | '/ping'
+    | '/_auth/chat'
+    | '/_auth/data'
+    | '/_auth/documents'
+    | '/_auth/models'
+    | '/_auth/community'
+    | '/_auth/profile'
+    | '/_auth/projects'
+    | '/_auth/settings'
+    | '/_auth/templates'
+    | '/login/$keyname'
+    | '/_auth/'
+    | '/login/'
+    | '/_auth/chat/$id'
+    | '/_auth/chat/attest'
+    | '/_auth/chat/video'
+    | '/_auth/data/$name'
+    | '/_auth/data/new'
+    | '/_auth/documents/$set'
+    | '/_auth/models/$name'
+    | '/_auth/chat/'
+    | '/_auth/data/'
+    | '/_auth/documents/'
+    | '/_auth/models/'
+  fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
-    LoginRouteRoute: typeof LoginRouteRouteWithChildren;
-    AuthRoute: typeof AuthRouteWithChildren;
-    FilesRoute: typeof FilesRoute;
-    PingRoute: typeof PingRoute;
+  LoginRouteRoute: typeof LoginRouteRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
+  FilesRoute: typeof FilesRoute
+  PingRoute: typeof PingRoute
 }
 
-const rootRouteChildren: RootRouteChildren = {
-    LoginRouteRoute: LoginRouteRouteWithChildren,
-    AuthRoute: AuthRouteWithChildren,
-    FilesRoute: FilesRoute,
-    PingRoute: PingRoute
-};
-
-export const routeTree = rootRoute
-    ._addFileChildren(rootRouteChildren)
-    ._addFileTypes<FileRouteTypes>();
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/login",
-        "/_auth",
-        "/files",
-        "/ping"
-      ]
-    },
-    "/login": {
-      "filePath": "login/route.tsx",
-      "children": [
-        "/login/$keyname",
-        "/login/"
-      ]
-    },
-    "/_auth": {
-      "filePath": "_auth.tsx",
-      "children": [
-        "/_auth/chat",
-        "/_auth/data",
-        "/_auth/documents",
-        "/_auth/models",
-        "/_auth/community",
-        "/_auth/profile",
-        "/_auth/projects",
-        "/_auth/settings",
-        "/_auth/templates",
-        "/_auth/"
-      ]
-    },
-    "/files": {
-      "filePath": "files.tsx"
-    },
-    "/ping": {
-      "filePath": "ping.tsx"
-    },
-    "/_auth/chat": {
-      "filePath": "_auth/chat/route.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/chat/$id",
-        "/_auth/chat/attest",
-        "/_auth/chat/video",
-        "/_auth/chat/"
-      ]
-    },
-    "/_auth/data": {
-      "filePath": "_auth/data/route.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/data/$name",
-        "/_auth/data/new",
-        "/_auth/data/"
-      ]
-    },
-    "/_auth/documents": {
-      "filePath": "_auth/documents/route.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/documents/$set",
-        "/_auth/documents/"
-      ]
-    },
-    "/_auth/models": {
-      "filePath": "_auth/models/route.tsx",
-      "parent": "/_auth",
-      "children": [
-        "/_auth/models/$name",
-        "/_auth/models/"
-      ]
-    },
-    "/_auth/community": {
-      "filePath": "_auth/community.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/profile": {
-      "filePath": "_auth/profile.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/projects": {
-      "filePath": "_auth/projects.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/settings": {
-      "filePath": "_auth/settings.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/templates": {
-      "filePath": "_auth/templates.tsx",
-      "parent": "/_auth"
-    },
-    "/login/$keyname": {
-      "filePath": "login/$keyname.tsx",
-      "parent": "/login"
-    },
-    "/_auth/": {
-      "filePath": "_auth/index.tsx",
-      "parent": "/_auth"
-    },
-    "/login/": {
-      "filePath": "login/index.tsx",
-      "parent": "/login"
-    },
-    "/_auth/chat/$id": {
-      "filePath": "_auth/chat/$id.tsx",
-      "parent": "/_auth/chat"
-    },
-    "/_auth/chat/attest": {
-      "filePath": "_auth/chat/attest.tsx",
-      "parent": "/_auth/chat"
-    },
-    "/_auth/chat/video": {
-      "filePath": "_auth/chat/video.tsx",
-      "parent": "/_auth/chat"
-    },
-    "/_auth/data/$name": {
-      "filePath": "_auth/data/$name.tsx",
-      "parent": "/_auth/data"
-    },
-    "/_auth/data/new": {
-      "filePath": "_auth/data/new.tsx",
-      "parent": "/_auth/data"
-    },
-    "/_auth/documents/$set": {
-      "filePath": "_auth/documents/$set.tsx",
-      "parent": "/_auth/documents"
-    },
-    "/_auth/models/$name": {
-      "filePath": "_auth/models/$name.tsx",
-      "parent": "/_auth/models"
-    },
-    "/_auth/chat/": {
-      "filePath": "_auth/chat/index.tsx",
-      "parent": "/_auth/chat"
-    },
-    "/_auth/data/": {
-      "filePath": "_auth/data/index.tsx",
-      "parent": "/_auth/data"
-    },
-    "/_auth/documents/": {
-      "filePath": "_auth/documents/index.tsx",
-      "parent": "/_auth/documents"
-    },
-    "/_auth/models/": {
-      "filePath": "_auth/models/index.tsx",
-      "parent": "/_auth/models"
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/ping': {
+      id: '/ping'
+      path: '/ping'
+      fullPath: '/ping'
+      preLoaderRoute: typeof PingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files': {
+      id: '/files'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof LoginRouteRoute
+    }
+    '/_auth/': {
+      id: '/_auth/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/login/$keyname': {
+      id: '/login/$keyname'
+      path: '/$keyname'
+      fullPath: '/login/$keyname'
+      preLoaderRoute: typeof LoginKeynameRouteImport
+      parentRoute: typeof LoginRouteRoute
+    }
+    '/_auth/templates': {
+      id: '/_auth/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof AuthTemplatesRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings': {
+      id: '/_auth/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthSettingsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/projects': {
+      id: '/_auth/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthProjectsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/community': {
+      id: '/_auth/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof AuthCommunityRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/models': {
+      id: '/_auth/models'
+      path: '/models'
+      fullPath: '/models'
+      preLoaderRoute: typeof AuthModelsRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/documents': {
+      id: '/_auth/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthDocumentsRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/data': {
+      id: '/_auth/data'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof AuthDataRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/chat': {
+      id: '/_auth/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AuthChatRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/models/': {
+      id: '/_auth/models/'
+      path: '/'
+      fullPath: '/models/'
+      preLoaderRoute: typeof AuthModelsIndexRouteImport
+      parentRoute: typeof AuthModelsRouteRoute
+    }
+    '/_auth/documents/': {
+      id: '/_auth/documents/'
+      path: '/'
+      fullPath: '/documents/'
+      preLoaderRoute: typeof AuthDocumentsIndexRouteImport
+      parentRoute: typeof AuthDocumentsRouteRoute
+    }
+    '/_auth/data/': {
+      id: '/_auth/data/'
+      path: '/'
+      fullPath: '/data/'
+      preLoaderRoute: typeof AuthDataIndexRouteImport
+      parentRoute: typeof AuthDataRouteRoute
+    }
+    '/_auth/chat/': {
+      id: '/_auth/chat/'
+      path: '/'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthChatIndexRouteImport
+      parentRoute: typeof AuthChatRouteRoute
+    }
+    '/_auth/models/$name': {
+      id: '/_auth/models/$name'
+      path: '/$name'
+      fullPath: '/models/$name'
+      preLoaderRoute: typeof AuthModelsNameRouteImport
+      parentRoute: typeof AuthModelsRouteRoute
+    }
+    '/_auth/documents/$set': {
+      id: '/_auth/documents/$set'
+      path: '/$set'
+      fullPath: '/documents/$set'
+      preLoaderRoute: typeof AuthDocumentsSetRouteImport
+      parentRoute: typeof AuthDocumentsRouteRoute
+    }
+    '/_auth/data/new': {
+      id: '/_auth/data/new'
+      path: '/new'
+      fullPath: '/data/new'
+      preLoaderRoute: typeof AuthDataNewRouteImport
+      parentRoute: typeof AuthDataRouteRoute
+    }
+    '/_auth/data/$name': {
+      id: '/_auth/data/$name'
+      path: '/$name'
+      fullPath: '/data/$name'
+      preLoaderRoute: typeof AuthDataNameRouteImport
+      parentRoute: typeof AuthDataRouteRoute
+    }
+    '/_auth/chat/video': {
+      id: '/_auth/chat/video'
+      path: '/video'
+      fullPath: '/chat/video'
+      preLoaderRoute: typeof AuthChatVideoRouteImport
+      parentRoute: typeof AuthChatRouteRoute
+    }
+    '/_auth/chat/attest': {
+      id: '/_auth/chat/attest'
+      path: '/attest'
+      fullPath: '/chat/attest'
+      preLoaderRoute: typeof AuthChatAttestRouteImport
+      parentRoute: typeof AuthChatRouteRoute
+    }
+    '/_auth/chat/$id': {
+      id: '/_auth/chat/$id'
+      path: '/$id'
+      fullPath: '/chat/$id'
+      preLoaderRoute: typeof AuthChatIdRouteImport
+      parentRoute: typeof AuthChatRouteRoute
     }
   }
 }
-ROUTE_MANIFEST_END */
+
+interface LoginRouteRouteChildren {
+  LoginKeynameRoute: typeof LoginKeynameRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+}
+
+const LoginRouteRouteChildren: LoginRouteRouteChildren = {
+  LoginKeynameRoute: LoginKeynameRoute,
+  LoginIndexRoute: LoginIndexRoute,
+}
+
+const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
+  LoginRouteRouteChildren,
+)
+
+interface AuthChatRouteRouteChildren {
+  AuthChatIdRoute: typeof AuthChatIdRoute
+  AuthChatAttestRoute: typeof AuthChatAttestRoute
+  AuthChatVideoRoute: typeof AuthChatVideoRoute
+  AuthChatIndexRoute: typeof AuthChatIndexRoute
+}
+
+const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
+  AuthChatIdRoute: AuthChatIdRoute,
+  AuthChatAttestRoute: AuthChatAttestRoute,
+  AuthChatVideoRoute: AuthChatVideoRoute,
+  AuthChatIndexRoute: AuthChatIndexRoute,
+}
+
+const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
+  AuthChatRouteRouteChildren,
+)
+
+interface AuthDataRouteRouteChildren {
+  AuthDataNameRoute: typeof AuthDataNameRoute
+  AuthDataNewRoute: typeof AuthDataNewRoute
+  AuthDataIndexRoute: typeof AuthDataIndexRoute
+}
+
+const AuthDataRouteRouteChildren: AuthDataRouteRouteChildren = {
+  AuthDataNameRoute: AuthDataNameRoute,
+  AuthDataNewRoute: AuthDataNewRoute,
+  AuthDataIndexRoute: AuthDataIndexRoute,
+}
+
+const AuthDataRouteRouteWithChildren = AuthDataRouteRoute._addFileChildren(
+  AuthDataRouteRouteChildren,
+)
+
+interface AuthDocumentsRouteRouteChildren {
+  AuthDocumentsSetRoute: typeof AuthDocumentsSetRoute
+  AuthDocumentsIndexRoute: typeof AuthDocumentsIndexRoute
+}
+
+const AuthDocumentsRouteRouteChildren: AuthDocumentsRouteRouteChildren = {
+  AuthDocumentsSetRoute: AuthDocumentsSetRoute,
+  AuthDocumentsIndexRoute: AuthDocumentsIndexRoute,
+}
+
+const AuthDocumentsRouteRouteWithChildren =
+  AuthDocumentsRouteRoute._addFileChildren(AuthDocumentsRouteRouteChildren)
+
+interface AuthModelsRouteRouteChildren {
+  AuthModelsNameRoute: typeof AuthModelsNameRoute
+  AuthModelsIndexRoute: typeof AuthModelsIndexRoute
+}
+
+const AuthModelsRouteRouteChildren: AuthModelsRouteRouteChildren = {
+  AuthModelsNameRoute: AuthModelsNameRoute,
+  AuthModelsIndexRoute: AuthModelsIndexRoute,
+}
+
+const AuthModelsRouteRouteWithChildren = AuthModelsRouteRoute._addFileChildren(
+  AuthModelsRouteRouteChildren,
+)
+
+interface AuthRouteChildren {
+  AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren
+  AuthDataRouteRoute: typeof AuthDataRouteRouteWithChildren
+  AuthDocumentsRouteRoute: typeof AuthDocumentsRouteRouteWithChildren
+  AuthModelsRouteRoute: typeof AuthModelsRouteRouteWithChildren
+  AuthCommunityRoute: typeof AuthCommunityRoute
+  AuthProfileRoute: typeof AuthProfileRoute
+  AuthProjectsRoute: typeof AuthProjectsRoute
+  AuthSettingsRoute: typeof AuthSettingsRoute
+  AuthTemplatesRoute: typeof AuthTemplatesRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
+  AuthDataRouteRoute: AuthDataRouteRouteWithChildren,
+  AuthDocumentsRouteRoute: AuthDocumentsRouteRouteWithChildren,
+  AuthModelsRouteRoute: AuthModelsRouteRouteWithChildren,
+  AuthCommunityRoute: AuthCommunityRoute,
+  AuthProfileRoute: AuthProfileRoute,
+  AuthProjectsRoute: AuthProjectsRoute,
+  AuthSettingsRoute: AuthSettingsRoute,
+  AuthTemplatesRoute: AuthTemplatesRoute,
+  AuthIndexRoute: AuthIndexRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
+const rootRouteChildren: RootRouteChildren = {
+  LoginRouteRoute: LoginRouteRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
+  FilesRoute: FilesRoute,
+  PingRoute: PingRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

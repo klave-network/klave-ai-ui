@@ -223,6 +223,9 @@ const secretariumHandler = {
                 );
                 handlerStore.currentConnection
                     .reset()
+                    .onError((e: string) => {
+                        console.error('Connection error:', e);
+                    })
                     .connect(endpoint, handlerStore.currentKey)
                     .then(() => {
                         resolve({
