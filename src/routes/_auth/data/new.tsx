@@ -175,7 +175,7 @@ function RouteComponent() {
         <div className="p-4 space-y-6 w-full">
             <h3 className="text-xl font-medium">Upload new file</h3>
             <FileUpload
-                maxFiles={2}
+                maxFiles={10}
                 maxSize={5 * 1024 * 1024}
                 className="w-full max-w-md"
                 value={files}
@@ -193,8 +193,7 @@ function RouteComponent() {
                             Drag & drop text files here
                         </p>
                         <p className="text-muted-foreground text-xs">
-                            Or click to browse (max 2 text files, up to 5MB
-                            each)
+                            Or click to browse (max 10 files, up to 5MB each)
                         </p>
                     </div>
                     <FileUploadTrigger asChild>
@@ -235,8 +234,8 @@ function RouteComponent() {
                     >
                         <Database className="size-4" />
                         {isProcessing
-                            ? 'Building RAG...'
-                            : 'Build RAG Database'}
+                            ? 'Adding files to RAG...'
+                            : 'Add files to RAG'}
                     </Button>
                 </div>
             )}

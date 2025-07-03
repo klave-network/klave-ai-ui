@@ -19,7 +19,7 @@ function RouteComponent() {
                 <b>Manage Data</b>
                 <Button className="mx-4 hover:cursor-pointer" asChild>
                     <Link to="/data/new">
-                        Upload file <Upload />
+                        Upload files <Upload />
                     </Link>
                 </Button>
             </div>
