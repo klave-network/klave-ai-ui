@@ -26,8 +26,16 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
         setLoading(true);
         setError(null);
 
-        inferenceGetResponse({ context_name, nb_pieces: 5 }, (result) => {
-            if (!isMountedRef.current) return true; // stop if unmounted
+        inferenceGetResponse({ context_name }, (result) => {
+            if (!isMountedRef.current)
+                return true; // stop if unmounted
+
+            if (typeof result === 'string') {
+                setError(result);
+                setLoading(false);
+                isMountedRef.current = false;
+                return true; // stop streaming on error
+            }
 
             const chunkText = String.fromCharCode(...result.piece);
             fullResponseRef.current += chunkText;

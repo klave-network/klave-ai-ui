@@ -13,7 +13,15 @@ import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
 export const ModelSelector = () => {
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
-    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
+    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0]?.name;
+
+    if (!models || models.length === 0) {
+        return (
+            <div className="text-gray-500">
+                No models available. Please add a model first.
+            </div>
+        );
+    }
 
     return (
         <Select
