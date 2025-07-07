@@ -21,18 +21,18 @@ import { Route as AuthSettingsRouteImport } from './routes/_auth/settings'
 import { Route as AuthProjectsRouteImport } from './routes/_auth/projects'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthCommunityRouteImport } from './routes/_auth/community'
+import { Route as AuthSpacesRouteRouteImport } from './routes/_auth/spaces/route'
 import { Route as AuthModelsRouteRouteImport } from './routes/_auth/models/route'
 import { Route as AuthDocumentsRouteRouteImport } from './routes/_auth/documents/route'
-import { Route as AuthDataRouteRouteImport } from './routes/_auth/data/route'
 import { Route as AuthChatRouteRouteImport } from './routes/_auth/chat/route'
+import { Route as AuthSpacesIndexRouteImport } from './routes/_auth/spaces/index'
 import { Route as AuthModelsIndexRouteImport } from './routes/_auth/models/index'
 import { Route as AuthDocumentsIndexRouteImport } from './routes/_auth/documents/index'
-import { Route as AuthDataIndexRouteImport } from './routes/_auth/data/index'
 import { Route as AuthChatIndexRouteImport } from './routes/_auth/chat/index'
+import { Route as AuthSpacesNewRouteImport } from './routes/_auth/spaces/new'
+import { Route as AuthSpacesNameRouteImport } from './routes/_auth/spaces/$name'
 import { Route as AuthModelsNameRouteImport } from './routes/_auth/models/$name'
 import { Route as AuthDocumentsSetRouteImport } from './routes/_auth/documents/$set'
-import { Route as AuthDataNewRouteImport } from './routes/_auth/data/new'
-import { Route as AuthDataNameRouteImport } from './routes/_auth/data/$name'
 import { Route as AuthChatVideoRouteImport } from './routes/_auth/chat/video'
 import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
 import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
@@ -96,6 +96,11 @@ const AuthCommunityRoute = AuthCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSpacesRouteRoute = AuthSpacesRouteRouteImport.update({
+  id: '/spaces',
+  path: '/spaces',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthModelsRouteRoute = AuthModelsRouteRouteImport.update({
   id: '/models',
   path: '/models',
@@ -106,15 +111,15 @@ const AuthDocumentsRouteRoute = AuthDocumentsRouteRouteImport.update({
   path: '/documents',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthDataRouteRoute = AuthDataRouteRouteImport.update({
-  id: '/data',
-  path: '/data',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthChatRouteRoute = AuthChatRouteRouteImport.update({
   id: '/chat',
   path: '/chat',
   getParentRoute: () => AuthRoute,
+} as any)
+const AuthSpacesIndexRoute = AuthSpacesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthSpacesRouteRoute,
 } as any)
 const AuthModelsIndexRoute = AuthModelsIndexRouteImport.update({
   id: '/',
@@ -126,15 +131,20 @@ const AuthDocumentsIndexRoute = AuthDocumentsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthDocumentsRouteRoute,
 } as any)
-const AuthDataIndexRoute = AuthDataIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthDataRouteRoute,
-} as any)
 const AuthChatIndexRoute = AuthChatIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthChatRouteRoute,
+} as any)
+const AuthSpacesNewRoute = AuthSpacesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthSpacesRouteRoute,
+} as any)
+const AuthSpacesNameRoute = AuthSpacesNameRouteImport.update({
+  id: '/$name',
+  path: '/$name',
+  getParentRoute: () => AuthSpacesRouteRoute,
 } as any)
 const AuthModelsNameRoute = AuthModelsNameRouteImport.update({
   id: '/$name',
@@ -145,16 +155,6 @@ const AuthDocumentsSetRoute = AuthDocumentsSetRouteImport.update({
   id: '/$set',
   path: '/$set',
   getParentRoute: () => AuthDocumentsRouteRoute,
-} as any)
-const AuthDataNewRoute = AuthDataNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthDataRouteRoute,
-} as any)
-const AuthDataNameRoute = AuthDataNameRouteImport.update({
-  id: '/$name',
-  path: '/$name',
-  getParentRoute: () => AuthDataRouteRoute,
 } as any)
 const AuthChatVideoRoute = AuthChatVideoRouteImport.update({
   id: '/video',
@@ -177,9 +177,9 @@ export interface FileRoutesByFullPath {
   '/files': typeof FilesRoute
   '/ping': typeof PingRoute
   '/chat': typeof AuthChatRouteRouteWithChildren
-  '/data': typeof AuthDataRouteRouteWithChildren
   '/documents': typeof AuthDocumentsRouteRouteWithChildren
   '/models': typeof AuthModelsRouteRouteWithChildren
+  '/spaces': typeof AuthSpacesRouteRouteWithChildren
   '/community': typeof AuthCommunityRoute
   '/profile': typeof AuthProfileRoute
   '/projects': typeof AuthProjectsRoute
@@ -191,14 +191,14 @@ export interface FileRoutesByFullPath {
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
   '/chat/video': typeof AuthChatVideoRoute
-  '/data/$name': typeof AuthDataNameRoute
-  '/data/new': typeof AuthDataNewRoute
   '/documents/$set': typeof AuthDocumentsSetRoute
   '/models/$name': typeof AuthModelsNameRoute
+  '/spaces/$name': typeof AuthSpacesNameRoute
+  '/spaces/new': typeof AuthSpacesNewRoute
   '/chat/': typeof AuthChatIndexRoute
-  '/data/': typeof AuthDataIndexRoute
   '/documents/': typeof AuthDocumentsIndexRoute
   '/models/': typeof AuthModelsIndexRoute
+  '/spaces/': typeof AuthSpacesIndexRoute
 }
 export interface FileRoutesByTo {
   '/files': typeof FilesRoute
@@ -214,14 +214,14 @@ export interface FileRoutesByTo {
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
   '/chat/video': typeof AuthChatVideoRoute
-  '/data/$name': typeof AuthDataNameRoute
-  '/data/new': typeof AuthDataNewRoute
   '/documents/$set': typeof AuthDocumentsSetRoute
   '/models/$name': typeof AuthModelsNameRoute
+  '/spaces/$name': typeof AuthSpacesNameRoute
+  '/spaces/new': typeof AuthSpacesNewRoute
   '/chat': typeof AuthChatIndexRoute
-  '/data': typeof AuthDataIndexRoute
   '/documents': typeof AuthDocumentsIndexRoute
   '/models': typeof AuthModelsIndexRoute
+  '/spaces': typeof AuthSpacesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -230,9 +230,9 @@ export interface FileRoutesById {
   '/files': typeof FilesRoute
   '/ping': typeof PingRoute
   '/_auth/chat': typeof AuthChatRouteRouteWithChildren
-  '/_auth/data': typeof AuthDataRouteRouteWithChildren
   '/_auth/documents': typeof AuthDocumentsRouteRouteWithChildren
   '/_auth/models': typeof AuthModelsRouteRouteWithChildren
+  '/_auth/spaces': typeof AuthSpacesRouteRouteWithChildren
   '/_auth/community': typeof AuthCommunityRoute
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/projects': typeof AuthProjectsRoute
@@ -244,14 +244,14 @@ export interface FileRoutesById {
   '/_auth/chat/$id': typeof AuthChatIdRoute
   '/_auth/chat/attest': typeof AuthChatAttestRoute
   '/_auth/chat/video': typeof AuthChatVideoRoute
-  '/_auth/data/$name': typeof AuthDataNameRoute
-  '/_auth/data/new': typeof AuthDataNewRoute
   '/_auth/documents/$set': typeof AuthDocumentsSetRoute
   '/_auth/models/$name': typeof AuthModelsNameRoute
+  '/_auth/spaces/$name': typeof AuthSpacesNameRoute
+  '/_auth/spaces/new': typeof AuthSpacesNewRoute
   '/_auth/chat/': typeof AuthChatIndexRoute
-  '/_auth/data/': typeof AuthDataIndexRoute
   '/_auth/documents/': typeof AuthDocumentsIndexRoute
   '/_auth/models/': typeof AuthModelsIndexRoute
+  '/_auth/spaces/': typeof AuthSpacesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -260,9 +260,9 @@ export interface FileRouteTypes {
     | '/files'
     | '/ping'
     | '/chat'
-    | '/data'
     | '/documents'
     | '/models'
+    | '/spaces'
     | '/community'
     | '/profile'
     | '/projects'
@@ -274,14 +274,14 @@ export interface FileRouteTypes {
     | '/chat/$id'
     | '/chat/attest'
     | '/chat/video'
-    | '/data/$name'
-    | '/data/new'
     | '/documents/$set'
     | '/models/$name'
+    | '/spaces/$name'
+    | '/spaces/new'
     | '/chat/'
-    | '/data/'
     | '/documents/'
     | '/models/'
+    | '/spaces/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/files'
@@ -297,14 +297,14 @@ export interface FileRouteTypes {
     | '/chat/$id'
     | '/chat/attest'
     | '/chat/video'
-    | '/data/$name'
-    | '/data/new'
     | '/documents/$set'
     | '/models/$name'
+    | '/spaces/$name'
+    | '/spaces/new'
     | '/chat'
-    | '/data'
     | '/documents'
     | '/models'
+    | '/spaces'
   id:
     | '__root__'
     | '/login'
@@ -312,9 +312,9 @@ export interface FileRouteTypes {
     | '/files'
     | '/ping'
     | '/_auth/chat'
-    | '/_auth/data'
     | '/_auth/documents'
     | '/_auth/models'
+    | '/_auth/spaces'
     | '/_auth/community'
     | '/_auth/profile'
     | '/_auth/projects'
@@ -326,14 +326,14 @@ export interface FileRouteTypes {
     | '/_auth/chat/$id'
     | '/_auth/chat/attest'
     | '/_auth/chat/video'
-    | '/_auth/data/$name'
-    | '/_auth/data/new'
     | '/_auth/documents/$set'
     | '/_auth/models/$name'
+    | '/_auth/spaces/$name'
+    | '/_auth/spaces/new'
     | '/_auth/chat/'
-    | '/_auth/data/'
     | '/_auth/documents/'
     | '/_auth/models/'
+    | '/_auth/spaces/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -429,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCommunityRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/spaces': {
+      id: '/_auth/spaces'
+      path: '/spaces'
+      fullPath: '/spaces'
+      preLoaderRoute: typeof AuthSpacesRouteRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/models': {
       id: '/_auth/models'
       path: '/models'
@@ -443,19 +450,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDocumentsRouteRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/data': {
-      id: '/_auth/data'
-      path: '/data'
-      fullPath: '/data'
-      preLoaderRoute: typeof AuthDataRouteRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/chat': {
       id: '/_auth/chat'
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof AuthChatRouteRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_auth/spaces/': {
+      id: '/_auth/spaces/'
+      path: '/'
+      fullPath: '/spaces/'
+      preLoaderRoute: typeof AuthSpacesIndexRouteImport
+      parentRoute: typeof AuthSpacesRouteRoute
     }
     '/_auth/models/': {
       id: '/_auth/models/'
@@ -471,19 +478,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDocumentsIndexRouteImport
       parentRoute: typeof AuthDocumentsRouteRoute
     }
-    '/_auth/data/': {
-      id: '/_auth/data/'
-      path: '/'
-      fullPath: '/data/'
-      preLoaderRoute: typeof AuthDataIndexRouteImport
-      parentRoute: typeof AuthDataRouteRoute
-    }
     '/_auth/chat/': {
       id: '/_auth/chat/'
       path: '/'
       fullPath: '/chat/'
       preLoaderRoute: typeof AuthChatIndexRouteImport
       parentRoute: typeof AuthChatRouteRoute
+    }
+    '/_auth/spaces/new': {
+      id: '/_auth/spaces/new'
+      path: '/new'
+      fullPath: '/spaces/new'
+      preLoaderRoute: typeof AuthSpacesNewRouteImport
+      parentRoute: typeof AuthSpacesRouteRoute
+    }
+    '/_auth/spaces/$name': {
+      id: '/_auth/spaces/$name'
+      path: '/$name'
+      fullPath: '/spaces/$name'
+      preLoaderRoute: typeof AuthSpacesNameRouteImport
+      parentRoute: typeof AuthSpacesRouteRoute
     }
     '/_auth/models/$name': {
       id: '/_auth/models/$name'
@@ -498,20 +512,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/documents/$set'
       preLoaderRoute: typeof AuthDocumentsSetRouteImport
       parentRoute: typeof AuthDocumentsRouteRoute
-    }
-    '/_auth/data/new': {
-      id: '/_auth/data/new'
-      path: '/new'
-      fullPath: '/data/new'
-      preLoaderRoute: typeof AuthDataNewRouteImport
-      parentRoute: typeof AuthDataRouteRoute
-    }
-    '/_auth/data/$name': {
-      id: '/_auth/data/$name'
-      path: '/$name'
-      fullPath: '/data/$name'
-      preLoaderRoute: typeof AuthDataNameRouteImport
-      parentRoute: typeof AuthDataRouteRoute
     }
     '/_auth/chat/video': {
       id: '/_auth/chat/video'
@@ -569,22 +569,6 @@ const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
   AuthChatRouteRouteChildren,
 )
 
-interface AuthDataRouteRouteChildren {
-  AuthDataNameRoute: typeof AuthDataNameRoute
-  AuthDataNewRoute: typeof AuthDataNewRoute
-  AuthDataIndexRoute: typeof AuthDataIndexRoute
-}
-
-const AuthDataRouteRouteChildren: AuthDataRouteRouteChildren = {
-  AuthDataNameRoute: AuthDataNameRoute,
-  AuthDataNewRoute: AuthDataNewRoute,
-  AuthDataIndexRoute: AuthDataIndexRoute,
-}
-
-const AuthDataRouteRouteWithChildren = AuthDataRouteRoute._addFileChildren(
-  AuthDataRouteRouteChildren,
-)
-
 interface AuthDocumentsRouteRouteChildren {
   AuthDocumentsSetRoute: typeof AuthDocumentsSetRoute
   AuthDocumentsIndexRoute: typeof AuthDocumentsIndexRoute
@@ -612,11 +596,27 @@ const AuthModelsRouteRouteWithChildren = AuthModelsRouteRoute._addFileChildren(
   AuthModelsRouteRouteChildren,
 )
 
+interface AuthSpacesRouteRouteChildren {
+  AuthSpacesNameRoute: typeof AuthSpacesNameRoute
+  AuthSpacesNewRoute: typeof AuthSpacesNewRoute
+  AuthSpacesIndexRoute: typeof AuthSpacesIndexRoute
+}
+
+const AuthSpacesRouteRouteChildren: AuthSpacesRouteRouteChildren = {
+  AuthSpacesNameRoute: AuthSpacesNameRoute,
+  AuthSpacesNewRoute: AuthSpacesNewRoute,
+  AuthSpacesIndexRoute: AuthSpacesIndexRoute,
+}
+
+const AuthSpacesRouteRouteWithChildren = AuthSpacesRouteRoute._addFileChildren(
+  AuthSpacesRouteRouteChildren,
+)
+
 interface AuthRouteChildren {
   AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren
-  AuthDataRouteRoute: typeof AuthDataRouteRouteWithChildren
   AuthDocumentsRouteRoute: typeof AuthDocumentsRouteRouteWithChildren
   AuthModelsRouteRoute: typeof AuthModelsRouteRouteWithChildren
+  AuthSpacesRouteRoute: typeof AuthSpacesRouteRouteWithChildren
   AuthCommunityRoute: typeof AuthCommunityRoute
   AuthProfileRoute: typeof AuthProfileRoute
   AuthProjectsRoute: typeof AuthProjectsRoute
@@ -627,9 +627,9 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
-  AuthDataRouteRoute: AuthDataRouteRouteWithChildren,
   AuthDocumentsRouteRoute: AuthDocumentsRouteRouteWithChildren,
   AuthModelsRouteRoute: AuthModelsRouteRouteWithChildren,
+  AuthSpacesRouteRoute: AuthSpacesRouteRouteWithChildren,
   AuthCommunityRoute: AuthCommunityRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthProjectsRoute: AuthProjectsRoute,
