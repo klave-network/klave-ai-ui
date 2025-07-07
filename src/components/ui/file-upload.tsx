@@ -7,7 +7,8 @@ import {
     FileCogIcon,
     FileIcon,
     FileTextIcon,
-    FileVideoIcon
+    FileVideoIcon,
+    PresentationIcon
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -1047,10 +1048,15 @@ function getFileIcon(file: File) {
         return <FileAudioIcon />;
     }
 
-    if (
-        type.startsWith('text/') ||
-        ['txt', 'md', 'rtf', 'pdf'].includes(extension)
-    ) {
+    if (['pdf'].includes(extension)) {
+        return <FileIcon />;
+    }
+
+    if (['pptx'].includes(extension)) {
+        return <PresentationIcon />;
+    }
+
+    if (type.startsWith('text/') || ['txt', 'md', 'rtf'].includes(extension)) {
         return <FileTextIcon />;
     }
 
