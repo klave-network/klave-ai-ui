@@ -124,7 +124,7 @@ function RouteComponent() {
                             Welcome{hasLoadedKeys ? ' back' : ''}!
                         </span>
                         <br />
-                        <span>Loggin you in</span>
+                        <span>Logging you in</span>
                     </CardTitle>
                     <CardDescription>
                         It will only take a few seconds, please wait...
