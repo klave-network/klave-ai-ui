@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from '@tanstack/react-router';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -10,16 +11,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { useUserRagDataSets, useUserChatSettings, storeActions } from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { truncateId } from '@/lib/utils';
 import { toast } from 'sonner';
 import { ChevronDown } from 'lucide-react';
 
 export const SpaceSelector = () => {
+    const location = useLocation();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const rags = useUserRagDataSets(currentUser);
     const { systemPrompt, temperature, topp, steps, slidingWindow } =
         useUserChatSettings(currentUser);
     const [selectedRags, setSelectedRags] = useState<Set<string>>(new Set());
+
+    // Check if we're in chat view
+    const isInChatView = location.pathname === '/chat';
 
     const handleChange = (ragId: string, checked: boolean) => {
         try {
@@ -68,7 +72,7 @@ export const SpaceSelector = () => {
 
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild disabled={!isInChatView}>
                 <Button variant="outline" className="w-[180px] justify-between">
                     {getDisplayText()}
                     <ChevronDown className="h-4 w-4" />

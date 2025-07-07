@@ -7,13 +7,18 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
+import { useLocation } from '@tanstack/react-router';
 import { useUserModels } from '@/store';
 import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
 
 export const ModelSelector = () => {
+    const location = useLocation();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
     const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0]?.name;
+
+    // Check if we're in chat view
+    const isInChatView = location.pathname === '/chat';
 
     if (!models || models.length === 0) {
         return (
@@ -30,7 +35,7 @@ export const ModelSelector = () => {
                 localStorage.setItem(CUR_MODEL_KEY, value)
             }
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[180px]" disabled={!isInChatView}>
                 <SelectValue placeholder="Language model" />
             </SelectTrigger>
             <SelectContent>
