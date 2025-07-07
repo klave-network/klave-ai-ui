@@ -160,11 +160,11 @@ export const SettingsModal = () => {
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild className="ml-auto">
+            <DialogTrigger asChild>
                 <Button
                     size="icon"
                     variant="outline"
-                    className="hover:cursor-pointer rounded-full"
+                    className="hover:cursor-pointer"
                 >
                     <Settings2 className="text-gray-500" />
                 </Button>
@@ -314,31 +314,6 @@ export const SettingsModal = () => {
                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                     <div className="space-y-0.5">
                                         <FormLabel>Sliding Window</FormLabel>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={value}
-                                            onCheckedChange={(checked) =>
-                                                isInChatView &&
-                                                onChange(checked)
-                                            }
-                                            disabled={!isInChatView}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="useRag"
-                            render={({
-                                field: { value, onChange, ...field }
-                            }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                                    <div className="space-y-0.5">
-                                        <FormLabel>Use RAG document</FormLabel>
                                     </div>
                                     <FormControl>
                                         <Switch
