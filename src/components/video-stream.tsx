@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { graphDeleteExecutionContext, graphInitExecutionContext, inferenceAddFrame } from '@/api/klave-ai';
+import {
+    graphDeleteExecutionContext,
+    graphInitExecutionContext,
+    inferenceAddFrame
+} from '@/api/klave-ai';
 import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
 import { load_image } from '@huggingface/transformers';
-import { Camera, type CameraType } from "react-camera-pro";
+import { Camera, type CameraType } from 'react-camera-pro';
 import { StreamedResponse } from './streamed-response';
 import { useUserModels } from '@/store';
 import prettyBytes from 'pretty-bytes';
-
 
 export const VideoStream = () => {
     const cameraRef = useRef<CameraType | null>(null);
@@ -17,15 +20,18 @@ export const VideoStream = () => {
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
     // const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
-    const currentModel = 'mistral'
+    const currentModel = 'mistral';
 
     const captureFrame = useCallback(async () => {
         if (currentContextName.current) {
-            console.log('Clearing previous context:', currentContextName.current);
+            console.log(
+                'Clearing previous context:',
+                currentContextName.current
+            );
             await graphDeleteExecutionContext(currentContextName.current);
             currentContextName.current = null;
         }
-        const frameData = cameraRef.current?.takePhoto('base64url')
+        const frameData = cameraRef.current?.takePhoto('base64url');
         const frame = await getImageTreatment(frameData as string);
         const contextName = `stories_context_${ctxId.current++}`;
         console.log('Frame data:', prettyBytes(frame.data.length), frame);
@@ -37,7 +43,8 @@ export const VideoStream = () => {
             topp: 0.9,
             steps: 256,
             sliding_window: false,
-            mode: 'generate'
+            mode: 'chat',
+            embeddings: false
         });
         currentContextName.current = contextName;
         await inferenceAddFrame({
@@ -53,14 +60,17 @@ export const VideoStream = () => {
             const timer = setInterval(captureFrame, 10000);
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [cameraRef, captureFrame, shouldRun]);
 
     const handleStreamComplete = (fullResponse: string) => {
         if (!models || !currentUser) return;
 
-        console.log('Stream complete, updating chat with response:', fullResponse);
+        console.log(
+            'Stream complete, updating chat with response:',
+            fullResponse
+        );
         setShouldRun(true);
         // store.setState((prev) => {
         //     const userChats = prev[currentUser]?.chats || [];
@@ -88,18 +98,20 @@ export const VideoStream = () => {
         // }
     };
 
-    console.log(currentContextName.current, hasQueried)
+    console.log(currentContextName.current, hasQueried);
 
     return (
         <div className="max-w-xl mx-auto p-4">
             {/* <div className="block w-1/2 h-1/2"> */}
-            <Camera ref={cameraRef} errorMessages={
-                {
+            <Camera
+                ref={cameraRef}
+                errorMessages={{
                     noCameraAccessible: 'No camera accessible',
                     permissionDenied: 'Permission denied',
                     switchCamera: 'Switch camera'
-                }
-            } aspectRatio={4 / 3} />
+                }}
+                aspectRatio={4 / 3}
+            />
             {/* <Button
                 type="button"
                 onClick={handleToggleRecording}
@@ -107,25 +119,28 @@ export const VideoStream = () => {
             >Go
             </Button> */}
             {/* </div> */}
-            {currentContextName.current && hasQueried
-                ? <StreamedResponse
+            {currentContextName.current && hasQueried ? (
+                <StreamedResponse
                     key={currentContextName.current}
                     context_name={currentContextName.current}
-                    onComplete={handleStreamComplete} />
-                : null}
+                    onComplete={handleStreamComplete}
+                />
+            ) : null}
         </div>
     );
 };
 
 const getImageTreatment = async (data: string | null) => {
-
     if (!data) {
         throw new Error('No image data provided');
     }
 
-    function resizedataURL(datas: string, wantedWidth: number, wantedHeight: number) {
+    function resizedataURL(
+        datas: string,
+        wantedWidth: number,
+        wantedHeight: number
+    ) {
         return new Promise(function (resolve) {
-
             // We create an image to receive the Data URI
             const img = document.createElement('img');
 
@@ -150,8 +165,7 @@ const getImageTreatment = async (data: string | null) => {
 
             // We put the Data URI in the image's src attribute
             img.src = datas;
-
-        })
+        });
     }
     const scaledImage = await resizedataURL(data, 120, 160);
     const image = await load_image(scaledImage);
