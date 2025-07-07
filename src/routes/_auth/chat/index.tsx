@@ -58,7 +58,7 @@ function RouteComponent() {
     const models = useUserModels(currentUser);
     const rags = useUserRagDataSets(currentUser);
     const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
-    const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'generate';
+    const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
     const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
         useUserChatSettings(currentUser);
 
@@ -88,9 +88,6 @@ function RouteComponent() {
             });
 
             if (useRag) {
-                console.log('useRag: ', useRag);
-                console.log('rag_id: ', rags[0].rag_id);
-                console.log('userPrompt: ', userPrompt);
                 await inferenceAddRagPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt,

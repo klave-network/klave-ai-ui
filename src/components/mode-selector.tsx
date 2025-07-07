@@ -10,7 +10,7 @@ import {
 import { CUR_MODE_KEY } from '@/lib/constants';
 
 export const ModeSelector = () => {
-    const currentModel = localStorage.getItem(CUR_MODE_KEY) ?? 'generate';
+    const currentModel = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
 
     return (
         <Select
