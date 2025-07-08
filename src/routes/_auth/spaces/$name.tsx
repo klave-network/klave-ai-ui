@@ -6,7 +6,18 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CopyIcon, FileText } from 'lucide-react';
+import {
+    CopyIcon,
+    FileText,
+    FileArchiveIcon,
+    FileAudioIcon,
+    FileCodeIcon,
+    FileCogIcon,
+    FileIcon,
+    FileTextIcon,
+    FileVideoIcon,
+    PresentationIcon
+} from 'lucide-react';
 import { ragDocumentList } from '@/api/klave-ai';
 import { type Document } from '@/lib/types';
 
@@ -51,6 +62,70 @@ function RouteComponent() {
         } catch {
             return dateString;
         }
+    };
+
+    // Get appropriate icon based on document type and URL
+    const getDocumentIcon = (doc: Document) => {
+        const type = doc.content_type;
+        const extension = doc.url.split('.').pop()?.toLowerCase() ?? '';
+
+        if (type.startsWith('video/')) {
+            return <FileVideoIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (type.startsWith('audio/')) {
+            return <FileAudioIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (['pdf'].includes(extension)) {
+            return <FileIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (['pptx', 'ppt'].includes(extension)) {
+            return <PresentationIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (
+            type.startsWith('text/') ||
+            ['txt', 'md', 'rtf'].includes(extension)
+        ) {
+            return <FileTextIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (
+            [
+                'html',
+                'css',
+                'js',
+                'jsx',
+                'ts',
+                'tsx',
+                'json',
+                'xml',
+                'php',
+                'py',
+                'rb',
+                'java',
+                'c',
+                'cpp',
+                'cs'
+            ].includes(extension)
+        ) {
+            return <FileCodeIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2'].includes(extension)) {
+            return <FileArchiveIcon className="h-5 w-5 text-primary" />;
+        }
+
+        if (
+            ['exe', 'msi', 'app', 'apk', 'deb', 'rpm'].includes(extension) ||
+            type.startsWith('application/')
+        ) {
+            return <FileCogIcon className="h-5 w-5 text-primary" />;
+        }
+
+        return <FileIcon className="h-5 w-5 text-primary" />;
     };
 
     if (!rag) return <div className="p-4">Loading RAG details...</div>;
@@ -190,7 +265,7 @@ function RouteComponent() {
                             >
                                 <div className="flex items-start gap-3">
                                     <div className="p-2 rounded-md bg-primary/10">
-                                        <FileText className="h-5 w-5 text-primary" />
+                                        {getDocumentIcon(doc)}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
