@@ -7,7 +7,10 @@ export type KeyPair = EncryptedKeyPair & {
 
 export type Model = {
     access: number;
-    description: string;
+    description: {
+        brief: string;
+        task: string;
+    };
     encryption_type: number;
     file_size: number;
     hash: string[];

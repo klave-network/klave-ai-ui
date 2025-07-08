@@ -33,7 +33,6 @@ type ModelDetails = {
 const sessionModelDetails: Record<string, ModelDetails | undefined> = {};
 
 function RouteComponent() {
-
     const { name } = Route.useParams();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const model = useUserModel(currentUser, name);
@@ -44,7 +43,7 @@ function RouteComponent() {
         try {
             const modelUrl = URL.parse(model.url);
             if (modelUrl?.host === 'huggingface.co') {
-                const comps = modelUrl.pathname.split('/')
+                const comps = modelUrl.pathname.split('/');
                 modelDetailUrlRef.current = `/api/models/${comps[1]}/${comps[2]}`;
             }
         } catch (e) {
@@ -52,60 +51,60 @@ function RouteComponent() {
         }
     }
 
-    const { get, data: remoteModelDetails } = useFetch('https://huggingface.co', {
-        mode: 'cors',
-        cachePolicy: CachePolicies.NO_CACHE,
-        interceptors: {
-            request: (initObj) => {
-                console.log('Requesting model details from:', initObj);
-                const { route, options } = initObj;
-                if (!route || route === '') {
-                    modelDetailQueriedRef.current = false
-                    throw new Error('Model URL is not set');
+    const { get, data: remoteModelDetails } = useFetch(
+        'https://huggingface.co',
+        {
+            mode: 'cors',
+            cachePolicy: CachePolicies.NO_CACHE,
+            interceptors: {
+                request: (initObj) => {
+                    console.log('Requesting model details from:', initObj);
+                    const { route, options } = initObj;
+                    if (!route || route === '') {
+                        modelDetailQueriedRef.current = false;
+                        throw new Error('Model URL is not set');
+                    }
+                    return options;
                 }
-                return options
+            },
+            // onNewData(currData, newData) {
+            //     console.log('Fetched model details:', currData, newData);
+            // },
+            onError: (error) => {
+                console.error('Error fetching model details:', error.error);
+                toast.error('Failed to fetch model details.');
             }
         },
-        // onNewData(currData, newData) {
-        //     console.log('Fetched model details:', currData, newData);
-        // },
-        onError: (error) => {
-            console.error('Error fetching model details:', error.error);
-            toast.error('Failed to fetch model details.');
-        }
-    }, [modelDetailUrlRef.current])
+        [modelDetailUrlRef.current]
+    );
 
     useEffect(() => {
-        console.log('Model selection changed:', name);
         modelDetailUrlRef.current = null;
         modelDetailQueriedRef.current = false;
     }, [name]);
 
-    if (!model)
-        return <div className="p-4">Loading model...</div>;
+    if (!model) return <div className="p-4">Loading model...</div>;
 
-    if (model && modelDetailUrlRef.current && modelDetailQueriedRef.current && remoteModelDetails?.id) {
+    if (
+        model &&
+        modelDetailUrlRef.current &&
+        modelDetailQueriedRef.current &&
+        remoteModelDetails?.id
+    ) {
         sessionModelDetails[model.name] = remoteModelDetails;
     }
 
-    console.log('sessionModelDetails', sessionModelDetails)
-
     const enhancedModelDetails = {
-        ...(model),
+        ...model,
         remote: sessionModelDetails[model?.name ?? '']
-    }
+    };
 
-    if (enhancedModelDetails.remote)
-        modelDetailQueriedRef.current = true;
+    if (enhancedModelDetails.remote) modelDetailQueriedRef.current = true;
 
-    console.log('Param for fetch', modelDetailUrlRef.current, modelDetailQueriedRef.current, modelDetailUrlRef.current && !modelDetailQueriedRef.current);
     if (modelDetailUrlRef.current && !modelDetailQueriedRef.current) {
         modelDetailQueriedRef.current = true;
-        console.log('Fetching model details from:', modelDetailUrlRef.current);
-        get(modelDetailUrlRef.current)
+        get(modelDetailUrlRef.current);
     }
-
-    console.log('Model details:', enhancedModelDetails);
 
     // Handle copy to clipboard
     const copyToClipboard = (text: string, field: string) => {
@@ -116,38 +115,27 @@ function RouteComponent() {
         });
     };
 
-    const dLicense = enhancedModelDetails.remote?.tags?.find(tag => tag.includes('license:'))?.split(':')[1].toUpperCase() ?? '-';
+    const dLicense =
+        enhancedModelDetails.remote?.tags
+            ?.find((tag) => tag.includes('license:'))
+            ?.split(':')[1]
+            .toUpperCase() ?? '-';
     const dLikes = enhancedModelDetails.remote?.likes ?? '-';
     const dDownloads = enhancedModelDetails.remote?.downloads ?? '-';
-    const dCreatedAt = enhancedModelDetails.remote?.createdAt ? new Date(enhancedModelDetails.remote.createdAt) : undefined
-    console.log('dCreatedAt', dCreatedAt);
-    const dCreatedAgo = dCreatedAt ? formatDistance(dCreatedAt, new Date()) : '-'
+    const dCreatedAt = enhancedModelDetails.remote?.createdAt
+        ? new Date(enhancedModelDetails.remote.createdAt)
+        : undefined;
+
+    const dCreatedAgo = dCreatedAt
+        ? formatDistance(dCreatedAt, new Date())
+        : '-';
     const dSize = prettyBytes(enhancedModelDetails.file_size);
     const dTokenizer = enhancedModelDetails.tokenizer_name ?? '-';
 
     return (
         <div className="space-y-2 w-full">
-            <div className='h-12 p-4 font-bold capitalize'>
-                {model.name}
-            </div>
+            <div className="h-12 p-4 font-bold capitalize">{model.name}</div>
             <div className="space-y-2">
-                {/* <div className="space-y-2">
-                    <Label>Model name</Label>
-                    <div className="flex items-center gap-2">
-                        <Input disabled value={model.name} />
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-6 hover:cursor-pointer"
-                            onClick={() =>
-                                copyToClipboard(model.name, 'Model Name')
-                            }
-                        >
-                            <CopyIcon className="h-3.5 w-3.5" />
-                            <span className="sr-only">Copy model name</span>
-                        </Button>
-                    </div>
-                </div> */}
                 <div className="p-4 space-y-2">
                     <Label>URL</Label>
                     <div className="flex items-center gap-2">
@@ -156,34 +144,58 @@ function RouteComponent() {
                             variant="ghost"
                             size="icon"
                             className="size-6 hover:cursor-pointer"
-                            onClick={() => copyToClipboard(model.url, 'Model URL')}
+                            onClick={() =>
+                                copyToClipboard(model.url, 'Model URL')
+                            }
                         >
                             <CopyIcon className="h-3.5 w-3.5" />
                             <span className="sr-only">Copy model url</span>
                         </Button>
                     </div>
                 </div>
-                <div className="p-4 pt-0 space-y-2">
-                    <Label>Description</Label>
+                <div className="p-4 space-y-2">
+                    <Label>Type</Label>
                     <div className="flex items-center gap-2">
-                        <Input disabled value={model.description} />
+                        <Input disabled value={model.description.task} />
                         <Button
                             variant="ghost"
                             size="icon"
                             className="size-6 hover:cursor-pointer"
                             onClick={() =>
                                 copyToClipboard(
-                                    model.description,
+                                    model.description.task,
+                                    'Model Type'
+                                )
+                            }
+                        >
+                            <CopyIcon className="h-3.5 w-3.5" />
+                            <span className="sr-only">Copy model type</span>
+                        </Button>
+                    </div>
+                </div>
+                <div className="p-4 space-y-2">
+                    <Label>Description</Label>
+                    <div className="flex items-center gap-2">
+                        <Input disabled value={model.description.brief} />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 hover:cursor-pointer"
+                            onClick={() =>
+                                copyToClipboard(
+                                    model.description.brief,
                                     'Model Description'
                                 )
                             }
                         >
                             <CopyIcon className="h-3.5 w-3.5" />
-                            <span className="sr-only">Copy model description</span>
+                            <span className="sr-only">
+                                Copy model description
+                            </span>
                         </Button>
                     </div>
                 </div>
-                <div className='grid grid-cols-3 gap-2 border-t'>
+                <div className="grid grid-cols-3 gap-2 border-t">
                     <div className="p-4 space-y-2">
                         <Label>License</Label>
                         <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -193,14 +205,13 @@ function RouteComponent() {
                                 size="icon"
                                 className="size-5 hover:cursor-pointer"
                                 onClick={() =>
-                                    copyToClipboard(
-                                        dLicense,
-                                        'Model License'
-                                    )
+                                    copyToClipboard(dLicense, 'Model License')
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
-                                <span className="sr-only">Copy model license</span>
+                                <span className="sr-only">
+                                    Copy model license
+                                </span>
                             </Button>
                         </div>
                     </div>
@@ -213,10 +224,7 @@ function RouteComponent() {
                                 size="icon"
                                 className="size-5 hover:cursor-pointer"
                                 onClick={() =>
-                                    copyToClipboard(
-                                        dSize,
-                                        'Model Size'
-                                    )
+                                    copyToClipboard(dSize, 'Model Size')
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
@@ -233,14 +241,13 @@ function RouteComponent() {
                                 size="icon"
                                 className="size-5 hover:cursor-pointer"
                                 onClick={() =>
-                                    copyToClipboard(
-                                        `${dLikes}`,
-                                        'Model Stats'
-                                    )
+                                    copyToClipboard(`${dLikes}`, 'Model Stats')
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
-                                <span className="sr-only">Copy model stats</span>
+                                <span className="sr-only">
+                                    Copy model stats
+                                </span>
                             </Button>
                         </div>
                     </div>
@@ -280,7 +287,9 @@ function RouteComponent() {
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
-                                <span className="sr-only">Copy model downloads</span>
+                                <span className="sr-only">
+                                    Copy model downloads
+                                </span>
                             </Button>
                         </div>
                     </div>
@@ -300,7 +309,9 @@ function RouteComponent() {
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
-                                <span className="sr-only">Copy model tokenizer</span>
+                                <span className="sr-only">
+                                    Copy model tokenizer
+                                </span>
                             </Button>
                         </div>
                     </div>
@@ -320,7 +331,9 @@ function RouteComponent() {
                                 }
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
-                                <span className="sr-only">Copy model created at</span>
+                                <span className="sr-only">
+                                    Copy model created at
+                                </span>
                             </Button>
                         </div>
                     </div>
