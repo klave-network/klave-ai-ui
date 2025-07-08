@@ -7,7 +7,11 @@ import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { Utils } from '@secretarium/connector';
-import { getQuote, verifyQuote, isConnected as isKlaveConnected } from '@/api/klave';
+import {
+    getQuote,
+    verifyQuote,
+    isConnected as isKlaveConnected
+} from '@/api/klave';
 import { LoadingDots } from '@/components/loading-dots';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
@@ -25,10 +29,13 @@ export const Route = createFileRoute('/_auth/chat/$id')({
         const currentTime = new Date().getTime();
         const isConnected = await isKlaveConnected();
         const quote = isConnected ? await getQuote({ challenge }) : undefined;
-        const verification = isConnected && quote ? await verifyQuote({
-            quote: quote.quote_binary,
-            current_time: currentTime
-        }) : undefined;
+        const verification =
+            isConnected && quote
+                ? await verifyQuote({
+                      quote: quote.quote_binary,
+                      current_time: currentTime
+                  })
+                : undefined;
 
         if (!chat)
             return {
@@ -178,10 +185,11 @@ function RouteComponent() {
                     return (
                         <div
                             key={id}
-                            className={`w-fit mb-2 px-4 py-2 rounded-xl ${role === 'user'
-                                ? 'bg-gray-100 ml-auto'
-                                : 'mr-auto'
-                                }`}
+                            className={`w-fit mb-2 px-4 py-2 rounded-xl ${
+                                role === 'user'
+                                    ? 'bg-gray-100 ml-auto'
+                                    : 'mr-auto'
+                            }`}
                         >
                             {isStreaming ? (
                                 <StreamedResponse
@@ -192,7 +200,9 @@ function RouteComponent() {
                                     }
                                 />
                             ) : (
-                                content
+                                <div className="whitespace-pre-wrap">
+                                    {content}
+                                </div>
                             )}
                         </div>
                     );
