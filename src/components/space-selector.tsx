@@ -73,7 +73,10 @@ export const SpaceSelector = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild disabled={!isInChatView}>
-                <Button variant="outline" className="w-[180px] justify-between">
+                <Button
+                    variant="outline"
+                    className="w-[180px] justify-between font-normal"
+                >
                     {getDisplayText()}
                     <ChevronDown className="h-4 w-4" />
                 </Button>
