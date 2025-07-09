@@ -57,7 +57,8 @@ function RouteComponent() {
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
     const rags = useUserRagDataSets(currentUser);
-    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
+    const currentModel =
+        localStorage.getItem(`${CUR_MODEL_KEY}_chat`) ?? models[0].name;
     const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
     const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
         useUserChatSettings(currentUser);
@@ -73,7 +74,7 @@ function RouteComponent() {
         // Create unique context ID for the chat name
         const contextId = generateSimpleId();
         const contextName = `stories_context_${contextId}`;
-
+        console.log('Model: ', currentModel);
         try {
             await graphInitExecutionContext({
                 model_name: currentModel,

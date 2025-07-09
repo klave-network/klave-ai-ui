@@ -19,7 +19,8 @@ export const VideoStream = () => {
     const [hasQueried, setHasQueried] = useState(false);
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
-    const currentModel = localStorage.getItem(CUR_MODEL_KEY) ?? models[0].name;
+    const currentModel =
+        localStorage.getItem(`${CUR_MODEL_KEY}_video`) ?? models[0].name;
 
     const captureFrame = useCallback(async () => {
         if (currentContextName.current) {
@@ -46,6 +47,7 @@ export const VideoStream = () => {
             embeddings: false
         });
         currentContextName.current = contextName;
+        console.log('frame data: ', frame.data);
         await inferenceAddFrame({
             context_name: contextName,
             frame_bytes: frame.data

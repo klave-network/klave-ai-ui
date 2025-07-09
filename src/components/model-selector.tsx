@@ -10,6 +10,7 @@ import {
 import { useLocation } from '@tanstack/react-router';
 import { useUserModels } from '@/store';
 import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
+import { useState, useEffect } from 'react';
 
 export const ModelSelector = () => {
     const location = useLocation();
@@ -29,16 +30,15 @@ export const ModelSelector = () => {
 
     // Get route-specific localStorage key
     const getModelKey = () => {
-        if (location.pathname === '/chat') {
-            return `${CUR_MODEL_KEY}_chat`;
-        } else if (location.pathname === '/chat/video') {
+        if (location.pathname.includes('/video')) {
             return `${CUR_MODEL_KEY}_video`;
+        } else {
+            return `${CUR_MODEL_KEY}_chat`;
         }
-        return CUR_MODEL_KEY;
     };
 
-    // Get current model for this route, fallback to first available model
-    const getCurrentModel = () => {
+    // Use state to track current model
+    const [currentModel, setCurrentModel] = useState(() => {
         const savedModel = localStorage.getItem(getModelKey());
         // Check if saved model exists in filtered models
         if (savedModel && models.some((model) => model.name === savedModel)) {
@@ -46,9 +46,28 @@ export const ModelSelector = () => {
         }
         // Fallback to first available model
         return models[0]?.name || '';
-    };
+    });
 
-    const currentModel = getCurrentModel();
+    // Update current model when route changes or models change
+    useEffect(() => {
+        const savedModel = localStorage.getItem(getModelKey());
+
+        if (savedModel && models.some((model) => model.name === savedModel)) {
+            setCurrentModel(savedModel);
+        } else {
+            const fallbackModel = models[0]?.name || '';
+            setCurrentModel(fallbackModel);
+            if (fallbackModel) {
+                localStorage.setItem(getModelKey(), fallbackModel);
+            }
+        }
+    }, [location.pathname, models]);
+
+    // Handle model selection
+    const handleModelChange = (value: string) => {
+        setCurrentModel(value);
+        localStorage.setItem(getModelKey(), value);
+    };
 
     // Check if we're in chat view
     const isInChatView =
@@ -63,12 +82,7 @@ export const ModelSelector = () => {
     }
 
     return (
-        <Select
-            value={currentModel}
-            onValueChange={(value) =>
-                localStorage.setItem(getModelKey(), value)
-            }
-        >
+        <Select value={currentModel} onValueChange={handleModelChange}>
             <SelectTrigger className="w-[180px]" disabled={!isInChatView}>
                 <SelectValue placeholder="Language model" />
             </SelectTrigger>
