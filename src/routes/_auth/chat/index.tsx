@@ -92,7 +92,7 @@ function RouteComponent() {
                     context_name: contextName,
                     user_prompt: userPrompt,
                     rag_id: rags[0].rag_id,
-                    n_rag_chunks: 3,
+                    n_rag_chunks: 4,
                     n_max_augmentations: 2
                 });
             } else {
