@@ -92,9 +92,9 @@ code {
 }
 
 @theme {
-    --color-kor: #f59b48;
-    --color-kcy: #76fbd7;
-    --color-kbl: #5785f8;
+    --color-kor: #fca870;
+    --color-kcy: #00ffd5;
+    --color-kbl: #00bfff;
     --shadow-centered: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
