@@ -29,10 +29,10 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             <div className="flex flex-col gap-6 items-center justify-center h-full">
                 <h2 className="text-2xl md:text-3xl">
-                    Welcome to <b>Klave for AI</b>
+                    Welcome to <b>Klave AI</b>
                 </h2>
                 <p className="text-center max-w-xl text-gray-500">
-                    Introducing Klave for AI
+                    Introducing Klave AI
                     <br />
                     Run your models and generate ideas or get help in total
                     privacy !
