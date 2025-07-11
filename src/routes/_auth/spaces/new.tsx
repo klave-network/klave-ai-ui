@@ -51,7 +51,7 @@ function RouteComponent() {
         try {
             // Create PostgreSQL database
             const database_id = await pgsqlCreate({
-                host: 'cuyegue.secretivecomputing.tech',
+                host: 'hellomylovelies.secretivecomputing.org',
                 dbname: 'klave_rag',
                 user: 'klave',
                 password: 'RlOsujsb3M6zZ78'

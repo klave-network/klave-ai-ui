@@ -14,7 +14,9 @@ import type {
     RagDeleteDocumentInput,
     RagDocumentListInput,
     Rag,
-    Document
+    Document,
+    Reference,
+    AddRagPromptResult
 } from '@/lib/types';
 
 let triedLoadingModels = false;
@@ -40,11 +42,10 @@ export const getModels = async (): Promise<Model[]> =>
                         if (parsedResult.length === 0) {
                             if (!triedLoadingModels) {
                                 triedLoadingModels = true;
-                                return loadModel()
-                                    .then(() => {
-                                        // Retry getting models after loading
-                                        return getModels();
-                                    });
+                                return loadModel().then(() => {
+                                    // Retry getting models after loading
+                                    return getModels();
+                                });
                             }
                         }
                         console.info(
@@ -159,7 +160,7 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
 
 export const inferenceAddRagPrompt = async (
     args: PromptInputRag
-): Promise<any> =>
+): Promise<AddRagPromptResult> =>
     waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -172,8 +173,7 @@ export const inferenceAddRagPrompt = async (
         .then(
             (tx) =>
                 new Promise((resolve, reject) => {
-                    tx.onResult((result: any) => {
-                        console.log('Result:', result);
+                    tx.onResult((result: AddRagPromptResult) => {
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -211,10 +211,8 @@ export const inferenceGetResponse = async (
     resolveCallback: (result: ChunkResult) => boolean
 ): Promise<void> => {
     await waitForConnection();
-    if (args.nb_pieces === undefined || args.nb_pieces < 1)
-        args.nb_pieces = 2; // Default to 2 pieces if not specified
-    if (args.nb_pieces > 20)
-        args.nb_pieces = 20; // Limit to a maximum of 20 pieces
+    if (args.nb_pieces === undefined || args.nb_pieces < 1) args.nb_pieces = 2; // Default to 2 pieces if not specified
+    if (args.nb_pieces > 20) args.nb_pieces = 20; // Limit to a maximum of 20 pieces
     const tx = await secretariumHandler.request(
         klaveKlaveAIContract,
         'inference_get_pieces',
@@ -240,7 +238,8 @@ export const inferenceGetResponse = async (
 
 const url = 'SmolVLM-500M-Instruct-Q8_0.gguf';
 const name = 'SmolVLM';
-const description = 'SmolVLM is a small, efficient vision-language model designed for tasks like image captioning and visual question answering. It is optimized for performance while maintaining high accuracy.';
+const description =
+    'SmolVLM is a small, efficient vision-language model designed for tasks like image captioning and visual question answering. It is optimized for performance while maintaining high accuracy.';
 
 // Define enums as objects
 const graph_encoding = { autodetect: 0 };
@@ -249,7 +248,7 @@ const execution_target = { cpu: 0 };
 // Model object
 const model = {
     name: name,
-    tokenizer_name: "",
+    tokenizer_name: '',
     local_path: url.split('/').pop(),
     url: url,
     description: description,
@@ -259,7 +258,18 @@ const model = {
     encryption_key: [],
     hash_type: 0,
     hash: [],
-    system_prompt: [66, 101, 32, 97, 32, 104, 101, 108, 112, 102, 117, 108, 32, 97, 115, 115, 105, 115, 116, 97, 110, 116, 46, 32, 65, 110, 115, 119, 101, 114, 32, 116, 104, 101, 32, 113, 117, 101, 115, 116, 105, 111, 110, 32, 97, 115, 32, 116, 114, 117, 116, 104, 102, 117, 108, 108, 121, 32, 97, 115, 32, 112, 111, 115, 115, 105, 98, 108, 101, 44, 32, 98, 117, 116, 32, 100, 111, 32, 110, 111, 116, 32, 103, 117, 101, 115, 115, 32, 105, 102, 32, 121, 111, 117, 32, 100, 111, 32, 110, 111, 116, 32, 107, 110, 111, 119, 32, 116, 104, 101, 32, 97, 110, 115, 119, 101, 114, 46, 32, 73, 102, 32, 121, 111, 117, 32, 97, 114, 101, 32, 117, 110, 115, 117, 114, 101, 44, 32, 115, 97, 121, 32, 115, 111, 46], // "Be a helpful assistant. Answer the question as truthfully as possible, but do not guess if you do not know the answer. If you are unsure, say so."
+    system_prompt: [
+        66, 101, 32, 97, 32, 104, 101, 108, 112, 102, 117, 108, 32, 97, 115,
+        115, 105, 115, 116, 97, 110, 116, 46, 32, 65, 110, 115, 119, 101, 114,
+        32, 116, 104, 101, 32, 113, 117, 101, 115, 116, 105, 111, 110, 32, 97,
+        115, 32, 116, 114, 117, 116, 104, 102, 117, 108, 108, 121, 32, 97, 115,
+        32, 112, 111, 115, 115, 105, 98, 108, 101, 44, 32, 98, 117, 116, 32,
+        100, 111, 32, 110, 111, 116, 32, 103, 117, 101, 115, 115, 32, 105, 102,
+        32, 121, 111, 117, 32, 100, 111, 32, 110, 111, 116, 32, 107, 110, 111,
+        119, 32, 116, 104, 101, 32, 97, 110, 115, 119, 101, 114, 46, 32, 73,
+        102, 32, 121, 111, 117, 32, 97, 114, 101, 32, 117, 110, 115, 117, 114,
+        101, 44, 32, 115, 97, 121, 32, 115, 111, 46
+    ], // "Be a helpful assistant. Answer the question as truthfully as possible, but do not guess if you do not know the answer. If you are unsure, say so."
     is_loaded: false,
     access: 0,
     max_threads: 64,
@@ -270,10 +280,10 @@ const model = {
 
 // Tokenizer object
 const tokenizer = {
-    name: "",
-    local_path: "",
-    url: "",
-    description: "",
+    name: '',
+    local_path: '',
+    url: '',
+    description: '',
     model_format: 0,
     engine_type: 0,
     tensor_type: 0,

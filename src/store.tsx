@@ -1,11 +1,12 @@
 import { STORE_KEY } from '@/lib/constants';
 import { useStore, Store } from '@tanstack/react-store';
-import { type Model, type Rag } from '@/lib/types';
+import { type Model, type Rag, type Reference } from '@/lib/types';
 
 type ChatMessage = {
     id: string;
     role: 'user' | 'ai';
     content: string;
+    references?: Reference[];
     timestamp?: number;
 };
 
@@ -16,6 +17,9 @@ type ChatSettings = {
     steps: number;
     slidingWindow: boolean;
     useRag: boolean;
+    modelName: string;
+    ragSpace: string;
+    ragChunks: number;
 };
 
 export type ChatHistory = {
@@ -216,7 +220,10 @@ export const storeActions = {
                     topp: 0.9,
                     steps: 256,
                     slidingWindow: false,
-                    useRag: false
+                    useRag: false,
+                    modelName: models[0].name,
+                    ragSpace: '',
+                    ragChunks: 2
                 },
                 models
             }

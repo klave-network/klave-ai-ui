@@ -100,7 +100,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
             })
 
             formData.append('file', fileBlob, `${file.filename}.${fileExtension}`)
-            const response = await fetch('https://cuyegue.secretivecomputing.tech:15000/upload', {
+            const response = await fetch('https://hellomylovelies.secretivecomputing.org:15000/upload', {
                 method: 'POST',
                 body: formData,
             })

@@ -6,17 +6,13 @@ import {
     inferenceAddRagPrompt
 } from '@/api/klave-ai';
 import { generateSimpleId } from '@/lib/utils';
-import {
-    storeActions,
-    useUserModels,
-    useUserChatSettings,
-    useUserRagDataSets
-} from '@/store';
+import { storeActions, useUserModels, useUserChatSettings } from '@/store';
 import { ChatInput } from '@/components/chat-input';
 import { CUR_USER_KEY, CUR_MODEL_KEY, CUR_MODE_KEY } from '@/lib/constants';
 import { getQuote, verifyQuote } from '@/api/klave';
 import { Utils } from '@secretarium/connector';
 import { LoadingDots } from '@/components/loading-dots';
+import type { Reference } from '@/lib/types';
 
 export const Route = createFileRoute('/_auth/chat/')({
     component: RouteComponent,
@@ -56,12 +52,19 @@ function RouteComponent() {
     const navigate = useNavigate();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const models = useUserModels(currentUser);
-    const rags = useUserRagDataSets(currentUser);
     const currentModel =
         localStorage.getItem(`${CUR_MODEL_KEY}_chat`) ?? models[0].name;
     const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
-    const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
-        useUserChatSettings(currentUser);
+    const {
+        systemPrompt,
+        steps,
+        slidingWindow,
+        useRag,
+        topp,
+        temperature,
+        ragSpace,
+        ragChunks
+    } = useUserChatSettings(currentUser);
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -74,7 +77,8 @@ function RouteComponent() {
         // Create unique context ID for the chat name
         const contextId = generateSimpleId();
         const contextName = `stories_context_${contextId}`;
-        console.log('Model: ', currentModel);
+        let references: Reference[] = [];
+
         try {
             await graphInitExecutionContext({
                 model_name: currentModel,
@@ -88,25 +92,30 @@ function RouteComponent() {
                 embeddings: false
             });
 
-            if (useRag) {
-                await inferenceAddRagPrompt({
+            if (ragSpace) {
+                const result = await inferenceAddRagPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt,
-                    rag_id: rags[0].rag_id,
-                    n_rag_chunks: 4,
+                    rag_id: ragSpace,
+                    n_rag_chunks: ragChunks,
                     n_max_augmentations: 2
                 });
+                const seen = new Set();
+                references = result.references.filter(
+                    (ref) => !seen.has(ref.filename) && seen.add(ref.filename)
+                );
             } else {
                 await inferenceAddPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt
                 });
             }
-
+            console.log('references', references);
             const message = {
                 id: generateSimpleId(),
                 content: userPrompt,
-                role: 'user' as const
+                role: 'user' as const,
+                references: references
             };
 
             const settings = {
@@ -115,7 +124,10 @@ function RouteComponent() {
                 topp: topp,
                 steps: steps,
                 slidingWindow: slidingWindow,
-                useRag: useRag
+                useRag: useRag,
+                modelName: currentModel,
+                ragSpace: ragSpace,
+                ragChunks: ragChunks
             };
 
             // Create and add new chat to tanstack store

@@ -47,10 +47,9 @@ export const VideoStream = () => {
             embeddings: false
         });
         currentContextName.current = contextName;
-        console.log('frame data: ', frame.data);
         await inferenceAddFrame({
             context_name: contextName,
-            frame_bytes: frame.data
+            frame_bytes: Array.from(frame.data) as any
         });
         setHasQueried(true);
         setShouldRun(false);

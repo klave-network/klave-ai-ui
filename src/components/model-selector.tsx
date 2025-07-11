@@ -7,15 +7,17 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { useLocation } from '@tanstack/react-router';
-import { useUserModels } from '@/store';
+import { useLocation, useParams } from '@tanstack/react-router';
+import { useUserModels, useUserChat } from '@/store';
 import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 
 export const ModelSelector = () => {
     const location = useLocation();
+    const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const allModels = useUserModels(currentUser);
+    const currentChat = useUserChat(currentUser, params?.id ?? '');
 
     // Filter models based on current route
     const models = allModels.filter((model) => {
@@ -39,6 +41,14 @@ export const ModelSelector = () => {
 
     // Use state to track current model
     const [currentModel, setCurrentModel] = useState(() => {
+        // Use modelName from currentChat.chatSettings if available
+        if (
+            currentChat?.chatSettings?.modelName &&
+            models.some((m) => m.name === currentChat.chatSettings.modelName)
+        ) {
+            return currentChat.chatSettings.modelName;
+        }
+
         const savedModel = localStorage.getItem(getModelKey());
         // Check if saved model exists in filtered models
         if (savedModel && models.some((model) => model.name === savedModel)) {
@@ -48,20 +58,29 @@ export const ModelSelector = () => {
         return models[0]?.name || '';
     });
 
-    // Update current model when route changes or models change
+    // Update current model when route changes, models change, or currentChat changes
     useEffect(() => {
-        const savedModel = localStorage.getItem(getModelKey());
-
-        if (savedModel && models.some((model) => model.name === savedModel)) {
-            setCurrentModel(savedModel);
+        if (
+            currentChat?.chatSettings?.modelName &&
+            models.some((m) => m.name === currentChat.chatSettings.modelName)
+        ) {
+            setCurrentModel(currentChat.chatSettings.modelName);
         } else {
-            const fallbackModel = models[0]?.name || '';
-            setCurrentModel(fallbackModel);
-            if (fallbackModel) {
-                localStorage.setItem(getModelKey(), fallbackModel);
+            const savedModel = localStorage.getItem(getModelKey());
+            if (
+                savedModel &&
+                models.some((model) => model.name === savedModel)
+            ) {
+                setCurrentModel(savedModel);
+            } else {
+                const fallbackModel = models[0]?.name || '';
+                setCurrentModel(fallbackModel);
+                if (fallbackModel) {
+                    localStorage.setItem(getModelKey(), fallbackModel);
+                }
             }
         }
-    }, [location.pathname, models]);
+    }, [location.pathname, models, currentChat]);
 
     // Handle model selection
     const handleModelChange = (value: string) => {
@@ -75,7 +94,7 @@ export const ModelSelector = () => {
 
     if (!models || models.length === 0) {
         return (
-            <div className="text-gray-500">
+            <div className="text-gray-500 text-sm italic">
                 No models available. Please add a model first.
             </div>
         );

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useUserChat, storeActions, store } from '@/store';
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { inferenceAddPrompt } from '@/api/klave-ai';
+import { inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai';
 import { StreamedResponse } from '@/components/streamed-response';
 import { generateSimpleId } from '@/lib/utils';
 import { ChatInput } from '@/components/chat-input';
@@ -13,6 +13,7 @@ import {
     isConnected as isKlaveConnected
 } from '@/api/klave';
 import { LoadingDots } from '@/components/loading-dots';
+import type { Reference } from '@/lib/types';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
     component: RouteComponent,
@@ -107,13 +108,28 @@ function RouteComponent() {
 
         setError(null);
         const promptToSend = userPrompt;
+        let references: Reference[] = [];
         setUserPrompt('');
 
         try {
-            await inferenceAddPrompt({
-                context_name: `stories_context_${chatId}`,
-                user_prompt: promptToSend
-            });
+            if (chat?.chatSettings.ragSpace) {
+                const result = await inferenceAddRagPrompt({
+                    context_name: `stories_context_${chatId}`,
+                    user_prompt: promptToSend,
+                    rag_id: chat?.chatSettings.ragSpace,
+                    n_rag_chunks: chat?.chatSettings.ragChunks,
+                    n_max_augmentations: 2
+                });
+                const seen = new Set();
+                references = result.references.filter(
+                    (ref) => !seen.has(ref.filename) && seen.add(ref.filename)
+                );
+            } else {
+                await inferenceAddPrompt({
+                    context_name: `stories_context_${chatId}`,
+                    user_prompt: promptToSend
+                });
+            }
 
             const userMessageId = generateSimpleId();
             const aiMessageId = generateSimpleId();
@@ -122,7 +138,8 @@ function RouteComponent() {
                 id: userMessageId,
                 content: promptToSend,
                 role: 'user',
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                references: references
             });
 
             storeActions.addMessage(currentUser, chatId, {
@@ -179,32 +196,54 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Chat */}
             <div className="max-w-xl flex-1 overflow-auto mb-4 w-full">
-                {chat.messages.map(({ id, role, content }) => {
+                {chat.messages.map(({ id, role, content, references }) => {
                     const isStreaming =
                         streamingMessageId === id && role === 'ai';
                     return (
-                        <div
-                            key={id}
-                            className={`w-fit mb-2 px-4 py-2 rounded-xl ${
-                                role === 'user'
-                                    ? 'bg-gray-100 ml-auto'
-                                    : 'mr-auto'
-                            }`}
-                        >
-                            {isStreaming ? (
-                                <StreamedResponse
-                                    key={`stream-${id}`}
-                                    context_name={`stories_context_${chatId}`}
-                                    onComplete={(fullResponse) =>
-                                        handleStreamComplete(id, fullResponse)
-                                    }
-                                />
-                            ) : (
-                                <div className="whitespace-pre-wrap">
-                                    {content}
+                        <>
+                            <div
+                                key={id}
+                                className={`w-fit mb-2 px-4 py-2 rounded-xl ${
+                                    role === 'user'
+                                        ? 'bg-gray-100 ml-auto'
+                                        : 'mr-auto'
+                                }`}
+                            >
+                                {isStreaming ? (
+                                    <StreamedResponse
+                                        key={`stream-${id}`}
+                                        context_name={`stories_context_${chatId}`}
+                                        onComplete={(fullResponse) =>
+                                            handleStreamComplete(
+                                                id,
+                                                fullResponse
+                                            )
+                                        }
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="whitespace-pre-wrap">
+                                            {content}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            {references?.length ? (
+                                <div className="text-xs flex items-center gap-2 px-4">
+                                    <h2 className="font-semibold mb-2">
+                                        References:{' '}
+                                    </h2>
+                                    {references.map((reference) => (
+                                        <div
+                                            key={reference.filename}
+                                            className="text-xs mb-2 bg-blue-200 rounded-lg px-2 py-1"
+                                        >
+                                            {reference.filename}
+                                        </div>
+                                    ))}
                                 </div>
-                            )}
-                        </div>
+                            ) : null}
+                        </>
                     );
                 })}
                 <div ref={messagesEndRef} />

@@ -1,44 +1,69 @@
-import { useState } from 'react';
-import { useLocation } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
+import { useLocation, useParams } from '@tanstack/react-router';
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuLabel,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { useUserRagDataSets, useUserChatSettings, storeActions } from '@/store';
+import {
+    useUserRagDataSets,
+    useUserChatSettings,
+    storeActions,
+    useUserChat
+} from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { toast } from 'sonner';
 import { ChevronDown } from 'lucide-react';
 
 export const SpaceSelector = () => {
     const location = useLocation();
+    const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const rags = useUserRagDataSets(currentUser);
-    const { systemPrompt, temperature, topp, steps, slidingWindow } =
-        useUserChatSettings(currentUser);
-    const [selectedRags, setSelectedRags] = useState<Set<string>>(new Set());
+    const {
+        systemPrompt,
+        temperature,
+        topp,
+        steps,
+        slidingWindow,
+        modelName,
+        ragSpace,
+        ragChunks
+    } = useUserChatSettings(currentUser);
+    const currentChat = useUserChat(currentUser, params?.id ?? '');
 
-    // Check if we're in chat view
     const isInChatView = location.pathname === '/chat';
 
-    const handleChange = (ragId: string, checked: boolean) => {
+    // Initialize selectedRag prioritizing currentChat.ragSpace if it exists
+    const [selectedRag, setSelectedRag] = useState<string | null>(
+        currentChat?.chatSettings.ragSpace ?? ragSpace ?? null
+    );
+
+    // Sync selectedRag when ragSpace or currentChat.ragSpace changes and only if not in chat view
+    useEffect(() => {
+        if (!isInChatView) {
+            setSelectedRag(
+                currentChat?.chatSettings.ragSpace ?? ragSpace ?? null
+            );
+        }
+        // Do NOT reset selectedRag when entering chat view to preserve user selection
+    }, [currentChat?.chatSettings.ragSpace, ragSpace, isInChatView]);
+
+    // Handle selection change, allowing deselect by clicking the selected item again
+    const handleChange = (value: string) => {
+        if (!isInChatView) return; // Prevent changes outside chat view
+
         try {
-            const newSelectedRags = new Set(selectedRags);
+            const newSelectedRag = selectedRag === value ? '' : value; // '' means deselected
 
-            if (checked) {
-                newSelectedRags.add(ragId);
-            } else {
-                newSelectedRags.delete(ragId);
-            }
+            setSelectedRag(newSelectedRag || null);
 
-            setSelectedRags(newSelectedRags);
-
-            // Update chat settings with useRag based on whether any RAG is selected
-            const useRag = newSelectedRags.size > 0;
+            const useRag = newSelectedRag !== '';
 
             storeActions.updateChatSettings(currentUser, {
                 systemPrompt,
@@ -46,7 +71,10 @@ export const SpaceSelector = () => {
                 topp,
                 steps,
                 slidingWindow,
-                useRag
+                useRag,
+                modelName,
+                ragSpace: newSelectedRag,
+                ragChunks
             });
 
             toast.success('Settings updated successfully');
@@ -65,9 +93,8 @@ export const SpaceSelector = () => {
     }
 
     const getDisplayText = () => {
-        if (selectedRags.size === 0) return 'Spaces';
-        if (selectedRags.size === 1) return `1 space selected`;
-        return `${selectedRags.size} spaces selected`;
+        if (!selectedRag) return 'Spaces';
+        return `1 space selected`;
     };
 
     return (
@@ -84,17 +111,19 @@ export const SpaceSelector = () => {
             <DropdownMenuContent className="w-auto">
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Available spaces</DropdownMenuLabel>
-                    {rags.map((rag) => (
-                        <DropdownMenuCheckboxItem
-                            key={rag.rag_id}
-                            checked={selectedRags.has(rag.rag_id)}
-                            onCheckedChange={(checked) =>
-                                handleChange(rag.rag_id, checked)
-                            }
-                        >
-                            {rag.table_name}
-                        </DropdownMenuCheckboxItem>
-                    ))}
+                    <DropdownMenuRadioGroup
+                        value={selectedRag || ''}
+                        onValueChange={handleChange}
+                    >
+                        {rags.map((rag) => (
+                            <DropdownMenuRadioItem
+                                key={rag.rag_id}
+                                value={rag.rag_id}
+                            >
+                                {rag.table_name}
+                            </DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>

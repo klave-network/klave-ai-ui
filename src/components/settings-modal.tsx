@@ -47,7 +47,8 @@ const formSchema = z.object({
     topp: z.number().min(0).max(1, 'Top-p must be between 0 and 1'),
     steps: z.number().min(256).max(1024),
     sliding_window: z.boolean(),
-    useRag: z.boolean()
+    useRag: z.boolean(),
+    ragChunks: z.number().min(0).max(5, 'Top-p must be between 0 and 5')
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -57,8 +58,16 @@ export const SettingsModal = () => {
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const { systemPrompt, steps, slidingWindow, useRag, topp, temperature } =
-        useUserChatSettings(currentUser);
+    const {
+        systemPrompt,
+        steps,
+        slidingWindow,
+        useRag,
+        topp,
+        temperature,
+        modelName,
+        ragChunks
+    } = useUserChatSettings(currentUser);
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -74,7 +83,8 @@ export const SettingsModal = () => {
             topp: 0.9,
             steps: 256,
             sliding_window: false,
-            useRag: false
+            useRag: false,
+            ragChunks: 3
         }
     });
 
@@ -90,7 +100,8 @@ export const SettingsModal = () => {
                       topp,
                       steps,
                       slidingWindow,
-                      useRag
+                      useRag,
+                      ragChunks
                   };
 
             // Reset the form with current values
@@ -100,7 +111,8 @@ export const SettingsModal = () => {
                 topp: settings.topp,
                 steps: settings.steps,
                 sliding_window: settings.slidingWindow,
-                useRag: settings.useRag
+                useRag: settings.useRag,
+                ragChunks: settings.ragChunks
             });
         }
     }, [
@@ -127,7 +139,8 @@ export const SettingsModal = () => {
                     topp,
                     steps,
                     slidingWindow,
-                    useRag
+                    useRag,
+                    ragChunks
                 },
                 formValues: form.getValues()
             });
@@ -147,7 +160,10 @@ export const SettingsModal = () => {
                 topp: data.topp,
                 steps: data.steps,
                 slidingWindow: data.sliding_window,
-                useRag: data.useRag
+                useRag: data.useRag,
+                modelName: modelName,
+                ragSpace: '',
+                ragChunks: data.ragChunks
             });
 
             toast.success('Settings updated successfully');
@@ -254,6 +270,35 @@ export const SettingsModal = () => {
                                             }
                                             labelFor="topp"
                                             labelTitle="Top-p"
+                                            labelValue={value}
+                                            disabled={!isInChatView}
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="ragChunks"
+                            render={({
+                                field: { value, onChange, ...field }
+                            }) => (
+                                <FormItem>
+                                    <FormControl>
+                                        <SliderTooltip
+                                            id="ragChunks"
+                                            min={0}
+                                            max={5}
+                                            step={1}
+                                            defaultValue={[value]}
+                                            onValueChange={([val]) =>
+                                                isInChatView && onChange(val)
+                                            }
+                                            labelFor="ragChunks"
+                                            labelTitle="RAG Chunks"
                                             labelValue={value}
                                             disabled={!isInChatView}
                                             {...field}

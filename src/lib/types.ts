@@ -30,6 +30,16 @@ export type Model = {
     url: string;
 };
 
+export type AddRagPromptResult = {
+    references: Reference[];
+    user_prompt: string;
+};
+
+export type Reference = {
+    filename: string;
+    content: string;
+};
+
 export type Tokenizer = {
     access: number;
     description: string;
