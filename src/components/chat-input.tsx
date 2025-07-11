@@ -7,12 +7,6 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
-// import {
-//     Popover,
-//     PopoverContent,
-//     PopoverTrigger
-// } from '@/components/ui/popover';
-// import { Link } from '@tanstack/react-router';
 import { SecureButton } from '@/components/secure-button';
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
@@ -38,7 +32,6 @@ export const ChatInput = ({
     isDisabled: isParentDisabling,
     secureButton
 }: ChatInputProps) => {
-
     const isDisconnected = !secureButton.quote || !secureButton.verification;
     const isDisabled = isParentDisabling || isDisconnected;
 
@@ -55,7 +48,11 @@ export const ChatInput = ({
             <div className="rounded-xl p-[1px] bg-gradient-to-r from-kor via-kbl to-kcy shadow-centered shadow-gray/50">
                 <div className="flex flex-col gap-4 rounded-[calc(0.9rem-1px)] bg-white border p-4">
                     <textarea
-                        placeholder={isDisconnected ? "It looks like you might be disconnected :(" : "Ask anything..."}
+                        placeholder={
+                            isDisconnected
+                                ? 'It looks like you might be disconnected :('
+                                : 'Ask anything...'
+                        }
                         className="flex-1 focus:outline-none resize-none field-sizing-content max-h-80"
                         rows={2}
                         disabled={isDisabled}

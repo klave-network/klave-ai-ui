@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { useUserModels } from '@/store';
+import { useUserLlModels, useUserVlModels } from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { Puzzle } from 'lucide-react';
 
@@ -9,7 +9,13 @@ export const Route = createFileRoute('/_auth/models')({
 
 function RouteComponent() {
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const models = useUserModels(currentUser);
+
+    // Fetch LL and VL models separately
+    const llModels = useUserLlModels(currentUser);
+    const vlModels = useUserVlModels(currentUser);
+
+    // Combine both model lists
+    const models = [...llModels, ...vlModels];
 
     return (
         <div className="flex flex-col h-full">
@@ -22,6 +28,11 @@ function RouteComponent() {
                         Available models loaded
                     </div>
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto p-3">
+                        {models.length === 0 && (
+                            <p className="text-gray-500 text-sm italic">
+                                No models available.
+                            </p>
+                        )}
                         {models.map((model) => (
                             <Link
                                 search

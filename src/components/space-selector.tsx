@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useLocation, useParams } from '@tanstack/react-router';
 import {
     DropdownMenu,
@@ -20,61 +19,55 @@ import { CUR_USER_KEY } from '@/lib/constants';
 import { toast } from 'sonner';
 import { ChevronDown } from 'lucide-react';
 
+// Default chat settings fallback
+const defaultChatSettings = {
+    systemPrompt: 'You are a helpful assistant.',
+    temperature: 0.8,
+    topp: 0.9,
+    steps: 256,
+    slidingWindow: false,
+    useRag: false,
+    currentLlModel: '',
+    currentVlModel: '',
+    ragSpace: '',
+    ragChunks: 2
+};
+
 export const SpaceSelector = () => {
     const location = useLocation();
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const rags = useUserRagDataSets(currentUser);
-    const {
-        systemPrompt,
-        temperature,
-        topp,
-        steps,
-        slidingWindow,
-        modelName,
-        ragSpace,
-        ragChunks
-    } = useUserChatSettings(currentUser);
+
+    const chatSettings =
+        useUserChatSettings(currentUser) ?? defaultChatSettings;
     const currentChat = useUserChat(currentUser, params?.id ?? '');
 
     const isInChatView = location.pathname === '/chat';
 
-    // Initialize selectedRag prioritizing currentChat.ragSpace if it exists
-    const [selectedRag, setSelectedRag] = useState<string | null>(
-        currentChat?.chatSettings.ragSpace ?? ragSpace ?? null
-    );
+    // Get selected ragSpace from currentChat settings or fallback
+    const selectedRag =
+        currentChat?.chatSettings.ragSpace ?? chatSettings.ragSpace ?? '';
 
-    // Sync selectedRag when ragSpace or currentChat.ragSpace changes and only if not in chat view
-    useEffect(() => {
-        if (!isInChatView) {
-            setSelectedRag(
-                currentChat?.chatSettings.ragSpace ?? ragSpace ?? null
-            );
-        }
-        // Do NOT reset selectedRag when entering chat view to preserve user selection
-    }, [currentChat?.chatSettings.ragSpace, ragSpace, isInChatView]);
-
-    // Handle selection change, allowing deselect by clicking the selected item again
+    // Handle selection change (toggle deselect on same selection)
     const handleChange = (value: string) => {
         if (!isInChatView) return; // Prevent changes outside chat view
 
         try {
-            const newSelectedRag = selectedRag === value ? '' : value; // '' means deselected
-
-            setSelectedRag(newSelectedRag || null);
-
-            const useRag = newSelectedRag !== '';
+            const newSelectedRag = selectedRag === value ? '' : value;
 
             storeActions.updateChatSettings(currentUser, {
-                systemPrompt,
-                temperature,
-                topp,
-                steps,
-                slidingWindow,
-                useRag,
-                modelName,
+                ...currentChat?.chatSettings,
+                systemPrompt: chatSettings.systemPrompt,
+                temperature: chatSettings.temperature,
+                topp: chatSettings.topp,
+                steps: chatSettings.steps,
+                slidingWindow: chatSettings.slidingWindow,
+                useRag: newSelectedRag !== '',
                 ragSpace: newSelectedRag,
-                ragChunks
+                ragChunks: chatSettings.ragChunks,
+                currentLlModel: chatSettings.currentLlModel,
+                currentVlModel: chatSettings.currentVlModel
             });
 
             toast.success('Settings updated successfully');
@@ -112,7 +105,7 @@ export const SpaceSelector = () => {
                 <DropdownMenuGroup>
                     <DropdownMenuLabel>Available spaces</DropdownMenuLabel>
                     <DropdownMenuRadioGroup
-                        value={selectedRag || ''}
+                        value={selectedRag}
                         onValueChange={handleChange}
                     >
                         {rags.map((rag) => (

@@ -38,17 +38,31 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 
+// Default chat settings fallback
+const defaultChatSettings = {
+    systemPrompt: 'You are a helpful assistant.',
+    temperature: 0.8,
+    topp: 0.9,
+    steps: 256,
+    slidingWindow: false,
+    useRag: false,
+    currentLlModel: '',
+    currentVlModel: '',
+    ragSpace: '',
+    ragChunks: 2
+};
+
 const formSchema = z.object({
-    system_prompt: z.string().min(1, 'System prompt is required'),
+    systemPrompt: z.string().min(1, 'System prompt is required'),
     temperature: z
         .number()
         .min(0)
         .max(2, 'Temperature must be between 0 and 2'),
     topp: z.number().min(0).max(1, 'Top-p must be between 0 and 1'),
     steps: z.number().min(256).max(1024),
-    sliding_window: z.boolean(),
+    slidingWindow: z.boolean(),
     useRag: z.boolean(),
-    ragChunks: z.number().min(0).max(5, 'Top-p must be between 0 and 5')
+    ragChunks: z.number().min(0).max(5, 'RAG chunks must be between 0 and 5')
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,95 +72,47 @@ export const SettingsModal = () => {
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const {
-        systemPrompt,
-        steps,
-        slidingWindow,
-        useRag,
-        topp,
-        temperature,
-        modelName,
-        ragChunks
-    } = useUserChatSettings(currentUser);
+    const chatSettings =
+        useUserChatSettings(currentUser) ?? defaultChatSettings;
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-    // Check if we're in chat view
+    // Only enable settings editing in chat view
     const isInChatView = location.pathname === '/chat';
 
-    // Create the form
+    // Initialize react-hook-form with validation schema and default values
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            system_prompt: '',
+            systemPrompt: '',
             temperature: 0.8,
             topp: 0.9,
             steps: 256,
-            sliding_window: false,
+            slidingWindow: false,
             useRag: false,
             ragChunks: 3
         }
     });
 
-    // Update form values when dialog opens or when currentChat/settings change
+    // When dialog opens or dependencies change, reset form with current settings
     useEffect(() => {
-        if (isDialogOpen) {
-            // Use currentChat settings if available, otherwise fall back to global settings
-            const settings = currentChat?.chatSettings
-                ? currentChat.chatSettings
-                : {
-                      systemPrompt,
-                      temperature,
-                      topp,
-                      steps,
-                      slidingWindow,
-                      useRag,
-                      ragChunks
-                  };
+        if (!isDialogOpen) return;
 
-            // Reset the form with current values
-            form.reset({
-                system_prompt: settings.systemPrompt,
-                temperature: settings.temperature,
-                topp: settings.topp,
-                steps: settings.steps,
-                sliding_window: settings.slidingWindow,
-                useRag: settings.useRag,
-                ragChunks: settings.ragChunks
-            });
-        }
-    }, [
-        isDialogOpen,
-        currentChat,
-        systemPrompt,
-        temperature,
-        topp,
-        steps,
-        slidingWindow,
-        useRag,
-        form
-    ]);
+        // Prefer current chat settings, fallback to global chatSettings
+        const settings = currentChat?.chatSettings ?? chatSettings;
 
-    // Debug logging
-    useEffect(() => {
-        if (isDialogOpen) {
-            console.log('Dialog opened with settings:', {
-                currentChat: currentChat ? 'exists' : 'null',
-                chatSettings: currentChat?.chatSettings,
-                globalSettings: {
-                    systemPrompt,
-                    temperature,
-                    topp,
-                    steps,
-                    slidingWindow,
-                    useRag,
-                    ragChunks
-                },
-                formValues: form.getValues()
-            });
-        }
-    }, [isDialogOpen, currentChat, form]);
+        form.reset({
+            systemPrompt: settings.systemPrompt,
+            temperature: settings.temperature,
+            topp: settings.topp,
+            steps: settings.steps,
+            slidingWindow: settings.slidingWindow,
+            useRag: settings.useRag,
+            ragChunks: settings.ragChunks
+        });
+    }, [isDialogOpen, currentChat, chatSettings, form]);
 
+    // Submit handler updates the store and closes dialog
     const onSubmit = (data: FormValues) => {
         if (!isInChatView) {
             toast.error('Settings can only be updated in chat view');
@@ -155,15 +121,17 @@ export const SettingsModal = () => {
 
         try {
             storeActions.updateChatSettings(currentUser, {
-                systemPrompt: data.system_prompt,
+                systemPrompt: data.systemPrompt,
                 temperature: data.temperature,
                 topp: data.topp,
                 steps: data.steps,
-                slidingWindow: data.sliding_window,
+                slidingWindow: data.slidingWindow,
                 useRag: data.useRag,
-                modelName: modelName,
-                ragSpace: '',
-                ragChunks: data.ragChunks
+                ragChunks: data.ragChunks,
+                // Keep model keys unchanged to avoid overwriting
+                currentLlModel: chatSettings.currentLlModel,
+                currentVlModel: chatSettings.currentVlModel,
+                ragSpace: chatSettings.ragSpace
             });
 
             toast.success('Settings updated successfully');
@@ -206,7 +174,7 @@ export const SettingsModal = () => {
                     >
                         <FormField
                             control={form.control}
-                            name="system_prompt"
+                            name="systemPrompt"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>System prompt</FormLabel>
@@ -352,7 +320,7 @@ export const SettingsModal = () => {
 
                         <FormField
                             control={form.control}
-                            name="sliding_window"
+                            name="slidingWindow"
                             render={({
                                 field: { value, onChange, ...field }
                             }) => (

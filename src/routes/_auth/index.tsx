@@ -35,7 +35,7 @@ function RouteComponent() {
                     Introducing Klave AI
                     <br />
                     Run your models and generate ideas or get help in total
-                    privacy !
+                    privacy!
                 </p>
             </div>
         </div>

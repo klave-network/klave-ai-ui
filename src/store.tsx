@@ -17,7 +17,8 @@ type ChatSettings = {
     steps: number;
     slidingWindow: boolean;
     useRag: boolean;
-    modelName: string;
+    currentLlModel: string;
+    currentVlModel: string;
     ragSpace: string;
     ragChunks: number;
 };
@@ -28,15 +29,28 @@ export type ChatHistory = {
     chatSettings: ChatSettings;
 };
 
-type KlaveAIState = Record<
-    string,
-    {
-        chats?: ChatHistory[];
-        models?: Model[];
-        ragDataSets?: Rag[];
-        chatSettings: ChatSettings;
-    }
->;
+type UserData = {
+    chatSettings: ChatSettings;
+    chats?: ChatHistory[];
+    vlModels?: Model[];
+    llModels?: Model[];
+    ragDataSets?: Rag[];
+};
+
+type KlaveAIState = Record<string, UserData>;
+
+const defaultChatSettings: ChatSettings = {
+    systemPrompt: 'You are a helpful assistant.',
+    temperature: 0.8,
+    topp: 0.9,
+    steps: 256,
+    slidingWindow: false,
+    useRag: false,
+    currentLlModel: '',
+    currentVlModel: '',
+    ragSpace: '',
+    ragChunks: 2
+};
 
 const initialState: KlaveAIState = {};
 
@@ -64,12 +78,20 @@ export const useUserChat = (keyname: string, chatId: string) =>
         state[keyname]?.chats?.find((chat) => chat.id === chatId)
     );
 
-export const useUserModels = (keyname: string) =>
-    useStore(store, (state) => state[keyname]?.models ?? []);
+export const useUserLlModels = (keyname: string) =>
+    useStore(store, (state) => state[keyname]?.llModels ?? []);
 
-export const useUserModel = (keyname: string, modelName: string) =>
+export const useUserLlModel = (keyname: string, modelName: string) =>
     useStore(store, (state) =>
-        state[keyname]?.models?.find((model) => model.name === modelName)
+        state[keyname]?.llModels?.find((model) => model.name === modelName)
+    );
+
+export const useUserVlModels = (keyname: string) =>
+    useStore(store, (state) => state[keyname]?.vlModels ?? []);
+
+export const useUserVlModel = (keyname: string, modelName: string) =>
+    useStore(store, (state) =>
+        state[keyname]?.vlModels?.find((model) => model.name === modelName)
     );
 
 export const useUserRagDataSets = (keyname: string) =>
@@ -81,7 +103,10 @@ export const useUserRagDataSet = (keyname: string, ragId: string) =>
     );
 
 export const useUserChatSettings = (keyname: string) =>
-    useStore(store, (state) => state[keyname].chatSettings);
+    useStore(
+        store,
+        (state) => state[keyname]?.chatSettings ?? defaultChatSettings
+    );
 
 export const useUserDocumentSets = (keyname: string) => [keyname];
 
@@ -99,14 +124,16 @@ export const storeActions = {
         settings: ChatSettings
     ) => {
         store.setState((state) => {
-            const userData = state[userKeyname] ?? { chats: [], models: [] };
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-            // Check if chat already exists
-            const existingChat = userData.chats?.find(
-                (chat) => chat.id === chatId
-            );
-            if (existingChat) {
-                return state; // Don't create duplicate
+            if (userData.chats?.some((chat) => chat.id === chatId)) {
+                return state; // Avoid duplicates
             }
 
             const newChat: ChatHistory = {
@@ -125,39 +152,54 @@ export const storeActions = {
         });
     },
 
-    updateChatSettings: (userKeyname: string, settings: ChatSettings) => {
-        const userData = store.state[userKeyname] ?? {
-            chats: [],
-            models: [],
-            ragDataSets: [],
-            chatSettings: {}
-        };
+    updateChatSettings: (
+        userKeyname: string,
+        settings: Partial<ChatSettings>
+    ) => {
+        store.setState((state) => {
+            const userData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-        store.setState((state) => ({
-            ...state,
-            [userKeyname]: {
-                ...userData,
-                chatSettings: {
-                    ...userData.chatSettings,
-                    ...settings
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chatSettings: {
+                        ...userData.chatSettings,
+                        ...settings
+                    }
                 }
-            }
-        }));
+            };
+        });
     },
 
     deleteChat: (userKeyname: string, chatId: string) => {
-        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const updatedChats = userData.chats?.filter(
-            (chat) => chat.id !== chatId
-        );
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-        store.setState((prev) => ({
-            ...prev,
-            [userKeyname]: {
-                ...userData,
-                chats: updatedChats
-            }
-        }));
+            const updatedChats = userData.chats?.filter(
+                (chat) => chat.id !== chatId
+            );
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chats: updatedChats
+                }
+            };
+        });
     },
 
     updateMessage: (
@@ -166,24 +208,33 @@ export const storeActions = {
         messageId: string,
         updatedContent: Partial<Pick<ChatMessage, 'content' | 'timestamp'>>
     ) => {
-        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
-        const updatedChats = userData.chats?.map((chat) => {
-            if (chat.id !== chatId) return chat;
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-            const updatedMessages = chat.messages.map((msg) =>
-                msg.id === messageId ? { ...msg, ...updatedContent } : msg
-            );
+            const updatedChats = userData.chats?.map((chat) => {
+                if (chat.id !== chatId) return chat;
 
-            return { ...chat, messages: updatedMessages };
+                const updatedMessages = chat.messages.map((msg) =>
+                    msg.id === messageId ? { ...msg, ...updatedContent } : msg
+                );
+
+                return { ...chat, messages: updatedMessages };
+            });
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chats: updatedChats
+                }
+            };
         });
-
-        store.setState((prev) => ({
-            ...prev,
-            [userKeyname]: {
-                ...userData,
-                chats: updatedChats
-            }
-        }));
     },
 
     addMessage: (userKeyname: string, chatId: string, message: ChatMessage) => {
@@ -208,42 +259,67 @@ export const storeActions = {
     // add models fetched from the backend
     // and set initial chat settings
     addModels: (userKeyname: string, models: Model[]) => {
-        const userData = store.state[userKeyname] ?? { chats: [], models: [] };
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-        store.setState((state) => ({
-            ...state,
-            [userKeyname]: {
-                ...userData,
-                chatSettings: {
-                    systemPrompt: 'You are a helpful assistant.',
-                    temperature: 0.8,
-                    topp: 0.9,
-                    steps: 256,
-                    slidingWindow: false,
-                    useRag: false,
-                    modelName: models[0].name,
-                    ragSpace: '',
-                    ragChunks: 2
-                },
-                models
-            }
-        }));
+            const llModels = models.filter(
+                (m) => m.description.task === 'text-generation'
+            );
+            const vlModels = models.filter(
+                (m) => m.description.task === 'image-text-to-text'
+            );
+
+            const firstLlm = llModels[0];
+            const firstVlm = vlModels[0];
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    chatSettings: {
+                        ...userData.chatSettings,
+                        systemPrompt: 'You are a helpful assistant.',
+                        temperature: 0.8,
+                        topp: 0.9,
+                        steps: 256,
+                        slidingWindow: false,
+                        useRag: false,
+                        currentLlModel: firstLlm?.name ?? '',
+                        currentVlModel: firstVlm?.name ?? '',
+                        ragSpace: '',
+                        ragChunks: 2
+                    },
+                    llModels,
+                    vlModels
+                }
+            };
+        });
     },
 
     // add RAG data sets fetched from the backend
     addRagDataSets: (userKeyname: string, ragDataSets: Rag[]) => {
-        const userData = store.state[userKeyname] ?? {
-            chats: [],
-            models: [],
-            ragDataSets: []
-        };
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings
+            };
 
-        store.setState((state) => ({
-            ...state,
-            [userKeyname]: {
-                ...userData,
-                ragDataSets
-            }
-        }));
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    ragDataSets
+                }
+            };
+        });
     }
 };

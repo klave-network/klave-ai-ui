@@ -4,11 +4,11 @@ import {
     graphInitExecutionContext,
     inferenceAddFrame
 } from '@/api/klave-ai';
-import { CUR_MODEL_KEY, CUR_USER_KEY } from '@/lib/constants';
+import { CUR_USER_KEY } from '@/lib/constants';
 import { load_image } from '@huggingface/transformers';
 import { Camera, type CameraType } from 'react-camera-pro';
 import { StreamedResponse } from './streamed-response';
-import { useUserModels } from '@/store';
+import { useUserVlModels, useUserChatSettings } from '@/store';
 import prettyBytes from 'pretty-bytes';
 
 export const VideoStream = () => {
@@ -18,9 +18,14 @@ export const VideoStream = () => {
     const [shouldRun, setShouldRun] = useState(true);
     const [hasQueried, setHasQueried] = useState(false);
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const models = useUserModels(currentUser);
+
+    // Get VL models and chat settings for current user
+    const vlModels = useUserVlModels(currentUser);
+    const chatSettings = useUserChatSettings(currentUser);
+
+    // Use current VL model from chat settings or fallback to first VL model
     const currentModel =
-        localStorage.getItem(`${CUR_MODEL_KEY}_video`) ?? models[0].name;
+        chatSettings?.currentVlModel || vlModels[0]?.name || '';
 
     const captureFrame = useCallback(async () => {
         if (currentContextName.current) {
@@ -31,10 +36,18 @@ export const VideoStream = () => {
             await graphDeleteExecutionContext(currentContextName.current);
             currentContextName.current = null;
         }
+
         const frameData = cameraRef.current?.takePhoto('base64url');
+        if (!frameData) {
+            console.warn('No frame data captured');
+            return;
+        }
+
         const frame = await getImageTreatment(frameData as string);
         const contextName = `stories_context_${ctxId.current++}`;
+
         console.log('Frame data:', prettyBytes(frame.data.length), frame);
+
         await graphInitExecutionContext({
             model_name: currentModel,
             context_name: contextName,
@@ -46,11 +59,14 @@ export const VideoStream = () => {
             mode: 'chat',
             embeddings: false
         });
+
         currentContextName.current = contextName;
+
         await inferenceAddFrame({
             context_name: contextName,
             frame_bytes: Array.from(frame.data) as any
         });
+
         setHasQueried(true);
         setShouldRun(false);
     }, [currentModel]);
@@ -58,51 +74,26 @@ export const VideoStream = () => {
     useEffect(() => {
         if (cameraRef.current && shouldRun) {
             const timer = setInterval(captureFrame, 10000);
-            return () => {
-                clearInterval(timer);
-            };
+            return () => clearInterval(timer);
         }
     }, [cameraRef, captureFrame, shouldRun]);
 
     const handleStreamComplete = (fullResponse: string) => {
-        if (!models || !currentUser) return;
+        if (!vlModels.length || !currentUser) return;
 
         console.log(
             'Stream complete, updating chat with response:',
             fullResponse
         );
         setShouldRun(true);
-        // store.setState((prev) => {
-        //     const userChats = prev[currentUser]?.chats || [];
-        //     const updatedChats = userChats.map((c) => {
-        //         if (c.id !== chatId) return c;
-        //         const updatedMessages = c.messages.map((msg) =>
-        //             msg.id === messageId
-        //                 ? { ...msg, content: fullResponse }
-        //                 : msg
-        //         );
-        //         return { ...c, messages: updatedMessages };
-        //     });
 
-        //     return {
-        //         ...prev,
-        //         [currentUser]: {
-        //             ...prev[currentUser],
-        //             chats: updatedChats
-        //         }
-        //     };
-        // });
-
-        // if (streamingMessageId === messageId) {
-        //     setStreamingMessageId('');
-        // }
+        // TODO: Implement chat update logic here if needed
     };
 
     console.log(currentContextName.current, hasQueried);
 
     return (
         <div className="max-w-xl mx-auto p-4">
-            {/* <div className="block w-1/2 h-1/2"> */}
             <Camera
                 ref={cameraRef}
                 errorMessages={{
@@ -112,20 +103,13 @@ export const VideoStream = () => {
                 }}
                 aspectRatio={4 / 3}
             />
-            {/* <Button
-                type="button"
-                onClick={handleToggleRecording}
-                className='hover:cursor-pointer w-full rounded font-bold'
-            >Go
-            </Button> */}
-            {/* </div> */}
-            {currentContextName.current && hasQueried ? (
+            {currentContextName.current && hasQueried && (
                 <StreamedResponse
                     key={currentContextName.current}
                     context_name={currentContextName.current}
                     onComplete={handleStreamComplete}
                 />
-            ) : null}
+            )}
         </div>
     );
 };
@@ -140,33 +124,25 @@ const getImageTreatment = async (data: string | null) => {
         wantedWidth: number,
         wantedHeight: number
     ) {
-        return new Promise(function (resolve) {
-            // We create an image to receive the Data URI
+        return new Promise<string>((resolve) => {
             const img = document.createElement('img');
 
-            // When the event "onload" is triggered we can resize the image.
             img.onload = function () {
-                // We create a canvas and get its context.
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
 
-                // We set the dimensions at the wanted size.
                 canvas.width = wantedWidth;
                 canvas.height = wantedHeight;
 
-                // We resize the image with the canvas method drawImage();
                 ctx?.drawImage(img, 0, 0, wantedWidth, wantedHeight);
-
                 const dataURI = canvas.toDataURL();
-
-                // This is the return of the Promise
                 resolve(dataURI);
             };
 
-            // We put the Data URI in the image's src attribute
             img.src = datas;
         });
     }
+
     const scaledImage = await resizedataURL(data, 120, 160);
     const image = await load_image(scaledImage);
 

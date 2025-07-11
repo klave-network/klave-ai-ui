@@ -1,4 +1,4 @@
-import { useUserModel } from '@/store';
+import { useUserLlModel } from '@/store';
 import { createFileRoute } from '@tanstack/react-router';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_auth/documents/$set')({
 function RouteComponent() {
     const { set } = Route.useParams();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const model = useUserModel(currentUser, set);
+    const model = useUserLlModel(currentUser, set);
 
     // Handle copy to clipboard
     const copyToClipboard = (text: string, field: string) => {
@@ -49,14 +49,14 @@ function RouteComponent() {
             <div className="space-y-2">
                 <Label>Model description</Label>
                 <div className="flex items-center gap-2">
-                    <Input disabled value={model.description} />
+                    <Input disabled value={model.description.brief} />
                     <Button
                         variant="ghost"
                         size="icon"
                         className="size-6 hover:cursor-pointer"
                         onClick={() =>
                             copyToClipboard(
-                                model.description,
+                                model.description.brief,
                                 'Model Description'
                             )
                         }
