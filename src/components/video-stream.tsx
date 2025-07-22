@@ -140,7 +140,7 @@ async function getImageTreatment(data: string | null) {
                 canvas.height = wantedHeight;
 
                 ctx?.drawImage(img, 0, 0, wantedWidth, wantedHeight);
-                const dataURI = canvas.toDataURL();
+                const dataURI = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG for smaller size, 0.8 quality;
                 resolve(dataURI);
             };
 
