@@ -15,7 +15,7 @@ import type {
     RagDocumentListInput,
     Rag,
     Document,
-    Reference,
+    Component,
     AddRagPromptResult
 } from '@/lib/types';
 
@@ -307,6 +307,56 @@ const graph_load_input = {
     encoding: graph_encoding.autodetect,
     target: execution_target.cpu
 };
+
+export const graphSaveComponent = async (args: Component): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'graph_save_component',
+                args,
+                `graph_save_component-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+
+export const graphLoadByName = async ({
+    model_name
+}: {
+    model_name: string;
+}): Promise<any> =>
+    waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                klaveKlaveAIContract,
+                'graph_load_by_name',
+                { model_name },
+                `graph_load_by_name-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+            )
+        )
+        .then(
+            (tx) =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
 
 export const loadModel = async (): Promise<any> =>
     waitForConnection()

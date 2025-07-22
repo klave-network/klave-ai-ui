@@ -6,29 +6,52 @@ export type KeyPair = EncryptedKeyPair & {
 };
 
 export type Model = {
-    access: number;
-    description: {
-        brief: string;
-        task: string;
-    };
-    encryption_type: number;
-    file_size: number;
-    hash: string[];
-    hash_type: number;
-    inactivity_timeout: number;
-    is_loaded: boolean;
-    local_path: string;
-    max_concurrent_queries: number;
-    max_concurrent_queries_per_user: number;
-    max_threads: number;
-    model_format: number;
     name: string;
+    metadata: {
+        type: number;
+        local_path: string;
+        url: string;
+        description: {
+            brief: string;
+            task: string;
+        };
+        format: number;
+        engine_type: number;
+        tensor_type: number;
+        engine_config: {
+            multimodal: boolean;
+        };
+        dependencies: (null | unknown)[];
+        parent_component: null | unknown;
+    };
     status: number;
-    system_prompt: number[];
-    tensor_type: number;
-    tokenizer_name: string;
-    url: string;
+    file_size: number;
 };
+
+// export type Model = {
+//     access: number;
+//     description: {
+//         brief: string;
+//         task: string;
+//     };
+//     encryption_type: number;
+//     file_size: number;
+//     hash: string[];
+//     hash_type: number;
+//     inactivity_timeout: number;
+//     is_loaded: boolean;
+//     local_path: string;
+//     max_concurrent_queries: number;
+//     max_concurrent_queries_per_user: number;
+//     max_threads: number;
+//     model_format: number;
+//     name: string;
+//     status: number;
+//     system_prompt: number[];
+//     tensor_type: number;
+//     tokenizer_name: string;
+//     url: string;
+// };
 
 export type AddRagPromptResult = {
     references: Reference[];
@@ -181,4 +204,29 @@ export type Document = {
     date: string;
     content_type: string;
     controller_public_key: string;
+};
+
+export type Component = {
+    name: string;
+    metadata: {
+        type: string;
+        local_path: string;
+        url: string;
+        description: string;
+        format: string;
+        engine_type: string;
+        engine_config: {
+            multimodal: boolean;
+        };
+        tensor_type: string;
+        dependencies: string[];
+        parent_component: string;
+    };
+    encryption_type: string;
+    encryption_key: string[];
+    hash_type: string;
+    hash: string[];
+    is_loaded: boolean;
+    access: string;
+    inactivity_timeout: number;
 };

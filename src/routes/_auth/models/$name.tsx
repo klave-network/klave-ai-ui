@@ -46,9 +46,9 @@ function RouteComponent() {
 
     // Derive model detail URL if from huggingface.co
     useEffect(() => {
-        if (model?.url) {
+        if (model?.metadata.url) {
             try {
-                const modelUrl = new URL(model.url);
+                const modelUrl = new URL(model.metadata.url);
                 if (modelUrl.host === 'huggingface.co') {
                     const comps = modelUrl.pathname.split('/').filter(Boolean);
                     if (comps.length >= 2) {
@@ -61,13 +61,13 @@ function RouteComponent() {
                     setModelDetailUrl(null);
                 }
             } catch (e) {
-                console.error('Invalid model URL:', model.url, e);
+                console.error('Invalid model URL:', model.metadata.url, e);
                 setModelDetailUrl(null);
             }
         } else {
             setModelDetailUrl(null);
         }
-    }, [model?.url]);
+    }, [model?.metadata.url]);
 
     const { get, data: remoteModelDetails } = useFetch<ModelDetails>(
         'https://huggingface.co',

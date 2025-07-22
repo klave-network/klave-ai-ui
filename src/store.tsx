@@ -269,10 +269,10 @@ export const storeActions = {
             };
 
             const llModels = models.filter(
-                (m) => m.description.task === 'text-generation'
+                (m) => m.metadata.description.task === 'text-generation'
             );
             const vlModels = models.filter(
-                (m) => m.description.task === 'image-text-to-text'
+                (m) => m.metadata.description.task === 'image-to-text'
             );
 
             const firstLlm = llModels[0];
