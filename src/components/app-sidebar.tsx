@@ -1,10 +1,11 @@
+import { LifeBuoy, MessageCirclePlus, Settings, Video } from 'lucide-react';
 import * as React from 'react';
-import { LifeBuoy, Settings, MessageCirclePlus, Video } from 'lucide-react';
-import { NavHeader } from '@/components/nav/header';
+
 import { NavAdmin } from '@/components/nav/admin';
-import { NavChats } from '@/components/nav/chats';
 import { NavAdministration } from '@/components/nav/administration';
+import { NavChats } from '@/components/nav/chats';
 import { NavFooter } from '@/components/nav/footer';
+import { NavHeader } from '@/components/nav/header';
 import {
     Sidebar,
     SidebarContent,

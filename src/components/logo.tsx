@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router';
+
 import klaveIcon from '@/assets/klave-icon.svg';
 import klaveLogo from '@/assets/klave-logo.svg';
 import { cn } from '@/lib/utils';
 
-export const Logo = ({ className, type = 'square' }: { type?: 'square' | 'horizontal'; className?: string }) => {
+export function Logo({ className, type = 'square' }: { type?: 'square' | 'horizontal'; className?: string }) {
     if (type === 'horizontal') {
         return (
             <Link
@@ -14,7 +15,7 @@ export const Logo = ({ className, type = 'square' }: { type?: 'square' | 'horizo
                     className
                 )}
             >
-                <img src={klaveLogo} alt="klave logo" className='h-full' />
+                <img src={klaveLogo} alt="klave logo" className="h-full" />
             </Link>
         );
     }
@@ -34,4 +35,4 @@ export const Logo = ({ className, type = 'square' }: { type?: 'square' | 'horizo
             </div>
         </Link>
     );
-};
+}

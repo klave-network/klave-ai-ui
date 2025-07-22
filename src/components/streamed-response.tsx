@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { inferenceGetResponse } from '@/api/klave-ai';
 import { LoadingDots } from '@/components/loading-dots';
 
-interface StreamedResponseProps {
+type StreamedResponseProps = {
     context_name: string;
     onComplete: (fullResponse: string) => void;
-}
+};
 
 export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     context_name,
@@ -56,15 +57,22 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
 
     return (
         <div className="whitespace-pre-wrap">
-            {loading && wordCount < 5 ? (
-                <div className="flex flex-col">
-                    <span className="animate-pulse">Generating</span>
-                    <LoadingDots />
-                </div>
-            ) : (
-                response
+            {loading && wordCount < 5
+                ? (
+                        <div className="flex flex-col">
+                            <span className="animate-pulse">Generating</span>
+                            <LoadingDots />
+                        </div>
+                    )
+                : (
+                        response
+                    )}
+            {error && (
+                <span className="text-red-600">
+                    Error:
+                    {error}
+                </span>
             )}
-            {error && <span className="text-red-600">Error: {error}</span>}
         </div>
     );
 };

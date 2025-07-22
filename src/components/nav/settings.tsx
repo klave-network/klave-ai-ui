@@ -1,5 +1,8 @@
+import type { LucideIcon } from 'lucide-react';
+
+import { Link } from '@tanstack/react-router';
 import * as React from 'react';
-import { type LucideIcon } from 'lucide-react';
+
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -8,7 +11,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { Link } from '@tanstack/react-router';
 
 export function NavSettings({
     items,
@@ -25,7 +27,7 @@ export function NavSettings({
             <SidebarGroupLabel>Settings</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
-                    {items.map((item) => (
+                    {items.map(item => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton asChild>
                                 <Link

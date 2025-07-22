@@ -1,17 +1,21 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import type { CameraType } from 'react-camera-pro';
+
+import { load_image } from '@huggingface/transformers';
+import prettyBytes from 'pretty-bytes';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Camera } from 'react-camera-pro';
+
 import {
     graphDeleteExecutionContext,
     graphInitExecutionContext,
     inferenceAddFrame
 } from '@/api/klave-ai';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { load_image } from '@huggingface/transformers';
-import { Camera, type CameraType } from 'react-camera-pro';
-import { StreamedResponse } from './streamed-response';
-import { useUserVlModels, useUserChatSettings } from '@/store';
-import prettyBytes from 'pretty-bytes';
+import { useUserChatSettings, useUserVlModels } from '@/store';
 
-export const VideoStream = () => {
+import { StreamedResponse } from './streamed-response';
+
+export function VideoStream() {
     const cameraRef = useRef<CameraType | null>(null);
     const currentContextName = useRef<string | null>(null);
     const ctxId = useRef(0);
@@ -24,8 +28,8 @@ export const VideoStream = () => {
     const chatSettings = useUserChatSettings(currentUser);
 
     // Use current VL model from chat settings or fallback to first VL model
-    const currentModel =
-        chatSettings?.currentVlModel || vlModels[0]?.name || '';
+    const currentModel
+        = chatSettings?.currentVlModel || vlModels[0]?.name || '';
 
     const captureFrame = useCallback(async () => {
         if (currentContextName.current) {
@@ -79,7 +83,8 @@ export const VideoStream = () => {
     }, [cameraRef, captureFrame, shouldRun]);
 
     const handleStreamComplete = (fullResponse: string) => {
-        if (!vlModels.length || !currentUser) return;
+        if (!vlModels.length || !currentUser)
+            return;
 
         console.log(
             'Stream complete, updating chat with response:',
@@ -112,9 +117,9 @@ export const VideoStream = () => {
             )}
         </div>
     );
-};
+}
 
-const getImageTreatment = async (data: string | null) => {
+async function getImageTreatment(data: string | null) {
     if (!data) {
         throw new Error('No image data provided');
     }
@@ -147,4 +152,4 @@ const getImageTreatment = async (data: string | null) => {
     const image = await load_image(scaledImage);
 
     return image;
-};
+}

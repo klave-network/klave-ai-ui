@@ -1,11 +1,12 @@
-import { useUserLlModel } from '@/store';
 import { createFileRoute } from '@tanstack/react-router';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { CopyIcon } from 'lucide-react';
 import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { CUR_USER_KEY } from '@/lib/constants';
+import { useUserLlModel } from '@/store';
 
 export const Route = createFileRoute('/_auth/documents/$set')({
     component: RouteComponent
@@ -25,7 +26,8 @@ function RouteComponent() {
         });
     };
 
-    if (!model) return <div className="p-4">Model not found</div>;
+    if (!model)
+        return <div className="p-4">Model not found</div>;
 
     return (
         <div className="p-4 space-y-2 w-1/3">
@@ -38,8 +40,7 @@ function RouteComponent() {
                         size="icon"
                         className="size-6 hover:cursor-pointer"
                         onClick={() =>
-                            copyToClipboard(model.name, 'Model Name')
-                        }
+                            copyToClipboard(model.name, 'Model Name')}
                     >
                         <CopyIcon className="h-3.5 w-3.5" />
                         <span className="sr-only">Copy model name</span>
@@ -58,8 +59,7 @@ function RouteComponent() {
                             copyToClipboard(
                                 model.description.brief,
                                 'Model Description'
-                            )
-                        }
+                            )}
                     >
                         <CopyIcon className="h-3.5 w-3.5" />
                         <span className="sr-only">Copy model description</span>
@@ -90,8 +90,7 @@ function RouteComponent() {
                         size="icon"
                         className="size-6 hover:cursor-pointer"
                         onClick={() =>
-                            copyToClipboard(model.name, 'Model Tokenizer Name')
-                        }
+                            copyToClipboard(model.name, 'Model Tokenizer Name')}
                     >
                         <CopyIcon className="h-3.5 w-3.5" />
                         <span className="sr-only">Copy tokenizer name</span>

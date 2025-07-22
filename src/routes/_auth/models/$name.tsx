@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useUserLlModel, useUserVlModel } from '@/store';
+import { formatDistance } from 'date-fns';
+import { CopyIcon } from 'lucide-react';
+import prettyBytes from 'pretty-bytes';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { CachePolicies, useFetch } from 'use-http';
+
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { CopyIcon } from 'lucide-react';
-import { toast } from 'sonner';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { CachePolicies, useFetch } from 'use-http';
-import { useEffect, useRef, useState } from 'react';
-import prettyBytes from 'pretty-bytes';
-import { formatDistance } from 'date-fns';
+import { useUserLlModel, useUserVlModel } from '@/store';
 
 export const Route = createFileRoute('/_auth/models/$name')({
     component: RouteComponent
@@ -57,14 +58,17 @@ function RouteComponent() {
                         );
                         modelDetailQueriedRef.current = false;
                     }
-                } else {
+                }
+                else {
                     setModelDetailUrl(null);
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 console.error('Invalid model URL:', model.metadata.url, e);
                 setModelDetailUrl(null);
             }
-        } else {
+        }
+        else {
             setModelDetailUrl(null);
         }
     }, [model?.metadata.url]);
@@ -121,9 +125,9 @@ function RouteComponent() {
     };
 
     // Extract remote details safely
-    const dLicense =
-        enhancedModelDetails.remote?.tags
-            ?.find((tag) => tag.includes('license:'))
+    const dLicense
+        = enhancedModelDetails.remote?.tags
+            ?.find(tag => tag.includes('license:'))
             ?.split(':')[1]
             .toUpperCase() ?? '-';
     const dLikes = enhancedModelDetails.remote?.likes ?? '-';
@@ -137,7 +141,8 @@ function RouteComponent() {
     const dSize = prettyBytes(enhancedModelDetails.file_size ?? 0);
     const dTokenizer = enhancedModelDetails.tokenizer_name ?? '-';
 
-    if (!model) return <div className="p-4">Loading model...</div>;
+    if (!model)
+        return <div className="p-4">Loading model...</div>;
 
     return (
         <div className="space-y-2 w-full">
@@ -156,8 +161,7 @@ function RouteComponent() {
                     label="Type"
                     value={model.description.task}
                     onCopy={() =>
-                        copyToClipboard(model.description.task, 'Model Type')
-                    }
+                        copyToClipboard(model.description.task, 'Model Type')}
                 />
 
                 {/* Description */}
@@ -168,8 +172,7 @@ function RouteComponent() {
                         copyToClipboard(
                             model.description.brief,
                             'Model Description'
-                        )
-                    }
+                        )}
                 />
 
                 <div className="grid grid-cols-3 gap-2 border-t">
@@ -178,8 +181,7 @@ function RouteComponent() {
                         label="License"
                         value={dLicense}
                         onCopy={() =>
-                            copyToClipboard(dLicense, 'Model License')
-                        }
+                            copyToClipboard(dLicense, 'Model License')}
                         isSmall
                     />
 
@@ -196,8 +198,7 @@ function RouteComponent() {
                         label="Stats"
                         value={`${dLikes}`}
                         onCopy={() =>
-                            copyToClipboard(`${dLikes}`, 'Model Stats')
-                        }
+                            copyToClipboard(`${dLikes}`, 'Model Stats')}
                         isSmall
                     />
                 </div>
@@ -207,8 +208,7 @@ function RouteComponent() {
                     label="Downloads"
                     value={`${dDownloads}`}
                     onCopy={() =>
-                        copyToClipboard(`${dDownloads}`, 'Model Downloads')
-                    }
+                        copyToClipboard(`${dDownloads}`, 'Model Downloads')}
                     isSmall
                 />
 
@@ -217,8 +217,7 @@ function RouteComponent() {
                     label="Tokenizer"
                     value={dTokenizer}
                     onCopy={() =>
-                        copyToClipboard(dTokenizer, 'Model Tokenizer')
-                    }
+                        copyToClipboard(dTokenizer, 'Model Tokenizer')}
                     isSmall
                 />
 
@@ -230,8 +229,7 @@ function RouteComponent() {
                         copyToClipboard(
                             dCreatedAt?.toISOString() ?? '',
                             'Model Created At'
-                        )
-                    }
+                        )}
                     isSmall
                 />
             </div>
@@ -266,7 +264,10 @@ function ModelDetailField({
                     onClick={onCopy}
                 >
                     <CopyIcon className="h-3.5 w-3.5" />
-                    <span className="sr-only">Copy {label.toLowerCase()}</span>
+                    <span className="sr-only">
+                        Copy
+                        {label.toLowerCase()}
+                    </span>
                 </Button>
             </div>
         </div>

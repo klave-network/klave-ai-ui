@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { useUserLlModels, useUserVlModels } from '@/store';
-import { CUR_USER_KEY } from '@/lib/constants';
 import { Puzzle } from 'lucide-react';
+
+import { CUR_USER_KEY } from '@/lib/constants';
+import { useUserLlModels, useUserVlModels } from '@/store';
 
 export const Route = createFileRoute('/_auth/models')({
     component: RouteComponent
@@ -33,7 +34,7 @@ function RouteComponent() {
                                 No models available.
                             </p>
                         )}
-                        {models.map((model) => (
+                        {models.map(model => (
                             <Link
                                 search
                                 to="/models/$name"

@@ -1,4 +1,4 @@
-import { type EncryptedKeyPair } from '@secretarium/connector';
+import type { EncryptedKeyPair } from '@secretarium/connector';
 
 export type KeyPair = EncryptedKeyPair & {
     id: string;

@@ -9,13 +9,13 @@ import {
 } from '@/components/ui/select';
 import { CUR_MODE_KEY } from '@/lib/constants';
 
-export const ModeSelector = () => {
+export function ModeSelector() {
     const currentModel = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
 
     return (
         <Select
             defaultValue={currentModel}
-            onValueChange={(value) => localStorage.setItem(CUR_MODE_KEY, value)}
+            onValueChange={value => localStorage.setItem(CUR_MODE_KEY, value)}
         >
             <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Mode" />
@@ -29,4 +29,4 @@ export const ModeSelector = () => {
             </SelectContent>
         </Select>
     );
-};
+}

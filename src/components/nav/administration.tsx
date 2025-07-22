@@ -1,4 +1,7 @@
+import { Link } from '@tanstack/react-router';
+import { Blocks, Puzzle } from 'lucide-react';
 import * as React from 'react';
+
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -7,8 +10,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { Link } from '@tanstack/react-router';
-import { Puzzle, Blocks } from 'lucide-react';
 
 export function NavAdministration({
     ...props
@@ -22,7 +23,7 @@ export function NavAdministration({
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to={`/models`}
+                                to="/models"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
@@ -36,7 +37,7 @@ export function NavAdministration({
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to={`/spaces`}
+                                to="/spaces"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}

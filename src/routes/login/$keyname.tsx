@@ -1,9 +1,18 @@
+import { Key, Utils } from '@secretarium/connector';
 import {
-    Link,
     createFileRoute,
-    useRouter,
-    useNavigate
+    Link,
+    useNavigate,
+    useRouter
 } from '@tanstack/react-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+
+import type { KeyPair } from '@/lib/types';
+
+import { LoadingDots } from '@/components/loading-dots';
+import { Logo } from '@/components/logo';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -13,19 +22,12 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import {
-    LOC_KEY,
+    CUR_USER_KEY,
     KLAVE_CONNECTION_KEYPAIR_PWD,
-    CUR_USER_KEY
+    LOC_KEY
 } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
-import { toast } from 'sonner';
-import { Key, Utils } from '@secretarium/connector';
-import { type KeyPair } from '@/lib/types';
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { Logo } from '@/components/logo';
-import { LoadingDots } from '@/components/loading-dots';
 
 export const Route = createFileRoute('/login/$keyname')({
     component: RouteComponent
@@ -45,7 +47,8 @@ function RouteComponent() {
         if (storedKeyPairs) {
             try {
                 setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Failed to parse stored key pairs:', error);
                 setKeyPairs([]);
             }
@@ -55,7 +58,8 @@ function RouteComponent() {
 
     const handleLogin = useCallback(
         async (e?: React.FormEvent<HTMLFormElement>) => {
-            if (hasSubmitted.current) return false;
+            if (hasSubmitted.current)
+                return false;
 
             hasSubmitted.current = true;
             if (e) {
@@ -67,7 +71,7 @@ function RouteComponent() {
             }
 
             const decodedKeyname = decodeURIComponent(keyname);
-            const key = keyPairs.find((kp) => kp.name === decodedKeyname);
+            const key = keyPairs.find(kp => kp.name === decodedKeyname);
 
             if (!key) {
                 toast.error('A user with this key does not exist');
@@ -97,7 +101,8 @@ function RouteComponent() {
                 localStorage.setItem(CUR_USER_KEY, key.name);
                 router.invalidate();
                 navigate({ to: '/', search: true });
-            } catch (e) {
+            }
+            catch (e) {
                 console.error(e);
                 toast.error(`Failed to connect with ${key.name}.`);
                 hasSubmitted.current = false;
@@ -108,7 +113,8 @@ function RouteComponent() {
     );
 
     useEffect(() => {
-        if (hasSubmitted.current || !keyPairsLoaded) return;
+        if (hasSubmitted.current || !keyPairsLoaded)
+            return;
         handleLogin();
     }, [handleLogin, keyPairsLoaded]);
 
@@ -121,7 +127,9 @@ function RouteComponent() {
                     <CardTitle className="text-xl mb-5">
                         <Logo className="mb-8" />
                         <span className="text-gray-400">
-                            Welcome{hasLoadedKeys ? ' back' : ''}!
+                            Welcome
+                            {hasLoadedKeys ? ' back' : ''}
+                            !
                         </span>
                         <br />
                         <span>Logging you in</span>

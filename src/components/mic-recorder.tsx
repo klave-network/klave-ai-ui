@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export const MicRecorder = () => {
+export function MicRecorder() {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
@@ -22,7 +22,7 @@ export const MicRecorder = () => {
                 // console.log('Stream obtained:', stream);
                 stream
                     .getTracks()
-                    .forEach((track) => console.log('Track:', track.kind));
+                    .forEach(track => console.log('Track:', track.kind));
             })
             .catch((err) => {
                 console.error('Permission denied or error:', err);
@@ -66,25 +66,25 @@ export const MicRecorder = () => {
             }
             // Also stop audio stream tracks on unmount to release mic
             if (audioStream) {
-                audioStream.getTracks().forEach((track) => track.stop());
+                audioStream.getTracks().forEach(track => track.stop());
             }
         };
     }, [audioStream]);
 
-    // Event handler type for button click
-    const handleToggleRecording = (
-        event: React.MouseEvent<HTMLButtonElement>
-    ) => {
-        event.preventDefault();
-        if (isRecording) {
-            stopRecording();
-        } else {
-            startRecording();
+    const stopRecording = () => {
+        if (!mediaRecorder)
+            return;
+        mediaRecorder.stop();
+        setIsRecording(false);
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
         }
     };
 
     const startRecording = () => {
-        if (!mediaRecorder) return;
+        if (!mediaRecorder)
+            return;
         mediaRecorder.start();
         setIsRecording(true);
         setRecordingTime(0);
@@ -101,13 +101,16 @@ export const MicRecorder = () => {
         }, 1000);
     };
 
-    const stopRecording = () => {
-        if (!mediaRecorder) return;
-        mediaRecorder.stop();
-        setIsRecording(false);
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
+    // Event handler type for button click
+    const handleToggleRecording = (
+        event: React.MouseEvent<HTMLButtonElement>
+    ) => {
+        event.preventDefault();
+        if (isRecording) {
+            stopRecording();
+        }
+        else {
+            startRecording();
         }
     };
 
@@ -124,29 +127,37 @@ export const MicRecorder = () => {
         <div>
             <button
                 onClick={handleToggleRecording}
-                className={`bg-red-400 hover:opacity-80 text-white font-bold py-2 px-4 rounded`}
+                className="bg-red-400 hover:opacity-80 text-white font-bold py-2 px-4 rounded"
                 type="button"
             >
-                {isRecording ? (
-                    <>
-                        <span
-                            className={`mr-3 ${isRecording && 'animate-pulse'}`}
-                        >
-                            ●
-                        </span>{' '}
-                        Stop Recording
-                    </>
-                ) : audioBlob ? (
-                    'Redo recording'
-                ) : (
-                    'Start Recording'
-                )}
+                {isRecording
+                    ? (
+                            <>
+                                <span
+                                    className={`mr-3 ${isRecording && 'animate-pulse'}`}
+                                >
+                                    ●
+                                </span>
+                                {' '}
+                                Stop Recording
+                            </>
+                        )
+                    : audioBlob
+                        ? (
+                                'Redo recording'
+                            )
+                        : (
+                                'Start Recording'
+                            )}
             </button>
             <div>
                 {isRecording && (
                     <div>
                         <p>Recording...</p>
-                        <p>Time: {formatTime(recordingTime)}</p>
+                        <p>
+                            Time:
+                            {formatTime(recordingTime)}
+                        </p>
                     </div>
                 )}
             </div>
@@ -163,4 +174,4 @@ export const MicRecorder = () => {
             )}
         </div>
     );
-};
+}

@@ -1,6 +1,8 @@
+import { Store, useStore } from '@tanstack/react-store';
+
+import type { Model, Rag, Reference } from '@/lib/types';
+
 import { STORE_KEY } from '@/lib/constants';
-import { useStore, Store } from '@tanstack/react-store';
-import { type Model, type Rag, type Reference } from '@/lib/types';
 
 type ChatMessage = {
     id: string;
@@ -70,50 +72,57 @@ if (savedState) {
 }
 
 // Hooks
-export const useUserChatHistory = (keyname: string) =>
-    useStore(store, (state) => state[keyname]?.chats ?? []);
+export function useUserChatHistory(keyname: string) {
+    return useStore(store, state => state[keyname]?.chats ?? []);
+}
 
-export const useUserChat = (keyname: string, chatId: string) =>
-    useStore(store, (state) =>
-        state[keyname]?.chats?.find((chat) => chat.id === chatId)
-    );
+export function useUserChat(keyname: string, chatId: string) {
+    return useStore(store, state =>
+        state[keyname]?.chats?.find(chat => chat.id === chatId));
+}
 
-export const useUserLlModels = (keyname: string) =>
-    useStore(store, (state) => state[keyname]?.llModels ?? []);
+export function useUserLlModels(keyname: string) {
+    return useStore(store, state => state[keyname]?.llModels ?? []);
+}
 
-export const useUserLlModel = (keyname: string, modelName: string) =>
-    useStore(store, (state) =>
-        state[keyname]?.llModels?.find((model) => model.name === modelName)
-    );
+export function useUserLlModel(keyname: string, modelName: string) {
+    return useStore(store, state =>
+        state[keyname]?.llModels?.find(model => model.name === modelName));
+}
 
-export const useUserVlModels = (keyname: string) =>
-    useStore(store, (state) => state[keyname]?.vlModels ?? []);
+export function useUserVlModels(keyname: string) {
+    return useStore(store, state => state[keyname]?.vlModels ?? []);
+}
 
-export const useUserVlModel = (keyname: string, modelName: string) =>
-    useStore(store, (state) =>
-        state[keyname]?.vlModels?.find((model) => model.name === modelName)
-    );
+export function useUserVlModel(keyname: string, modelName: string) {
+    return useStore(store, state =>
+        state[keyname]?.vlModels?.find(model => model.name === modelName));
+}
 
-export const useUserRagDataSets = (keyname: string) =>
-    useStore(store, (state) => state[keyname]?.ragDataSets ?? []);
+export function useUserRagDataSets(keyname: string) {
+    return useStore(store, state => state[keyname]?.ragDataSets ?? []);
+}
 
-export const useUserRagDataSet = (keyname: string, ragId: string) =>
-    useStore(store, (state) =>
-        state[keyname]?.ragDataSets?.find((rag) => rag.rag_id === ragId)
-    );
+export function useUserRagDataSet(keyname: string, ragId: string) {
+    return useStore(store, state =>
+        state[keyname]?.ragDataSets?.find(rag => rag.rag_id === ragId));
+}
 
-export const useUserChatSettings = (keyname: string) =>
-    useStore(
+export function useUserChatSettings(keyname: string) {
+    return useStore(
         store,
-        (state) => state[keyname]?.chatSettings ?? defaultChatSettings
+        state => state[keyname]?.chatSettings ?? defaultChatSettings
     );
+}
 
 export const useUserDocumentSets = (keyname: string) => [keyname];
 
-export const useUserDocumentSet = (keyname: string, documentSet: string) => [
-    keyname,
-    documentSet
-];
+export function useUserDocumentSet(keyname: string, documentSet: string) {
+    return [
+        keyname,
+        documentSet
+    ];
+}
 
 // Actions
 export const storeActions = {
@@ -132,7 +141,7 @@ export const storeActions = {
                 chatSettings: defaultChatSettings
             };
 
-            if (userData.chats?.some((chat) => chat.id === chatId)) {
+            if (userData.chats?.some(chat => chat.id === chatId)) {
                 return state; // Avoid duplicates
             }
 
@@ -189,7 +198,7 @@ export const storeActions = {
             };
 
             const updatedChats = userData.chats?.filter(
-                (chat) => chat.id !== chatId
+                chat => chat.id !== chatId
             );
 
             return {
@@ -218,9 +227,10 @@ export const storeActions = {
             };
 
             const updatedChats = userData.chats?.map((chat) => {
-                if (chat.id !== chatId) return chat;
+                if (chat.id !== chatId)
+                    return chat;
 
-                const updatedMessages = chat.messages.map((msg) =>
+                const updatedMessages = chat.messages.map(msg =>
                     msg.id === messageId ? { ...msg, ...updatedContent } : msg
                 );
 
@@ -239,15 +249,16 @@ export const storeActions = {
 
     addMessage: (userKeyname: string, chatId: string, message: ChatMessage) => {
         const userData = store.state[userKeyname];
-        if (!userData) return;
+        if (!userData)
+            return;
 
-        const updatedChats = userData.chats?.map((chat) =>
+        const updatedChats = userData.chats?.map(chat =>
             chat.id === chatId
                 ? { ...chat, messages: [...chat.messages, message] }
                 : chat
         );
 
-        store.setState((state) => ({
+        store.setState(state => ({
             ...state,
             [userKeyname]: {
                 ...userData,
@@ -269,10 +280,10 @@ export const storeActions = {
             };
 
             const llModels = models.filter(
-                (m) => m.metadata.description.task === 'text-generation'
+                m => m.metadata.description.task === 'text-generation'
             );
             const vlModels = models.filter(
-                (m) => m.metadata.description.task === 'image-to-text'
+                m => m.metadata.description.task === 'image-to-text'
             );
 
             const firstLlm = llModels[0];

@@ -1,14 +1,16 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
+import React from 'react';
+
+import type { QuoteResponse, VerifyResponse } from '@/lib/types';
+
+import { SecureButton } from '@/components/secure-button';
+import { Button } from '@/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
-import { SecureButton } from '@/components/secure-button';
-import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
 type ChatInputProps = {
     userPrompt: string;
@@ -24,14 +26,14 @@ type ChatInputProps = {
     };
 };
 
-export const ChatInput = ({
+export function ChatInput({
     userPrompt,
     setUserPrompt,
     error,
     onSend,
     isDisabled: isParentDisabling,
     secureButton
-}: ChatInputProps) => {
+}: ChatInputProps) {
     const isDisconnected = !secureButton.quote || !secureButton.verification;
     const isDisabled = isParentDisabling || isDisconnected;
 
@@ -57,7 +59,7 @@ export const ChatInput = ({
                         rows={2}
                         disabled={isDisabled}
                         value={userPrompt}
-                        onChange={(e) => setUserPrompt(e.target.value)}
+                        onChange={e => setUserPrompt(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
@@ -130,4 +132,4 @@ export const ChatInput = ({
             </div>
         </div>
     );
-};
+}

@@ -1,23 +1,24 @@
 import { useLocation, useParams } from '@tanstack/react-router';
+import { ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import {
-    useUserRagDataSets,
-    useUserChatSettings,
-    storeActions,
-    useUserChat
-} from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { toast } from 'sonner';
-import { ChevronDown } from 'lucide-react';
+import {
+    storeActions,
+    useUserChat,
+    useUserChatSettings,
+    useUserRagDataSets
+} from '@/store';
 
 // Default chat settings fallback
 const defaultChatSettings = {
@@ -33,25 +34,26 @@ const defaultChatSettings = {
     ragChunks: 2
 };
 
-export const SpaceSelector = () => {
+export function SpaceSelector() {
     const location = useLocation();
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const rags = useUserRagDataSets(currentUser);
 
-    const chatSettings =
-        useUserChatSettings(currentUser) ?? defaultChatSettings;
+    const chatSettings
+        = useUserChatSettings(currentUser) ?? defaultChatSettings;
     const currentChat = useUserChat(currentUser, params?.id ?? '');
 
     const isInChatView = location.pathname === '/chat';
 
     // Get selected ragSpace from currentChat settings or fallback
-    const selectedRag =
-        currentChat?.chatSettings.ragSpace ?? chatSettings.ragSpace ?? '';
+    const selectedRag
+        = currentChat?.chatSettings.ragSpace ?? chatSettings.ragSpace ?? '';
 
     // Handle selection change (toggle deselect on same selection)
     const handleChange = (value: string) => {
-        if (!isInChatView) return; // Prevent changes outside chat view
+        if (!isInChatView)
+            return; // Prevent changes outside chat view
 
         try {
             const newSelectedRag = selectedRag === value ? '' : value;
@@ -71,7 +73,8 @@ export const SpaceSelector = () => {
             });
 
             toast.success('Settings updated successfully');
-        } catch (error) {
+        }
+        catch (error) {
             toast.error('Failed to update settings');
             console.error('Error updating settings:', error);
         }
@@ -86,7 +89,8 @@ export const SpaceSelector = () => {
     }
 
     const getDisplayText = () => {
-        if (!selectedRag) return 'Spaces';
+        if (!selectedRag)
+            return 'Spaces';
         return `1 space selected`;
     };
 
@@ -108,7 +112,7 @@ export const SpaceSelector = () => {
                         value={selectedRag}
                         onValueChange={handleChange}
                     >
-                        {rags.map((rag) => (
+                        {rags.map(rag => (
                             <DropdownMenuRadioItem
                                 key={rag.rag_id}
                                 value={rag.rag_id}
@@ -121,4 +125,4 @@ export const SpaceSelector = () => {
             </DropdownMenuContent>
         </DropdownMenu>
     );
-};
+}

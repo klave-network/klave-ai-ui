@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { Play, RotateCw, StopCircle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Play, StopCircle, RotateCw } from 'lucide-react';
 
-export const VideoRecorder = () => {
+export function VideoRecorder() {
     const [isRecording, setIsRecording] = useState<boolean>(false);
     const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
@@ -26,7 +27,7 @@ export const VideoRecorder = () => {
                 // console.log('Stream obtained:', stream);
                 stream
                     .getTracks()
-                    .forEach((track) => console.log('Track:', track.kind));
+                    .forEach(track => console.log('Track:', track.kind));
             })
             .catch((err) => {
                 console.error('Permission denied or error:', err);
@@ -74,13 +75,26 @@ export const VideoRecorder = () => {
                 clearInterval(timerRef.current);
             }
             if (mediaStream) {
-                mediaStream.getTracks().forEach((track) => track.stop());
+                mediaStream.getTracks().forEach(track => track.stop());
             }
         };
     }, [mediaStream]);
 
+    const stopRecording = () => {
+        if (!mediaRecorder)
+            return;
+
+        mediaRecorder.stop();
+        setIsRecording(false);
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+    };
+
     const startRecording = () => {
-        if (!mediaRecorder) return;
+        if (!mediaRecorder)
+            return;
 
         mediaRecorder.start();
         setIsRecording(true);
@@ -98,23 +112,13 @@ export const VideoRecorder = () => {
         }, 1000);
     };
 
-    const stopRecording = () => {
-        if (!mediaRecorder) return;
-
-        mediaRecorder.stop();
-        setIsRecording(false);
-        if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-        }
-    };
-
     const handleToggleRecording = (e: React.MouseEvent<HTMLButtonElement>) => {
         // console.log('handleToggleRecording');
         e.preventDefault();
         if (isRecording) {
             stopRecording();
-        } else {
+        }
+        else {
             startRecording();
         }
     };
@@ -144,24 +148,36 @@ export const VideoRecorder = () => {
                         : 'bg-green-600 hover:bg-green-700'
                 )}
             >
-                {isRecording ? (
-                    <>
-                        <StopCircle className="animate-pulse" /> Stop Recording
-                    </>
-                ) : videoBlob ? (
-                    <>
-                        <RotateCw /> Redo Recording
-                    </>
-                ) : (
-                    <>
-                        <Play /> Start Recording
-                    </>
-                )}
+                {isRecording
+                    ? (
+                            <>
+                                <StopCircle className="animate-pulse" />
+                                {' '}
+                                Stop Recording
+                            </>
+                        )
+                    : videoBlob
+                        ? (
+                                <>
+                                    <RotateCw />
+                                    {' '}
+                                    Redo Recording
+                                </>
+                            )
+                        : (
+                                <>
+                                    <Play />
+                                    {' '}
+                                    Start Recording
+                                </>
+                            )}
             </Button>
 
             {isRecording && (
                 <p className="mt-2 text-center text-gray-700">
-                    Recording... {formatTime(recordingTime)}
+                    Recording...
+                    {' '}
+                    {formatTime(recordingTime)}
                 </p>
             )}
 
@@ -177,4 +193,4 @@ export const VideoRecorder = () => {
             )}
         </div>
     );
-};
+}

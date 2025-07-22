@@ -70,7 +70,7 @@ import { Link } from '@tanstack/react-router';
 Then anywhere in your JSX you can use it like so:
 
 ```tsx
-<Link to="/about">About</Link>
+<Link to="/about">About</Link>;
 ```
 
 This will create a link that will navigate to the `/about` route.
@@ -84,10 +84,8 @@ In the File Based Routing setup the layout is located in `src/routes/__root.tsx`
 Here is an example layout that includes a header:
 
 ```tsx
-import { Outlet, createRootRoute } from '@tanstack/react-router';
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-
-import { Link } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
     component: () => (
@@ -131,7 +129,7 @@ const peopleRoute = createRoute({
         const data = peopleRoute.useLoaderData();
         return (
             <ul>
-                {data.results.map((person) => (
+                {data.results.map(person => (
                     <li key={person.name}>{person.name}</li>
                 ))}
             </ul>
@@ -202,15 +200,15 @@ function App() {
         queryKey: ['people'],
         queryFn: () =>
             fetch('https://swapi.dev/api/people')
-                .then((res) => res.json())
-                .then((data) => data.results as { name: string }[]),
+                .then(res => res.json())
+                .then(data => data.results as { name: string }[]),
         initialData: []
     });
 
     return (
         <div>
             <ul>
-                {data.map((person) => (
+                {data.map(person => (
                     <li key={person.name}>{person.name}</li>
                 ))}
             </ul>
@@ -238,6 +236,7 @@ Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
 ```tsx
 import { useStore } from '@tanstack/react-store';
 import { Store } from '@tanstack/store';
+
 import './App.css';
 
 const countStore = new Store(0);
@@ -246,8 +245,10 @@ function App() {
     const count = useStore(countStore);
     return (
         <div>
-            <button onClick={() => countStore.setState((n) => n + 1)}>
-                Increment - {count}
+            <button onClick={() => countStore.setState(n => n + 1)}>
+                Increment -
+                {' '}
+                {count}
             </button>
         </div>
     );
@@ -262,7 +263,8 @@ Let's check this out by doubling the count using derived state.
 
 ```tsx
 import { useStore } from '@tanstack/react-store';
-import { Store, Derived } from '@tanstack/store';
+import { Derived, Store } from '@tanstack/store';
+
 import './App.css';
 
 const countStore = new Store(0);
@@ -279,10 +281,15 @@ function App() {
 
     return (
         <div>
-            <button onClick={() => countStore.setState((n) => n + 1)}>
-                Increment - {count}
+            <button onClick={() => countStore.setState(n => n + 1)}>
+                Increment -
+                {' '}
+                {count}
             </button>
-            <div>Doubled - {doubledCount}</div>
+            <div>
+                Doubled -
+                {doubledCount}
+            </div>
         </div>
     );
 }

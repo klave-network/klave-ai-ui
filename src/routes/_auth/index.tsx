@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
+
 import { getModels, getRagList } from '@/api/klave-ai';
-import { storeActions } from '@/store';
 import { CUR_USER_KEY } from '@/lib/constants';
+import { storeActions } from '@/store';
 
 export const Route = createFileRoute('/_auth/')({
     component: RouteComponent,
@@ -29,7 +30,9 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             <div className="flex flex-col gap-6 items-center justify-center h-full">
                 <h2 className="text-2xl md:text-3xl">
-                    Welcome to <b>Klave AI</b>
+                    Welcome to
+                    {' '}
+                    <b>Klave AI</b>
                 </h2>
                 <p className="text-center max-w-xl text-gray-500">
                     Introducing Klave AI

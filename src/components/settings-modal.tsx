@@ -1,9 +1,12 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocation, useParams } from '@tanstack/react-router';
 import { Settings2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { SliderTooltip } from '@/components/ui/slider-tooltip';
 import {
     Dialog,
     DialogClose,
@@ -15,14 +18,6 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from '@/components/ui/select';
-import {
     Form,
     FormControl,
     FormField,
@@ -30,13 +25,19 @@ import {
     FormLabel,
     FormMessage
 } from '@/components/ui/form';
-import { useUserChatSettings, useUserChat, storeActions } from '@/store';
+import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select';
+import { SliderTooltip } from '@/components/ui/slider-tooltip';
+import { Switch } from '@/components/ui/switch';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
+import { storeActions, useUserChat, useUserChatSettings } from '@/store';
 
 // Default chat settings fallback
 const defaultChatSettings = {
@@ -67,13 +68,13 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const SettingsModal = () => {
+export function SettingsModal() {
     const location = useLocation();
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const chatSettings =
-        useUserChatSettings(currentUser) ?? defaultChatSettings;
+    const chatSettings
+        = useUserChatSettings(currentUser) ?? defaultChatSettings;
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -96,7 +97,8 @@ export const SettingsModal = () => {
 
     // When dialog opens or dependencies change, reset form with current settings
     useEffect(() => {
-        if (!isDialogOpen) return;
+        if (!isDialogOpen)
+            return;
 
         // Prefer current chat settings, fallback to global chatSettings
         const settings = currentChat?.chatSettings ?? chatSettings;
@@ -136,7 +138,8 @@ export const SettingsModal = () => {
 
             toast.success('Settings updated successfully');
             setIsDialogOpen(false);
-        } catch (error) {
+        }
+        catch (error) {
             toast.error('Failed to update settings');
             console.error('Error updating settings:', error);
         }
@@ -205,8 +208,7 @@ export const SettingsModal = () => {
                                             step={0.01}
                                             defaultValue={[value]}
                                             onValueChange={([val]) =>
-                                                isInChatView && onChange(val)
-                                            }
+                                                isInChatView && onChange(val)}
                                             labelFor="temperature"
                                             labelTitle="Temperature"
                                             labelValue={value}
@@ -234,8 +236,7 @@ export const SettingsModal = () => {
                                             step={0.1}
                                             defaultValue={[value]}
                                             onValueChange={([val]) =>
-                                                isInChatView && onChange(val)
-                                            }
+                                                isInChatView && onChange(val)}
                                             labelFor="topp"
                                             labelTitle="Top-p"
                                             labelValue={value}
@@ -263,8 +264,7 @@ export const SettingsModal = () => {
                                             step={1}
                                             defaultValue={[value]}
                                             onValueChange={([val]) =>
-                                                isInChatView && onChange(val)
-                                            }
+                                                isInChatView && onChange(val)}
                                             labelFor="ragChunks"
                                             labelTitle="RAG Chunks"
                                             labelValue={value}
@@ -288,10 +288,9 @@ export const SettingsModal = () => {
                                     <FormControl>
                                         <Select
                                             value={value.toString()}
-                                            onValueChange={(val) =>
-                                                isInChatView &&
-                                                onChange(Number(val))
-                                            }
+                                            onValueChange={val =>
+                                                isInChatView
+                                                && onChange(Number(val))}
                                             disabled={!isInChatView}
                                             {...field}
                                         >
@@ -331,10 +330,9 @@ export const SettingsModal = () => {
                                     <FormControl>
                                         <Switch
                                             checked={value}
-                                            onCheckedChange={(checked) =>
-                                                isInChatView &&
-                                                onChange(checked)
-                                            }
+                                            onCheckedChange={checked =>
+                                                isInChatView
+                                                && onChange(checked)}
                                             disabled={!isInChatView}
                                             {...field}
                                         />
@@ -359,4 +357,4 @@ export const SettingsModal = () => {
             </DialogContent>
         </Dialog>
     );
-};
+}

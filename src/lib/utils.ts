@@ -1,6 +1,7 @@
+import type { ClassValue } from 'clsx';
+
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { ClassValue } from 'clsx';
 
 export function cn(...inputs: Array<ClassValue>) {
     return twMerge(clsx(inputs));
@@ -25,8 +26,10 @@ export function truncateId(
     startChars: number = 6,
     endChars: number = 4
 ): string {
-    if (!id) return '';
-    if (id.length <= startChars + endChars) return id;
+    if (!id)
+        return '';
+    if (id.length <= startChars + endChars)
+        return id;
 
     return `${id.slice(0, startChars)}...${id.slice(-endChars)}`;
 }

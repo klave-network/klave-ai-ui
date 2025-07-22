@@ -1,3 +1,5 @@
+import { useLocation, useParams } from '@tanstack/react-router';
+
 import {
     Select,
     SelectContent,
@@ -7,24 +9,23 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { useLocation, useParams } from '@tanstack/react-router';
+import { CUR_USER_KEY } from '@/lib/constants';
 import {
-    useUserLlModels,
-    useUserVlModels,
+    storeActions,
     useUserChat,
     useUserChatSettings,
-    storeActions
+    useUserLlModels,
+    useUserVlModels
 } from '@/store';
-import { CUR_USER_KEY } from '@/lib/constants';
 
-export const ModelSelector = () => {
+export function ModelSelector() {
     const location = useLocation();
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
 
     const isVideoChat = location.pathname.includes('/video');
-    const isChatView =
-        location.pathname === '/chat' || location.pathname === '/chat/video';
+    const isChatView
+        = location.pathname === '/chat' || location.pathname === '/chat/video';
 
     const llModels = useUserLlModels(currentUser);
     const vlModels = useUserVlModels(currentUser);
@@ -57,7 +58,8 @@ export const ModelSelector = () => {
     }
 
     const handleChange = (modelName: string) => {
-        if (isDisabled) return;
+        if (isDisabled)
+            return;
 
         storeActions.updateChatSettings(currentUser, {
             ...baseSettings,
@@ -81,7 +83,7 @@ export const ModelSelector = () => {
             <SelectContent>
                 <SelectGroup>
                     <SelectLabel>Available language models</SelectLabel>
-                    {models.map((model) => (
+                    {models.map(model => (
                         <SelectItem key={model.name} value={model.name}>
                             {model.name}
                         </SelectItem>
@@ -90,4 +92,4 @@ export const ModelSelector = () => {
             </SelectContent>
         </Select>
     );
-};
+}

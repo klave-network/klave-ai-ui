@@ -1,25 +1,27 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Utils } from '@secretarium/connector';
 import {
-    Lock,
-    Cpu,
-    ChevronRight,
-    ChevronLeft,
     BadgeCheck,
-    Landmark,
-    TriangleAlert,
+    ChevronLeft,
+    ChevronRight,
+    Cpu,
     FileDigit,
+    Landmark,
+    Lock,
     SquareArrowOutUpRight,
+    TriangleAlert,
     Unplug
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import type { QuoteResponse, VerifyResponse } from '@/lib/types';
+
 import { klaveKlaveAIContract } from '@/api';
+import { Button } from '@/components/ui/button';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger
 } from '@/components/ui/popover';
-import { Utils } from '@secretarium/connector';
-import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
 type SecureButtonProps = {
     currentTime: number;
@@ -38,15 +40,18 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
         'default' | 'connection' | 'attestation'
     >('default');
 
-    if (!quote || !verification)
-        return <Button
-            variant="ghost"
-            disabled={true}
-            className="hover:cursor-pointer hover:bg-gray-200 bg-gray-300 border border-gray-500"
-        >
-            <Unplug className="h-4 w-4" />
-            Disconnected
-        </Button>
+    if (!quote || !verification) {
+        return (
+            <Button
+                variant="ghost"
+                disabled={true}
+                className="hover:cursor-pointer hover:bg-gray-200 bg-gray-300 border border-gray-500"
+            >
+                <Unplug className="h-4 w-4" />
+                Disconnected
+            </Button>
+        );
+    }
 
     const downloadableQuote = new Blob([new Uint8Array(quote?.quote_binary ?? [])], {
         type: 'application/octet-stream'
@@ -85,7 +90,8 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                             {
                                                 verification?.quote_verification_result_description
                                             }
-                                            .{' '}
+                                            .
+                                            {' '}
                                             <a
                                                 href="https://docs.klave.com/learn/confidential-computing/attestation"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"
@@ -142,7 +148,8 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                             )}
                                             className="text-blue-400 hover:underline flex align-middle items-center"
                                         >
-                                            Download Quote .bin{' '}
+                                            Download Quote .bin
+                                            {' '}
                                             <SquareArrowOutUpRight className="ml-2 size-4" />
                                         </a>
                                     </div>
@@ -164,7 +171,8 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                                     rel="noreferrer noopener"
                                                     className="text-blue-400 hover:underline flex align-middle items-center"
                                                 >
-                                                    {sa}{' '}
+                                                    {sa}
+                                                    {' '}
                                                     <SquareArrowOutUpRight className="ml-2 size-4" />
                                                 </a>
                                             ))}
@@ -204,7 +212,8 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                         <span>
                                             Your information is private when you
                                             use this app, no-one can see your
-                                            data.{' '}
+                                            data.
+                                            {' '}
                                             <a
                                                 href="https://docs.klave.com/learn/confidential-computing/tee"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"
@@ -223,7 +232,8 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                             {
                                                 verification?.quote_verification_result_description
                                             }
-                                            .{' '}
+                                            .
+                                            {' '}
                                             <a
                                                 href="https://docs.klave.com/learn/confidential-computing/attestation"
                                                 className="text-blue-400 hover:underline flex align-middle items-center"

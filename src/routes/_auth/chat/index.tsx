@@ -1,18 +1,20 @@
+import { Utils } from '@secretarium/connector';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
+
+import type { Reference } from '@/lib/types';
+
+import { getQuote, verifyQuote } from '@/api/klave';
 import {
     graphInitExecutionContext,
     inferenceAddPrompt,
     inferenceAddRagPrompt
 } from '@/api/klave-ai';
-import { generateSimpleId } from '@/lib/utils';
-import { storeActions, useUserLlModels, useUserChatSettings } from '@/store';
 import { ChatInput } from '@/components/chat-input';
-import { CUR_USER_KEY, CUR_MODE_KEY } from '@/lib/constants';
-import { getQuote, verifyQuote } from '@/api/klave';
-import { Utils } from '@secretarium/connector';
 import { LoadingDots } from '@/components/loading-dots';
-import type { Reference } from '@/lib/types';
+import { CUR_MODE_KEY, CUR_USER_KEY } from '@/lib/constants';
+import { generateSimpleId } from '@/lib/utils';
+import { storeActions, useUserChatSettings, useUserLlModels } from '@/store';
 
 export const Route = createFileRoute('/_auth/chat/')({
     component: RouteComponent,
@@ -45,8 +47,8 @@ export const Route = createFileRoute('/_auth/chat/')({
 });
 
 function RouteComponent() {
-    const { currentTime, challenge, quote, verification } =
-        Route.useLoaderData();
+    const { currentTime, challenge, quote, verification }
+        = Route.useLoaderData();
 
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -60,8 +62,8 @@ function RouteComponent() {
     const chatSettings = useUserChatSettings(currentUser);
 
     // Determine current model from chatSettings or fallback to first LL model
-    const currentModel =
-        chatSettings?.currentLlModel || llModels[0]?.name || '';
+    const currentModel
+        = chatSettings?.currentLlModel || llModels[0]?.name || '';
 
     // Determine current mode (fallback to 'chat')
     const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
@@ -83,8 +85,8 @@ function RouteComponent() {
                 model_name: currentModel,
                 context_name: contextName,
                 system_prompt:
-                    chatSettings?.systemPrompt ??
-                    'You are a helpful assistant.',
+                    chatSettings?.systemPrompt
+                    ?? 'You are a helpful assistant.',
                 temperature: chatSettings?.temperature ?? 0.8,
                 topp: chatSettings?.topp ?? 0.9,
                 steps: chatSettings?.steps ?? 256,
@@ -104,9 +106,10 @@ function RouteComponent() {
 
                 const seen = new Set<string>();
                 references = result.references.filter(
-                    (ref) => !seen.has(ref.filename) && seen.add(ref.filename)
+                    ref => !seen.has(ref.filename) && seen.add(ref.filename)
                 );
-            } else {
+            }
+            else {
                 await inferenceAddPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt
@@ -123,8 +126,8 @@ function RouteComponent() {
             // Prepare settings matching your store's ChatSettings type
             const settings = {
                 systemPrompt:
-                    chatSettings?.systemPrompt ??
-                    'You are a helpful assistant.',
+                    chatSettings?.systemPrompt
+                    ?? 'You are a helpful assistant.',
                 temperature: chatSettings?.temperature ?? 0.8,
                 topp: chatSettings?.topp ?? 0.9,
                 steps: chatSettings?.steps ?? 256,
@@ -138,7 +141,8 @@ function RouteComponent() {
 
             storeActions.createChat(currentUser, contextId, message, settings);
             navigate({ to: `/chat/${contextId}`, search: true });
-        } catch (err) {
+        }
+        catch (err) {
             console.error('Error: ', err);
             setError('Failed to create context');
         }

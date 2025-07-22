@@ -1,27 +1,28 @@
-import secretariumHandler from '@/lib/secretarium-handler';
-import { klaveKlaveAIContract, waitForConnection } from '@/api';
 import type {
+    AddRagPromptResult,
+    ChunkResult,
+    Component,
     ContextInput,
+    Document,
+    FrameInput,
     InferenceResponseInput,
     Model,
     PromptInput,
-    FrameInput,
-    Tokenizer,
-    ChunkResult,
     PromptInputRag,
-    RagCreateInput,
-    RagDocumentInput,
-    RagDeleteDocumentInput,
-    RagDocumentListInput,
     Rag,
-    Document,
-    Component,
-    AddRagPromptResult
+    RagCreateInput,
+    RagDeleteDocumentInput,
+    RagDocumentInput,
+    RagDocumentListInput,
+    Tokenizer
 } from '@/lib/types';
 
+import { klaveKlaveAIContract, waitForConnection } from '@/api';
+import secretariumHandler from '@/lib/secretarium-handler';
+
 let triedLoadingModels = false;
-export const getModels = async (): Promise<Model[]> =>
-    waitForConnection()
+export async function getModels(): Promise<Model[]> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -31,7 +32,7 @@ export const getModels = async (): Promise<Model[]> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
                         const parsedResult = JSON.parse(result) as Model[];
@@ -60,9 +61,10 @@ export const getModels = async (): Promise<Model[]> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const getTokenizers = async (): Promise<Tokenizer[]> =>
-    waitForConnection()
+export async function getTokenizers(): Promise<Tokenizer[]> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -72,7 +74,7 @@ export const getTokenizers = async (): Promise<Tokenizer[]> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
                         const parsedResult = JSON.parse(result) as Tokenizer[];
@@ -84,11 +86,10 @@ export const getTokenizers = async (): Promise<Tokenizer[]> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const graphInitExecutionContext = async (
-    args: ContextInput
-): Promise<any> =>
-    waitForConnection()
+export async function graphInitExecutionContext(args: ContextInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -98,7 +99,7 @@ export const graphInitExecutionContext = async (
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -109,11 +110,10 @@ export const graphInitExecutionContext = async (
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const graphDeleteExecutionContext = async (
-    contextName: string
-): Promise<any> =>
-    waitForConnection()
+export async function graphDeleteExecutionContext(contextName: string): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -123,7 +123,7 @@ export const graphDeleteExecutionContext = async (
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -134,9 +134,10 @@ export const graphDeleteExecutionContext = async (
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
-    waitForConnection()
+export async function inferenceAddPrompt(args: PromptInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -146,7 +147,7 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -157,11 +158,10 @@ export const inferenceAddPrompt = async (args: PromptInput): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const inferenceAddRagPrompt = async (
-    args: PromptInputRag
-): Promise<AddRagPromptResult> =>
-    waitForConnection()
+export async function inferenceAddRagPrompt(args: PromptInputRag): Promise<AddRagPromptResult> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -171,7 +171,7 @@ export const inferenceAddRagPrompt = async (
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: AddRagPromptResult) => {
                         resolve(result);
@@ -182,9 +182,10 @@ export const inferenceAddRagPrompt = async (
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const inferenceAddFrame = async (args: FrameInput): Promise<any> =>
-    waitForConnection()
+export async function inferenceAddFrame(args: FrameInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -194,7 +195,7 @@ export const inferenceAddFrame = async (args: FrameInput): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -205,14 +206,14 @@ export const inferenceAddFrame = async (args: FrameInput): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const inferenceGetResponse = async (
-    args: InferenceResponseInput,
-    resolveCallback: (result: ChunkResult) => boolean
-): Promise<void> => {
+export async function inferenceGetResponse(args: InferenceResponseInput, resolveCallback: (result: ChunkResult) => boolean): Promise<void> {
     await waitForConnection();
-    if (args.nb_pieces === undefined || args.nb_pieces < 1) args.nb_pieces = 2; // Default to 2 pieces if not specified
-    if (args.nb_pieces > 20) args.nb_pieces = 20; // Limit to a maximum of 20 pieces
+    if (args.nb_pieces === undefined || args.nb_pieces < 1)
+        args.nb_pieces = 2; // Default to 2 pieces if not specified
+    if (args.nb_pieces > 20)
+        args.nb_pieces = 20; // Limit to a maximum of 20 pieces
     const tx = await secretariumHandler.request(
         klaveKlaveAIContract,
         'inference_get_pieces',
@@ -234,12 +235,12 @@ export const inferenceGetResponse = async (
 
         tx.send().catch(reject);
     });
-};
+}
 
 const url = 'SmolVLM-500M-Instruct-Q8_0.gguf';
 const name = 'SmolVLM';
-const description =
-    'SmolVLM is a small, efficient vision-language model designed for tasks like image captioning and visual question answering. It is optimized for performance while maintaining high accuracy.';
+const description
+    = 'SmolVLM is a small, efficient vision-language model designed for tasks like image captioning and visual question answering. It is optimized for performance while maintaining high accuracy.';
 
 // Define enums as objects
 const graph_encoding = { autodetect: 0 };
@@ -247,11 +248,11 @@ const execution_target = { cpu: 0 };
 
 // Model object
 const model = {
-    name: name,
+    name,
     tokenizer_name: '',
     local_path: url.split('/').pop(),
-    url: url,
-    description: description,
+    url,
+    description,
     model_format: 1,
     tensor_type: 2,
     encryption_type: 0,
@@ -259,16 +260,151 @@ const model = {
     hash_type: 0,
     hash: [],
     system_prompt: [
-        66, 101, 32, 97, 32, 104, 101, 108, 112, 102, 117, 108, 32, 97, 115,
-        115, 105, 115, 116, 97, 110, 116, 46, 32, 65, 110, 115, 119, 101, 114,
-        32, 116, 104, 101, 32, 113, 117, 101, 115, 116, 105, 111, 110, 32, 97,
-        115, 32, 116, 114, 117, 116, 104, 102, 117, 108, 108, 121, 32, 97, 115,
-        32, 112, 111, 115, 115, 105, 98, 108, 101, 44, 32, 98, 117, 116, 32,
-        100, 111, 32, 110, 111, 116, 32, 103, 117, 101, 115, 115, 32, 105, 102,
-        32, 121, 111, 117, 32, 100, 111, 32, 110, 111, 116, 32, 107, 110, 111,
-        119, 32, 116, 104, 101, 32, 97, 110, 115, 119, 101, 114, 46, 32, 73,
-        102, 32, 121, 111, 117, 32, 97, 114, 101, 32, 117, 110, 115, 117, 114,
-        101, 44, 32, 115, 97, 121, 32, 115, 111, 46
+        66,
+        101,
+        32,
+        97,
+        32,
+        104,
+        101,
+        108,
+        112,
+        102,
+        117,
+        108,
+        32,
+        97,
+        115,
+        115,
+        105,
+        115,
+        116,
+        97,
+        110,
+        116,
+        46,
+        32,
+        65,
+        110,
+        115,
+        119,
+        101,
+        114,
+        32,
+        116,
+        104,
+        101,
+        32,
+        113,
+        117,
+        101,
+        115,
+        116,
+        105,
+        111,
+        110,
+        32,
+        97,
+        115,
+        32,
+        116,
+        114,
+        117,
+        116,
+        104,
+        102,
+        117,
+        108,
+        108,
+        121,
+        32,
+        97,
+        115,
+        32,
+        112,
+        111,
+        115,
+        115,
+        105,
+        98,
+        108,
+        101,
+        44,
+        32,
+        98,
+        117,
+        116,
+        32,
+        100,
+        111,
+        32,
+        110,
+        111,
+        116,
+        32,
+        103,
+        117,
+        101,
+        115,
+        115,
+        32,
+        105,
+        102,
+        32,
+        121,
+        111,
+        117,
+        32,
+        100,
+        111,
+        32,
+        110,
+        111,
+        116,
+        32,
+        107,
+        110,
+        111,
+        119,
+        32,
+        116,
+        104,
+        101,
+        32,
+        97,
+        110,
+        115,
+        119,
+        101,
+        114,
+        46,
+        32,
+        73,
+        102,
+        32,
+        121,
+        111,
+        117,
+        32,
+        97,
+        114,
+        101,
+        32,
+        117,
+        110,
+        115,
+        117,
+        114,
+        101,
+        44,
+        32,
+        115,
+        97,
+        121,
+        32,
+        115,
+        111,
+        46
     ], // "Be a helpful assistant. Answer the question as truthfully as possible, but do not guess if you do not know the answer. If you are unsure, say so."
     is_loaded: false,
     access: 0,
@@ -297,8 +433,8 @@ const tokenizer = {
 
 // Graph builder object
 const graph_builder = {
-    model: model,
-    tokenizer: tokenizer
+    model,
+    tokenizer
 };
 
 // Graph load input object
@@ -308,8 +444,8 @@ const graph_load_input = {
     target: execution_target.cpu
 };
 
-export const graphSaveComponent = async (args: Component): Promise<any> =>
-    waitForConnection()
+export async function graphSaveComponent(args: Component): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -319,7 +455,7 @@ export const graphSaveComponent = async (args: Component): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -330,13 +466,14 @@ export const graphSaveComponent = async (args: Component): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const graphLoadByName = async ({
+export async function graphLoadByName({
     model_name
 }: {
     model_name: string;
-}): Promise<any> =>
-    waitForConnection()
+}): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -346,7 +483,7 @@ export const graphLoadByName = async ({
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -357,9 +494,10 @@ export const graphLoadByName = async ({
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const loadModel = async (): Promise<any> =>
-    waitForConnection()
+export async function loadModel(): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -369,7 +507,7 @@ export const loadModel = async (): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -380,9 +518,10 @@ export const loadModel = async (): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const ragCreate = async (args: RagCreateInput): Promise<any> =>
-    waitForConnection()
+export async function ragCreate(args: RagCreateInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -392,7 +531,7 @@ export const ragCreate = async (args: RagCreateInput): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -403,9 +542,10 @@ export const ragCreate = async (args: RagCreateInput): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const ragAddDocument = async (args: RagDocumentInput): Promise<any> =>
-    waitForConnection()
+export async function ragAddDocument(args: RagDocumentInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -415,7 +555,7 @@ export const ragAddDocument = async (args: RagDocumentInput): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -426,11 +566,10 @@ export const ragAddDocument = async (args: RagDocumentInput): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const ragDeleteDocument = async (
-    args: RagDeleteDocumentInput
-): Promise<any> =>
-    waitForConnection()
+export async function ragDeleteDocument(args: RagDeleteDocumentInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -440,7 +579,7 @@ export const ragDeleteDocument = async (
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -451,11 +590,10 @@ export const ragDeleteDocument = async (
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const ragDocumentList = async (
-    args: RagDocumentListInput
-): Promise<Document[]> =>
-    waitForConnection()
+export async function ragDocumentList(args: RagDocumentListInput): Promise<Document[]> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -465,7 +603,7 @@ export const ragDocumentList = async (
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -476,9 +614,10 @@ export const ragDocumentList = async (
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const getRagList = async (): Promise<Rag[]> =>
-    waitForConnection()
+export async function getRagList(): Promise<Rag[]> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -488,7 +627,7 @@ export const getRagList = async (): Promise<Rag[]> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
                         resolve(result);
@@ -499,3 +638,4 @@ export const getRagList = async (): Promise<Rag[]> =>
                     tx.send().catch(reject);
                 })
         );
+}

@@ -1,8 +1,9 @@
 import secretariumHandler from '@/lib/secretarium-handler';
 
 // Function to extract the klave app address from URL params
-const getAddressFromUrl = (): string | null => {
-    if (typeof window === 'undefined') return null;
+function getAddressFromUrl(): string | null {
+    if (typeof window === 'undefined')
+        return null;
 
     const urlParams = new URLSearchParams(window.location.search);
     const d = urlParams.get('d');
@@ -13,19 +14,21 @@ const getAddressFromUrl = (): string | null => {
     }
 
     return null;
-};
+}
 
-export const klaveKlaveAIContract =
-    getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_AI_CONTRACT;
+export const klaveKlaveAIContract
+    = getAddressFromUrl() || import.meta.env.VITE_APP_KLAVE_AI_CONTRACT;
 
-export const waitForConnection = () =>
-    new Promise<void>((resolve) => {
+export function waitForConnection() {
+    return new Promise<void>((resolve) => {
         const loopCondition = () => {
             const isConnected = secretariumHandler.isConnected();
-            if (isConnected) resolve();
+            if (isConnected)
+                resolve();
             else setTimeout(loopCondition, 1000);
         };
         loopCondition();
     });
+}
 
 export const isConnected = () => secretariumHandler.isConnected();

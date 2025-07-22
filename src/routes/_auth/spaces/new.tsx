@@ -1,5 +1,10 @@
-import { useState, useCallback } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import { Database, Upload, X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+
+import { ragAddDocument, ragCreate, ragDocumentList } from '@/api/klave-ai';
+import { pgsqlCreate, pgsqlList } from '@/api/klave-pg';
 import { Button } from '@/components/ui/button';
 import {
     FileUpload,
@@ -11,10 +16,6 @@ import {
     FileUploadList,
     FileUploadTrigger
 } from '@/components/ui/file-upload';
-import { Upload, X, Database } from 'lucide-react';
-import { toast } from 'sonner';
-import { ragCreate, ragAddDocument, ragDocumentList } from '@/api/klave-ai';
-import { pgsqlCreate, pgsqlList } from '@/api/klave-pg';
 import { CUR_USER_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/spaces/new')({
@@ -38,7 +39,8 @@ function RouteComponent() {
                 const content = e.target?.result;
                 if (typeof content === 'string') {
                     resolve(content);
-                } else {
+                }
+                else {
                     reject(new Error('Failed to read file as text'));
                 }
             };
@@ -47,7 +49,7 @@ function RouteComponent() {
         });
     };
 
-    const buildRag = async (currentUser: string) => {
+    const buildRag = async () => {
         try {
             // Create PostgreSQL database
             const database_id = await pgsqlCreate({
@@ -64,7 +66,7 @@ function RouteComponent() {
 
             // Create RAG instance
             const rag_id = await ragCreate({
-                database_id: database_id,
+                database_id,
                 rag_name: 'rag_demo1',
                 model_name: 'mistral'
             });
@@ -90,12 +92,12 @@ function RouteComponent() {
                     const content = await readFileAsText(file);
 
                     await ragAddDocument({
-                        rag_id: rag_id,
+                        rag_id,
                         document: {
                             url: file.name,
                             version: '1.0',
                             length: content.length,
-                            content: content,
+                            content,
                             date: new Date().toISOString().split('T')[0], // Format: YYYY-MM-DD
                             content_type: file.type || 'text/plain',
                             controller_public_key:
@@ -106,7 +108,8 @@ function RouteComponent() {
                     toast.success(`Document added: ${file.name}`, {
                         description: `Content length: ${content.length} characters`
                     });
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(`Error processing file ${file.name}:`, error);
                     toast.error(`Failed to process ${file.name}`, {
                         description:
@@ -118,7 +121,7 @@ function RouteComponent() {
             }
 
             // List documents to verify addition
-            const doc_list = await ragDocumentList({ rag_id: rag_id });
+            const doc_list = await ragDocumentList({ rag_id });
             console.log('Documents in RAG:', doc_list);
 
             toast.success('RAG setup completed!', {
@@ -126,7 +129,8 @@ function RouteComponent() {
             });
 
             return rag_id;
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error building RAG:', error);
             toast.error('Failed to build RAG', {
                 description:
@@ -154,10 +158,13 @@ function RouteComponent() {
 
         setIsProcessing(true);
         try {
-            await buildRag(currentUser);
-        } catch (error) {
+            await buildRag();
+        }
+        catch (error) {
             // Error handling is done in buildRag function
-        } finally {
+            console.error('Error building RAG:', error);
+        }
+        finally {
             setIsProcessing(false);
         }
     };

@@ -1,8 +1,9 @@
+import { CircleCheck, CircleX } from 'lucide-react';
+
 import secretariumHandler from '@/lib/secretarium-handler';
 import { cn } from '@/lib/utils';
-import { CircleX, CircleCheck } from 'lucide-react';
 
-export const StatusBar = () => {
+export function StatusBar() {
     return (
         <div
             className={cn(
@@ -10,15 +11,21 @@ export const StatusBar = () => {
                 secretariumHandler.isConnected() ? 'bg-green-400' : 'bg-red-400'
             )}
         >
-            {secretariumHandler.isConnected() ? (
-                <span className="flex items-center gap-1">
-                    <CircleCheck className="h-4 w-4" /> Connected
-                </span>
-            ) : (
-                <span className="flex items-center gap-1">
-                    Disconnected <CircleX className="h-4 w-4" />
-                </span>
-            )}
+            {secretariumHandler.isConnected()
+                ? (
+                        <span className="flex items-center gap-1">
+                            <CircleCheck className="h-4 w-4" />
+                            {' '}
+                            Connected
+                        </span>
+                    )
+                : (
+                        <span className="flex items-center gap-1">
+                            Disconnected
+                            {' '}
+                            <CircleX className="h-4 w-4" />
+                        </span>
+                    )}
         </div>
     );
-};
+}

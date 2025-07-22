@@ -1,30 +1,32 @@
 import '@total-typescript/ts-reset';
+import type { ObjectId } from 'mongodb';
 import type { Server } from 'node:net';
 import type { Plugin } from 'vite';
+
+import cors from 'cors';
+import express from 'express';
+import { MongoClient } from 'mongodb';
+import multer from 'multer';
+import fs from 'node:fs';
 import http from 'node:http';
 import https from 'node:https';
+import path from 'node:path';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID for unique IDs
 import viteMkcert from 'vite-plugin-mkcert';
-import express from "express";
-import multer from "multer";
-import cors from "cors";
-import fs from "node:fs";
-import path from "node:path";
-import { MongoClient, ObjectId } from "mongodb";
-import { v4 as uuidv4 } from "uuid"; // Import UUID for unique IDs
 
 type OCROuputSuccess = {
     file_type: string;
     filename: string;
     text: string;
-}
+};
 
 type OCROuputError = {
     error: string;
-}
+};
 
 type OCROuput = OCROuputSuccess | OCROuputError;
 
-const isOCROuputSuccess = (output: OCROuput): output is OCROuputSuccess => {
+function isOCROuputSuccess(output: OCROuput): output is OCROuputSuccess {
     return (output as OCROuputSuccess).text !== undefined;
 }
 
@@ -33,9 +35,9 @@ const app = express();
 const port = 3446;
 // const host = 'localhost';
 const host = 'demo.ai.filer.127.0.0.1.sslip.io';
-const db = new MongoClient("mongodb://localhost:27017").db('filer');
-const filesCollection = db.collection("files");
-const setsCollection = db.collection("sets");
+const db = new MongoClient('mongodb://localhost:27017').db('filer');
+const filesCollection = db.collection('files');
+const setsCollection = db.collection('sets');
 
 const regex = /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-(.+)/i;
 
@@ -46,26 +48,25 @@ app.use(express.json());
 // Set up multer storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadsDir = path.join(__dirname, "uploads");
+        const uploadsDir = path.join(__dirname, 'uploads');
         cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
         cb(null, uuidv4()); // Include UUID in the filename
-    },
+    }
 });
 
 // Create the multer instance
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 // Set up a route for file uploads
-app.post("/upload", upload.single("file"), async (req, res) => {
-
+app.post('/upload', upload.single('file'), async (req, res) => {
     const { file } = req;
     if (!file) {
-        res.status(400).json({ message: "No file uploaded!" });
+        res.status(400).json({ message: 'No file uploaded!' });
         return;
     }
-    let insertedId: ObjectId | undefined = undefined;
+    let insertedId: ObjectId | undefined;
     try {
         const newRecord = {
             uuid: file.filename,
@@ -73,42 +74,44 @@ app.post("/upload", upload.single("file"), async (req, res) => {
             mimeType: file.mimetype,
             size: file.size,
             dateUploaded: new Date(),
-            status: "uploaded",
+            status: 'uploaded'
         };
         const inserted = await filesCollection.insertOne(newRecord);
         insertedId = inserted.insertedId;
         res.status(200).json({
-            message: "File uploaded successfully.",
+            message: 'File uploaded successfully.',
             file: newRecord
 
-        })
-    } catch (error) {
-        console.error("Error inserting file into database:", error);
-        res.status(500).json({ message: "Error uploading file." });
+        });
+    }
+    catch (error) {
+        console.error('Error inserting file into database:', error);
+        res.status(500).json({ message: 'Error uploading file.' });
         return;
     }
 
     setTimeout(async () => {
-        let ocrOutput: OCROuput | undefined = undefined;
+        let ocrOutput: OCROuput | undefined;
         try {
-            const formData = new FormData()
+            const formData = new FormData();
             const filePath = path.join(file.destination, file.filename);
             const fileExtension = path.extname(file.originalname).toLowerCase();
-            const fileBytesArray = await fs.createReadStream(filePath).toArray()
+            const fileBytesArray = await fs.createReadStream(filePath).toArray();
             const fileBlob = new Blob(fileBytesArray, {
-                type: file.mimetype || "application/octet-stream"
-            })
+                type: file.mimetype || 'application/octet-stream'
+            });
 
-            formData.append('file', fileBlob, `${file.filename}.${fileExtension}`)
+            formData.append('file', fileBlob, `${file.filename}.${fileExtension}`);
             const response = await fetch('https://hellomylovelies.secretivecomputing.org:15000/upload', {
                 method: 'POST',
-                body: formData,
-            })
+                body: formData
+            });
 
             ocrOutput = await response.json() as OCROuput;
-            console.log("OCR Output:", ocrOutput);
-        } catch (error) {
-            console.error("Error during OCR processing:", error);
+            console.log('OCR Output:', ocrOutput);
+        }
+        catch (error) {
+            console.error('Error during OCR processing:', error);
             return;
         }
         if (!isOCROuputSuccess(ocrOutput) || !ocrOutput?.text) {
@@ -117,12 +120,13 @@ app.post("/upload", upload.single("file"), async (req, res) => {
                     _id: insertedId
                 }, {
                     $set: {
-                        status: "error",
-                        ocrError: `OCR processing failed or returned no text. ${(ocrOutput as any).error ?? "Unknown error"}`
+                        status: 'error',
+                        ocrError: `OCR processing failed or returned no text. ${(ocrOutput as any).error ?? 'Unknown error'}`
                     }
                 });
-            } catch (error) {
-                console.error("Error inserting file into database:", error);
+            }
+            catch (error) {
+                console.error('Error inserting file into database:', error);
             }
             return;
         }
@@ -131,23 +135,23 @@ app.post("/upload", upload.single("file"), async (req, res) => {
                 _id: insertedId
             }, {
                 $set: {
-                    status: "processed",
-                    ocrOutput: ocrOutput.text,
+                    status: 'processed',
+                    ocrOutput: ocrOutput.text
                 }
             });
-        } catch (error) {
-            console.error("Error inserting file into database:", error);
+        }
+        catch (error) {
+            console.error('Error inserting file into database:', error);
         }
     }, 200);
 });
 
-app.get("/files", (req, res) => {
-
-    filesCollection.find().toArray().then(files => {
+app.get('/files', (req, res) => {
+    filesCollection.find().toArray().then((files) => {
         res.json({ files });
-    }).catch(error => {
-        console.error("Error fetching files from database:", error);
-        res.status(500).json({ message: "Error fetching files." });
+    }).catch((error) => {
+        console.error('Error fetching files from database:', error);
+        res.status(500).json({ message: 'Error fetching files.' });
     });
 
     // const directoryPath = path.join(__dirname, "uploads");
@@ -210,21 +214,20 @@ app.get("/files", (req, res) => {
     // });
 });
 
-app.delete("/files", (req, res) => {
-
+app.delete('/files', (req, res) => {
     const fileIds = req.body.fileIds; // Expecting an array of file IDs
-    const directoryPath = path.join(__dirname, "uploads");
+    const directoryPath = path.join(__dirname, 'uploads');
 
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
-        res.status(400).json({ message: "Invalid file IDs." });
-        return
+        res.status(400).json({ message: 'Invalid file IDs.' });
+        return;
     }
 
     // List files to find the correct ones to delete
     fs.readdir(directoryPath, (err, files) => {
         if (err) {
             return res.status(500).json({
-                message: "Unable to scan files!",
+                message: 'Unable to scan files!'
             });
         }
 
@@ -238,7 +241,7 @@ app.delete("/files", (req, res) => {
             .filter(Boolean); // Remove undefined values if no match is found
 
         if (filesToDelete.length === 0) {
-            return res.status(404).json({ message: "No files found." });
+            return res.status(404).json({ message: 'No files found.' });
         }
 
         let deletionCount = 0;
@@ -249,14 +252,14 @@ app.delete("/files", (req, res) => {
             fs.unlink(filePath, (err) => {
                 if (err) {
                     return res.status(500).json({
-                        message: `Unable to delete file: ${fileToDelete}.`,
+                        message: `Unable to delete file: ${fileToDelete}.`
                     });
                 }
 
                 deletionCount++;
                 if (deletionCount === filesToDelete.length) {
                     res.json({
-                        message: `${deletionCount} file(s) deleted successfully.`,
+                        message: `${deletionCount} file(s) deleted successfully.`
                     });
                 }
             });
@@ -264,13 +267,13 @@ app.delete("/files", (req, res) => {
     });
 });
 
-app.get("/files/:id", (req, res) => {
+app.get('/files/:id', (req, res) => {
     const fileId = req.params.id;
-    const directoryPath = path.join(__dirname, "uploads");
+    const directoryPath = path.join(__dirname, 'uploads');
 
     fs.readdir(directoryPath, (err, files) => {
         if (err) {
-            return res.status(500).json({ message: "Unable to scan files!" });
+            return res.status(500).json({ message: 'Unable to scan files!' });
         }
 
         const file = files.find((file) => {
@@ -278,7 +281,7 @@ app.get("/files/:id", (req, res) => {
             return match && match[1] === fileId;
         });
         if (!file) {
-            return res.status(404).json({ message: "File not found!" });
+            return res.status(404).json({ message: 'File not found!' });
         }
 
         const match = file.match(regex);
@@ -287,17 +290,17 @@ app.get("/files/:id", (req, res) => {
         // Serve the file with the correct filename in the Content-Disposition header
         const filePath = path.join(directoryPath, file);
         res.setHeader(
-            "Content-Disposition",
+            'Content-Disposition',
             `attachment; filename="${originalFilename}"`
         );
         res.sendFile(filePath);
     });
 });
 
-app.get("/sets", async (req, res) => {
+app.get('/sets', async (req, res) => {
     const { user } = req.query;
     if (!user) {
-        res.status(400).json({ message: "User parameter is required." });
+        res.status(400).json({ message: 'User parameter is required.' });
         return;
     }
     try {
@@ -305,17 +308,18 @@ app.get("/sets", async (req, res) => {
             user
         }).toArray();
         res.json({ sets });
-    } catch (error) {
-        console.error("Error fetching sets from database:", error);
-        res.status(500).json({ message: "Error fetching sets." });
+    }
+    catch (error) {
+        console.error('Error fetching sets from database:', error);
+        res.status(500).json({ message: 'Error fetching sets.' });
     }
 });
 
-app.post("/sets", async (req, res) => {
+app.post('/sets', async (req, res) => {
     const { user } = req.query;
     const set = req.body;
     if (!set) {
-        res.status(400).json({ message: "Invalid set data." });
+        res.status(400).json({ message: 'Invalid set data.' });
         return;
     }
     try {
@@ -323,21 +327,22 @@ app.post("/sets", async (req, res) => {
             ...set,
             user,
             uuid: uuidv4(),
-            dateCreated: new Date(),
+            dateCreated: new Date()
         };
         await setsCollection.insertOne(newSet);
-        res.status(201).json({ message: "Set created successfully.", set: newSet });
-    } catch (error) {
-        console.error("Error inserting set into database:", error);
-        res.status(500).json({ message: "Error creating set." });
+        res.status(201).json({ message: 'Set created successfully.', set: newSet });
+    }
+    catch (error) {
+        console.error('Error inserting set into database:', error);
+        res.status(500).json({ message: 'Error creating set.' });
     }
 });
 
-app.delete("/sets", async (req, res) => {
+app.delete('/sets', async (req, res) => {
     const { setIds } = req.body;
 
     if (!Array.isArray(setIds) || setIds.length === 0) {
-        res.status(400).json({ message: "Invalid set IDs." });
+        res.status(400).json({ message: 'Invalid set IDs.' });
         return;
     }
 
@@ -348,24 +353,26 @@ app.delete("/sets", async (req, res) => {
 
         if (result.deletedCount > 0) {
             res.json({ message: `${result.deletedCount} set(s) deleted successfully.` });
-        } else {
-            res.status(404).json({ message: "No sets found." });
         }
-    } catch (error) {
-        console.error("Error deleting sets from database:", error);
-        res.status(500).json({ message: "Error deleting sets." });
+        else {
+            res.status(404).json({ message: 'No sets found.' });
+        }
+    }
+    catch (error) {
+        console.error('Error deleting sets from database:', error);
+        res.status(500).json({ message: 'Error deleting sets.' });
     }
 });
 
 let protocol = 'http';
-let serverContainer: Server | undefined = undefined;
-const httpsise = async () => {
+let serverContainer: Server | undefined;
+async function httpsise() {
     try {
-        const vitePlugin = (viteMkcert({
+        const vitePlugin = viteMkcert({
             keyFileName: 'demo-ai-filer-dev-key.pem',
             certFileName: 'demo-ai-filer-dev-cert.pem',
-            hosts: [host, 'localhost'],
-        }) as unknown as Plugin);
+            hosts: [host, 'localhost']
+        }) as unknown as Plugin;
         if (vitePlugin && typeof vitePlugin.config === 'function') {
             const vitePluginConfig = await vitePlugin.config({
                 logLevel: 'silent'
@@ -380,11 +387,13 @@ const httpsise = async () => {
                 cert: vitePluginConfig.server.https.cert
             }, app);
             protocol = 'https';
-        } else {
+        }
+        else {
             serverContainer = http.createServer({}, app);
         }
-    } catch (error) {
-        console.error("Error setting up HTTPS server:", error);
+    }
+    catch (error) {
+        console.error('Error setting up HTTPS server:', error);
         process.exit(1);
     }
 }
@@ -393,7 +402,7 @@ httpsise()
     .then(() => {
         if (!serverContainer) {
             return process.on('SIGINT', () => {
-                console.log("Shutting down server...");
+                console.log('Shutting down server...');
                 process.exit(0);
             });
         }

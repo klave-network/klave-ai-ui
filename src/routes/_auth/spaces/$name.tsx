@@ -1,25 +1,27 @@
-import { useUserRagDataSet } from '@/store';
 import { createFileRoute } from '@tanstack/react-router';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { truncateId } from '@/lib/utils';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     CopyIcon,
-    FileText,
     FileArchiveIcon,
     FileAudioIcon,
     FileCodeIcon,
     FileCogIcon,
     FileIcon,
+    FileText,
     FileTextIcon,
     FileVideoIcon,
     PresentationIcon
 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import type { Document } from '@/lib/types';
+
 import { ragDocumentList } from '@/api/klave-ai';
-import { type Document } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CUR_USER_KEY } from '@/lib/constants';
+import { truncateId } from '@/lib/utils';
+import { useUserRagDataSet } from '@/store';
 
 export const Route = createFileRoute('/_auth/spaces/$name')({
     component: RouteComponent,
@@ -27,7 +29,8 @@ export const Route = createFileRoute('/_auth/spaces/$name')({
         const { name } = params;
         const ragDocList = await ragDocumentList({ rag_id: name });
 
-        if (!ragDocList) throw new Error('RAG not found');
+        if (!ragDocList)
+            throw new Error('RAG not found');
 
         return { ragDocList };
     }
@@ -49,17 +52,19 @@ function RouteComponent() {
     };
 
     const formatFileSize = (bytes: number) => {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0)
+            return '0 Bytes';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`;
     };
 
     const formatDate = (dateString: string) => {
         try {
             return new Date(dateString).toLocaleDateString();
-        } catch {
+        }
+        catch {
             return dateString;
         }
     };
@@ -86,8 +91,8 @@ function RouteComponent() {
         }
 
         if (
-            type.startsWith('text/') ||
-            ['txt', 'md', 'rtf'].includes(extension)
+            type.startsWith('text/')
+            || ['txt', 'md', 'rtf'].includes(extension)
         ) {
             return <FileTextIcon className="h-5 w-5 text-primary" />;
         }
@@ -119,8 +124,8 @@ function RouteComponent() {
         }
 
         if (
-            ['exe', 'msi', 'app', 'apk', 'deb', 'rpm'].includes(extension) ||
-            type.startsWith('application/')
+            ['exe', 'msi', 'app', 'apk', 'deb', 'rpm'].includes(extension)
+            || type.startsWith('application/')
         ) {
             return <FileCogIcon className="h-5 w-5 text-primary" />;
         }
@@ -128,7 +133,8 @@ function RouteComponent() {
         return <FileIcon className="h-5 w-5 text-primary" />;
     };
 
-    if (!rag) return <div className="p-4">Loading RAG details...</div>;
+    if (!rag)
+        return <div className="p-4">Loading RAG details...</div>;
 
     const documents: Document[] = ragDocList || [];
 
@@ -149,8 +155,7 @@ function RouteComponent() {
                             size="icon"
                             className="size-6 hover:cursor-pointer"
                             onClick={() =>
-                                copyToClipboard(rag.rag_id, 'RAG ID')
-                            }
+                                copyToClipboard(rag.rag_id, 'RAG ID')}
                         >
                             <CopyIcon className="h-3.5 w-3.5" />
                             <span className="sr-only">Copy RAG ID</span>
@@ -166,8 +171,7 @@ function RouteComponent() {
                             size="icon"
                             className="size-6 hover:cursor-pointer"
                             onClick={() =>
-                                copyToClipboard(rag.model_name, 'Model Name')
-                            }
+                                copyToClipboard(rag.model_name, 'Model Name')}
                         >
                             <CopyIcon className="h-3.5 w-3.5" />
                             <span className="sr-only">Copy model name</span>
@@ -187,8 +191,7 @@ function RouteComponent() {
                                     copyToClipboard(
                                         rag.database_id,
                                         'Database ID'
-                                    )
-                                }
+                                    )}
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
                                 <span className="sr-only">
@@ -209,8 +212,7 @@ function RouteComponent() {
                                     copyToClipboard(
                                         rag.table_name,
                                         'Table Name'
-                                    )
-                                }
+                                    )}
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
                                 <span className="sr-only">Copy table name</span>
@@ -229,8 +231,7 @@ function RouteComponent() {
                                     copyToClipboard(
                                         `${rag.chunk_length}`,
                                         'Chunk Length'
-                                    )
-                                }
+                                    )}
                             >
                                 <CopyIcon className="h-3.5 w-3.5" />
                                 <span className="sr-only">
@@ -248,83 +249,92 @@ function RouteComponent() {
                     <h3 className="text-lg font-semibold">Documents</h3>
                 </div>
 
-                {documents.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">
-                        <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                        <p>No documents found in this RAG dataset</p>
-                        <p className="text-sm">
-                            Upload documents to get started
-                        </p>
-                    </div>
-                ) : (
-                    <div className="space-y-2">
-                        {documents.map((doc, index) => (
-                            <div
-                                key={doc.id || index}
-                                className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors"
-                            >
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 rounded-md bg-primary/10">
-                                        {getDocumentIcon(doc)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h4 className="font-medium truncate">
-                                                {doc.url}
-                                            </h4>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="size-5 hover:cursor-pointer"
-                                                onClick={() =>
-                                                    copyToClipboard(
-                                                        doc.url,
-                                                        'Document URL'
-                                                    )
-                                                }
-                                            >
-                                                <CopyIcon className="h-3 w-3" />
-                                                <span className="sr-only">
-                                                    Copy document URL
-                                                </span>
-                                            </Button>
+                {documents.length === 0
+                    ? (
+                            <div className="p-8 text-center text-gray-500">
+                                <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                <p>No documents found in this RAG dataset</p>
+                                <p className="text-sm">
+                                    Upload documents to get started
+                                </p>
+                            </div>
+                        )
+                    : (
+                            <div className="space-y-2">
+                                {documents.map((doc, index) => (
+                                    <div
+                                        key={doc.id || index}
+                                        className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors"
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 rounded-md bg-primary/10">
+                                                {getDocumentIcon(doc)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <h4 className="font-medium truncate">
+                                                        {doc.url}
+                                                    </h4>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-5 hover:cursor-pointer"
+                                                        onClick={() =>
+                                                            copyToClipboard(
+                                                                doc.url,
+                                                                'Document URL'
+                                                            )}
+                                                    >
+                                                        <CopyIcon className="h-3 w-3" />
+                                                        <span className="sr-only">
+                                                            Copy document URL
+                                                        </span>
+                                                    </Button>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                                    <div>
+                                                        <span className="font-medium">
+                                                            Size:
+                                                        </span>
+                                                        {' '}
+                                                        {formatFileSize(doc.length)}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium">
+                                                            Type:
+                                                        </span>
+                                                        {' '}
+                                                        {doc.content_type}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium">
+                                                            Version:
+                                                        </span>
+                                                        {' '}
+                                                        {doc.version}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium">
+                                                            Date:
+                                                        </span>
+                                                        {' '}
+                                                        {formatDate(doc.date)}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                                            <div>
-                                                <span className="font-medium">
-                                                    Size:
-                                                </span>{' '}
-                                                {formatFileSize(doc.length)}
-                                            </div>
-                                            <div>
-                                                <span className="font-medium">
-                                                    Type:
-                                                </span>{' '}
-                                                {doc.content_type}
-                                            </div>
-                                            <div>
-                                                <span className="font-medium">
-                                                    Version:
-                                                </span>{' '}
-                                                {doc.version}
-                                            </div>
-                                            <div>
-                                                <span className="font-medium">
-                                                    Date:
-                                                </span>{' '}
-                                                {formatDate(doc.date)}
-                                            </div>
-                                        </div>
                                     </div>
+                                ))}
+                                <div className="py-2 text-sm text-gray-500">
+                                    Total:
+                                    {' '}
+                                    {documents.length}
+                                    {' '}
+                                    document
+                                    {documents.length !== 1 ? 's' : ''}
                                 </div>
                             </div>
-                        ))}
-                        <div className="py-2 text-sm text-gray-500">
-                            Total: {documents.length} document
-                            {documents.length !== 1 ? 's' : ''}
-                        </div>
-                    </div>
-                )}
+                        )}
             </div>
         </div>
     );
