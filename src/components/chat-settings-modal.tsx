@@ -68,7 +68,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function SettingsModal() {
+export function ChatSettingsModal() {
     const location = useLocation();
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
@@ -197,7 +197,7 @@ export function SettingsModal() {
                             control={form.control}
                             name="temperature"
                             render={({
-                                field: { value, onChange, ...field }
+                                field: { value, onChange, ref, ...field }
                             }) => (
                                 <FormItem>
                                     <FormControl>
@@ -225,7 +225,7 @@ export function SettingsModal() {
                             control={form.control}
                             name="topp"
                             render={({
-                                field: { value, onChange, ...field }
+                                field: { value, onChange, ref, ...field }
                             }) => (
                                 <FormItem>
                                     <FormControl>
@@ -253,7 +253,7 @@ export function SettingsModal() {
                             control={form.control}
                             name="ragChunks"
                             render={({
-                                field: { value, onChange, ...field }
+                                field: { value, onChange, ref, ...field }
                             }) => (
                                 <FormItem>
                                     <FormControl>

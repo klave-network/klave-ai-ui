@@ -12,7 +12,7 @@ import {
 } from '@/api/klave-ai';
 import { StreamedResponse } from '@/components/streamed-response';
 import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserChatSettings, useUserVlModels } from '@/store';
+import { useUserChatSettings, useUserLenseSettings, useUserVlModels } from '@/store';
 
 // Define a type for the saved responses
 type SavedResponse = {
@@ -20,6 +20,13 @@ type SavedResponse = {
     timestamp: Date;
     response: string;
     contextName: string;
+};
+
+// Default chat settings fallback
+const defaultLenseSettings = {
+    systemPrompt: 'You are a helpful assistant.',
+    userPrompt: 'What do you see?',
+    snapshotFrequency: 10000
 };
 
 export const Route = createFileRoute('/_auth/chat/lense')({
@@ -34,6 +41,7 @@ function RouteComponent() {
     const [hasQueried, setHasQueried] = useState(false);
     const [savedResponses, setSavedResponses] = useState<SavedResponse[]>([]);
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const lenseSettings = useUserLenseSettings(currentUser) ?? defaultLenseSettings;
 
     // Get VL models and chat settings for current user
     const vlModels = useUserVlModels(currentUser);
@@ -60,7 +68,7 @@ function RouteComponent() {
         await graphInitExecutionContext({
             model_name: currentModel,
             context_name: contextName,
-            system_prompt: 'You are a helpful assistant.',
+            system_prompt: lenseSettings.systemPrompt,
             temperature: 0.8,
             topp: 0.9,
             steps: 256,
@@ -76,7 +84,7 @@ function RouteComponent() {
 
         await inferenceAddFrame({
             context_name: contextName,
-            user_prompt: 'What do you see?',
+            user_prompt: lenseSettings.userPrompt,
             frame_bytes_b64: b64frames
         });
 
@@ -84,14 +92,14 @@ function RouteComponent() {
 
         setHasQueried(true);
         setShouldRun(false);
-    }, [currentModel]);
+    }, [currentModel, lenseSettings.systemPrompt, lenseSettings.userPrompt]);
 
     useEffect(() => {
         if (cameraRef.current && shouldRun) {
-            const timer = setInterval(captureFrame, 10000);
+            const timer = setInterval(captureFrame, lenseSettings.snapshotFrequency);
             return () => clearInterval(timer);
         }
-    }, [cameraRef, captureFrame, shouldRun]);
+    }, [cameraRef, captureFrame, shouldRun, lenseSettings.snapshotFrequency]);
 
     const handleStreamComplete = (fullResponse: string) => {
         if (!vlModels.length || !currentUser || !currentContextName.current)
