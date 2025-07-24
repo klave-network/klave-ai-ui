@@ -152,25 +152,25 @@ function RouteComponent() {
                 {/* URL */}
                 <ModelDetailField
                     label="URL"
-                    value={model.url}
-                    onCopy={() => copyToClipboard(model.url, 'Model URL')}
+                    value={model.metadata.url}
+                    onCopy={() => copyToClipboard(model.metadata.url, 'Model URL')}
                 />
 
                 {/* Type */}
                 <ModelDetailField
                     label="Type"
-                    value={model.description.task}
+                    value={model.metadata.description.task}
                     onCopy={() =>
-                        copyToClipboard(model.description.task, 'Model Type')}
+                        copyToClipboard(model.metadata.description.task, 'Model Type')}
                 />
 
                 {/* Description */}
                 <ModelDetailField
                     label="Description"
-                    value={model.description.brief}
+                    value={model.metadata.description.brief}
                     onCopy={() =>
                         copyToClipboard(
-                            model.description.brief,
+                            model.metadata.description.brief,
                             'Model Description'
                         )}
                 />

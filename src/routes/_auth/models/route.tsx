@@ -52,7 +52,7 @@ function RouteComponent() {
                                     {model.name}
                                     <br />
                                     <span className="text-xs text-gray-500">
-                                        {model.description.brief}
+                                        {model.metadata.description.brief}
                                     </span>
                                 </span>
                             </Link>

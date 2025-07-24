@@ -90,6 +90,7 @@ export type ContextInput = {
     sliding_window: boolean;
     mode: string;
     embeddings: boolean;
+    multimodal: boolean;
 };
 
 // Base context type
@@ -115,7 +116,8 @@ export type PromptInputRag = BaseContext & {
 };
 
 export type FrameInput = BaseContext & {
-    frame_bytes: Uint8Array;
+    frame_bytes_b64: string;
+    user_prompt: string;
 };
 
 export type ChunkResult = {

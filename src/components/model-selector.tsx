@@ -23,9 +23,9 @@ export function ModelSelector() {
     const params = useParams({ strict: false });
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
 
-    const isVideoChat = location.pathname.includes('/video');
+    const isVideoChat = location.pathname.includes('/lense');
     const isChatView
-        = location.pathname === '/chat' || location.pathname === '/chat/video';
+        = location.pathname === '/chat' || location.pathname === '/chat/lense';
 
     const llModels = useUserLlModels(currentUser);
     const vlModels = useUserVlModels(currentUser);
