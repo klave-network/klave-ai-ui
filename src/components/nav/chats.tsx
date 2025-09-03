@@ -1,25 +1,26 @@
+import { Link } from '@tanstack/react-router';
+import { MoreHorizontal, Text, Trash2 } from 'lucide-react';
 import * as React from 'react';
-import {
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuAction
-} from '@/components/ui/sidebar';
-import { useSidebar } from '@/hooks/use-sidebar';
+
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Link } from '@tanstack/react-router';
-import { useUserChatHistory, storeActions } from '@/store';
-import { MoreHorizontal, Text, Trash2 } from 'lucide-react';
+import {
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuAction,
+    SidebarMenuButton,
+    SidebarMenuItem
+} from '@/components/ui/sidebar';
+import { useSidebar } from '@/hooks/use-sidebar';
 import { CUR_USER_KEY } from '@/lib/constants';
+import { storeActions, useUserChatHistory } from '@/store';
 
 export function NavChats({
     ...props
@@ -39,7 +40,7 @@ export function NavChats({
     const handleDeleteChat = (chatId: string) => {
         if (currentUser)
             storeActions.deleteChat(currentUser, chatId);
-    }
+    };
 
     // Split into first 5 and remaining
     const firstFive = reversedChats.slice(0, 5);
@@ -65,12 +66,12 @@ export function NavChats({
                         </SidebarMenuButton>
                     </SidebarMenuItem> */}
                     {/* Render first 5 (most recent) */}
-                    {firstFive.map((item) => (
+                    {firstFive.map(item => (
                         <SidebarMenuItem key={item.id}>
                             <SidebarMenuButton asChild>
                                 <Link
                                     search
-                                    to={`/chat/$id`}
+                                    to="/chat/$id"
                                     params={{ id: item.id }}
                                     activeProps={{
                                         className: 'bg-sidebar-accent'
@@ -110,28 +111,34 @@ export function NavChats({
                                     onClick={() => setShowAll(!showAll)}
                                     variant="ghost"
                                 >
-                                    {showAll ? (
-                                        <>
-                                            <MoreHorizontal /> Show less
-                                        </>
-                                    ) : (
-                                        <>
-                                            <MoreHorizontal /> Show more
-                                        </>
-                                    )}
+                                    {showAll
+                                        ? (
+                                                <>
+                                                    <MoreHorizontal />
+                                                    {' '}
+                                                    Show less
+                                                </>
+                                            )
+                                        : (
+                                                <>
+                                                    <MoreHorizontal />
+                                                    {' '}
+                                                    Show more
+                                                </>
+                                            )}
                                 </Button>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     )}
 
                     {/* Conditionally render the remaining chats */}
-                    {showAll &&
-                        remaining.map((item) => (
+                    {showAll
+                        && remaining.map(item => (
                             <SidebarMenuItem key={item.id}>
                                 <SidebarMenuButton asChild>
                                     <Link
                                         search
-                                        to={`/chat/$id`}
+                                        to="/chat/$id"
                                         params={{ id: item.id }}
                                         activeProps={{
                                             className: 'bg-sidebar-accent'

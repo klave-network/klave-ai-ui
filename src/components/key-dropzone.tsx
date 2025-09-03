@@ -1,18 +1,18 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
+
+import type { KeyPair } from '@/lib/types';
+
 import { Card, CardContent } from '@/components/ui/card';
-import { type KeyPair } from '@/lib/types';
 
 type DropzoneProps = {
     onFileUpload: (data: KeyPair | null) => void;
 };
 
 export const KeyDropzone: React.FC<DropzoneProps> = ({ onFileUpload }) => {
-
     useEffect(() => {
-
         return () => {
-        }
+        };
     }, []);
 
     const onDrop = useCallback(
@@ -29,7 +29,8 @@ export const KeyDropzone: React.FC<DropzoneProps> = ({ onFileUpload }) => {
                                 event.target.result as string
                             ) as KeyPair;
                             onFileUpload(data);
-                        } catch (error) {
+                        }
+                        catch (error) {
                             console.error('JSON parse error:', error);
                         }
                     }
@@ -61,7 +62,7 @@ export const KeyDropzone: React.FC<DropzoneProps> = ({ onFileUpload }) => {
                     <p className="text-center">
                         {isDragActive
                             ? 'Drop the key here...'
-                            : "Drag your key or click to select one"}
+                            : 'Drag your key or click to select one'}
                     </p>
                 </div>
             </CardContent>

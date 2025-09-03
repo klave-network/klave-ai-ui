@@ -1,4 +1,7 @@
+import { Link } from '@tanstack/react-router';
+import { Blocks, Puzzle } from 'lucide-react';
 import * as React from 'react';
+
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -7,8 +10,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { Link } from '@tanstack/react-router';
-import { Cog, Puzzle, Folder } from 'lucide-react';
 
 export function NavAdministration({
     ...props
@@ -22,7 +23,7 @@ export function NavAdministration({
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to={`/models`}
+                                to="/models"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
@@ -32,31 +33,17 @@ export function NavAdministration({
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem key="manage-data">
+                    <SidebarMenuItem key="manage-spaces">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to={`/data`}
+                                to="/spaces"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
                             >
-                                <Folder />
-                                <span>Manage Data</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem key="manage-settings">
-                        <SidebarMenuButton asChild>
-                            <Link
-                                search
-                                to={`/settings`}
-                                activeProps={{
-                                    className: 'bg-sidebar-accent flex'
-                                }}
-                            >
-                                <Cog />
-                                <span>Settings</span>
+                                <Blocks />
+                                <span>Manage Spaces</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

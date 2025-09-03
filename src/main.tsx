@@ -1,14 +1,14 @@
+import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+
 import { Toaster } from '@/components/ui/sonner';
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen';
-
+import secretariumHandler from './lib/secretarium-handler.ts';
 import './styles.css';
 import reportWebVitals from './reportWebVitals.ts';
-import secretariumHandler from './lib/secretarium-handler.ts';
+// Import the generated route tree
+import { routeTree } from './routeTree.gen';
 
 secretariumHandler.initialize();
 
@@ -24,6 +24,7 @@ const router = createRouter({
 
 // Register the router instance for type safety
 declare module '@tanstack/react-router' {
+    /* eslint-disable ts/consistent-type-definitions */
     interface Register {
         router: typeof router;
     }

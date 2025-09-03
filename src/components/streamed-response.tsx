@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import { inferenceGetResponse } from '@/api/klave-ai';
 import { LoadingDots } from '@/components/loading-dots';
 
-interface StreamedResponseProps {
+type StreamedResponseProps = {
     context_name: string;
     onComplete: (fullResponse: string) => void;
-}
+};
 
 export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     context_name,
@@ -26,8 +27,16 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
         setLoading(true);
         setError(null);
 
-        inferenceGetResponse({ context_name, nb_pieces: 5 }, (result) => {
-            if (!isMountedRef.current) return true; // stop if unmounted
+        inferenceGetResponse({ context_name }, (result) => {
+            if (!isMountedRef.current)
+                return true; // stop if unmounted
+
+            if (typeof result === 'string') {
+                setError(result);
+                setLoading(false);
+                isMountedRef.current = false;
+                return true; // stop streaming on error
+            }
 
             const chunkText = String.fromCharCode(...result.piece);
             fullResponseRef.current += chunkText;
@@ -48,15 +57,22 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
 
     return (
         <div className="whitespace-pre-wrap">
-            {loading && wordCount < 5 ? (
-                <div className="flex flex-col">
-                    <span className="animate-pulse">Generating</span>
-                    <LoadingDots />
-                </div>
-            ) : (
-                response
+            {loading && wordCount < 5
+                ? (
+                        <div className="flex flex-col">
+                            <span className="animate-pulse">Generating</span>
+                            <LoadingDots />
+                        </div>
+                    )
+                : (
+                        response
+                    )}
+            {error && (
+                <span className="text-red-600">
+                    Error:
+                    {error}
+                </span>
             )}
-            {error && <span className="text-red-600">Error: {error}</span>}
         </div>
     );
 };

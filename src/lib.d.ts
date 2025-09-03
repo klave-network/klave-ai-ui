@@ -1,3 +1,4 @@
+/* eslint-disable ts/consistent-type-definitions */
 interface Window {
     appKlaveCluster: (config: string | Record<string, unknown>) => void;
     appKlaveCommand: (

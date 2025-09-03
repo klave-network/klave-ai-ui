@@ -1,0 +1,16 @@
+# Serve stage
+FROM nginx:alpine
+
+ENV GEN=45
+
+# Copy built files from build stage
+COPY --chmod=755 /dist /usr/share/nginx/html
+
+# Copy nginx configuration (we'll create this next)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

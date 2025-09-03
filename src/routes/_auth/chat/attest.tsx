@@ -1,9 +1,10 @@
+import { Utils } from '@secretarium/connector';
 import { createFileRoute } from '@tanstack/react-router';
+import { SquareArrowOutUpRight } from 'lucide-react';
+
+import { klaveKlaveAIContract } from '@/api';
 import { getBackendVersion, getQuote, verifyQuote } from '@/api/klave';
 import { Label } from '@/components/ui/label';
-import { Utils } from '@secretarium/connector';
-import { klaveKlaveAIContract } from '@/api';
-import { SquareArrowOutUpRight } from 'lucide-react';
 
 export const Route = createFileRoute('/_auth/chat/attest')({
     component: RouteComponent,
@@ -35,8 +36,8 @@ export const Route = createFileRoute('/_auth/chat/attest')({
 });
 
 function RouteComponent() {
-    const { currentTime, challenge, quote, version, verification } =
-        Route.useLoaderData();
+    const { currentTime, challenge, quote, version, verification }
+        = Route.useLoaderData();
 
     const { wasm_version, core_version } = version;
     const secretariumCoreVersion = `${core_version.major}.${core_version.minor}.${core_version.patch}`;
@@ -65,14 +66,26 @@ function RouteComponent() {
             </div>
             <div className="space-y-2">
                 <Label>Runtime</Label>
-                <span className="font-bold">Secretarium Core :</span>{' '}
+                <span className="font-bold">Secretarium Core :</span>
+                {' '}
                 <span className="text-gray-400">
-                    v{secretariumCoreVersion} ({core_version.build_number})
+                    v
+                    {secretariumCoreVersion}
+                    {' '}
+                    (
+                    {core_version.build_number}
+                    )
                 </span>
                 <br />
-                <span className="font-bold">Secretarium WASM :</span>{' '}
+                <span className="font-bold">Secretarium WASM :</span>
+                {' '}
                 <span className="text-gray-400">
-                    v{secretariumWasmVersion} ({wasm_version.build_number})
+                    v
+                    {secretariumWasmVersion}
+                    {' '}
+                    (
+                    {wasm_version.build_number}
+                    )
                 </span>
             </div>
             <div className="space-y-2">
@@ -106,7 +119,8 @@ function RouteComponent() {
                     href={URL.createObjectURL(downloadableQuote)}
                     className="text-blue-400 hover:underline flex align-middle items-center"
                 >
-                    Download Quote .bin{' '}
+                    Download Quote .bin
+                    {' '}
                     <SquareArrowOutUpRight className="ml-2 size-4" />
                 </a>
             </div>
@@ -122,7 +136,8 @@ function RouteComponent() {
                             rel="noreferrer"
                             className="text-blue-400 hover:underline flex align-middle items-center"
                         >
-                            {sa}{' '}
+                            {sa}
+                            {' '}
                             <SquareArrowOutUpRight className="ml-2 size-4" />
                         </a>
                     ))}

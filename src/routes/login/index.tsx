@@ -1,9 +1,18 @@
+import { Key, Utils } from '@secretarium/connector';
 import {
     createFileRoute,
-    useRouter,
+    Link,
     useNavigate,
-    Link
+    useRouter
 } from '@tanstack/react-router';
+import { KeyRound } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+import type { KeyPair } from '@/lib/types';
+
+import { KeyDropzone } from '@/components/key-dropzone';
+import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -13,18 +22,11 @@ import {
     CardTitle
 } from '@/components/ui/card';
 import {
-    LOC_KEY,
+    CUR_USER_KEY,
     KLAVE_CONNECTION_KEYPAIR_PWD,
-    CUR_USER_KEY
+    LOC_KEY
 } from '@/lib/constants';
-import { useState, useEffect } from 'react';
-import { type KeyPair } from '@/lib/types';
 import secretariumHandler from '@/lib/secretarium-handler';
-import { Key, Utils } from '@secretarium/connector';
-import { toast } from 'sonner';
-import { KeyDropzone } from '@/components/key-dropzone';
-import { KeyRound } from 'lucide-react';
-import { Logo } from '@/components/logo';
 
 export const Route = createFileRoute('/login/')({
     component: RouteComponent
@@ -41,12 +43,14 @@ function RouteComponent() {
         if (storedKeyPairs) {
             try {
                 setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Failed to parse stored key pairs:', error);
                 // Initialize with empty array if parsing fails
                 localStorage.setItem(LOC_KEY, JSON.stringify([]));
             }
-        } else {
+        }
+        else {
             // Initialize with empty array if no key pairs are stored
             localStorage.setItem(LOC_KEY, JSON.stringify([]));
         }
@@ -65,8 +69,8 @@ function RouteComponent() {
             const promise = secretariumHandler
                 .use(key, KLAVE_CONNECTION_KEYPAIR_PWD)
                 .then(Key.importKey)
-                .then((key) => key.getRawPublicKey())
-                .then((rawPublicKey) => Utils.hash(rawPublicKey))
+                .then(key => key.getRawPublicKey())
+                .then(rawPublicKey => Utils.hash(rawPublicKey))
                 .then((hashPublicKey) => {
                     (window as any).currentDevicePublicKeyHash = Utils.toBase64(
                         hashPublicKey,
@@ -101,7 +105,9 @@ function RouteComponent() {
                     <CardTitle className="text-xl mb-5">
                         <Logo className="mb-8" />
                         <span className="text-gray-400">
-                            Welcome{hasLoadedKeys ? ' back' : ''}!
+                            Welcome
+                            {hasLoadedKeys ? ' back' : ''}
+                            !
                         </span>
                         <br />
                         <span>Please log in</span>
@@ -110,47 +116,54 @@ function RouteComponent() {
                 <CardContent>
                     <form>
                         <div className="grid gap-6">
-                            {hasLoadedKeys ? (
-                                <>
-                                    <CardDescription className="text-center">
-                                        You've already logged in with{' '}
-                                        {hasManyLoadedKeys
-                                            ? 'one of these keys'
-                                            : 'this key'}{' '}
-                                        before:
-                                    </CardDescription>
-                                    {keyPairs.map((keyPair) => (
-                                        <Button
-                                            variant="outline"
-                                            key={keyPair.name}
-                                            className="hover:cursor-pointer"
-                                            asChild
-                                        >
-                                            <Link
-                                                search
-                                                to="/login/$keyname"
-                                                params={{
-                                                    keyname: encodeURIComponent(
-                                                        keyPair.name
-                                                    )
-                                                }}
-                                            >
-                                                <KeyRound />
-                                                {keyPair.name}
-                                            </Link>
-                                        </Button>
-                                    ))}
-                                </>
-                            ) : null}
-                            {hasLoadedKeys ? (
-                                <>
-                                    <hr />
-                                </>
-                            ) : null}
+                            {hasLoadedKeys
+                                ? (
+                                        <>
+                                            <CardDescription className="text-center">
+                                                You've already logged in with
+                                                {' '}
+                                                {hasManyLoadedKeys
+                                                    ? 'one of these keys'
+                                                    : 'this key'}
+                                                {' '}
+                                                before:
+                                            </CardDescription>
+                                            {keyPairs.map(keyPair => (
+                                                <Button
+                                                    variant="outline"
+                                                    key={keyPair.name}
+                                                    className="hover:cursor-pointer"
+                                                    asChild
+                                                >
+                                                    <Link
+                                                        search
+                                                        to="/login/$keyname"
+                                                        params={{
+                                                            keyname: encodeURIComponent(
+                                                                keyPair.name
+                                                            )
+                                                        }}
+                                                    >
+                                                        <KeyRound />
+                                                        {keyPair.name}
+                                                    </Link>
+                                                </Button>
+                                            ))}
+                                        </>
+                                    )
+                                : null}
+                            {hasLoadedKeys
+                                ? (
+                                        <>
+                                            <hr />
+                                        </>
+                                    )
+                                : null}
                             <CardDescription className="text-center">
                                 {hasLoadedKeys
                                     ? 'You can also upload'
-                                    : 'Upload'}{' '}
+                                    : 'Upload'}
+                                {' '}
                                 a new key to log in.
                             </CardDescription>
                             <KeyDropzone onFileUpload={handleFileUpload} />

@@ -3,9 +3,9 @@ import {
     Bell,
     ChevronsUpDown,
     CreditCard,
+    Languages,
     LogOut,
-    Sparkles,
-    Languages
+    Sparkles
 } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,9 +24,9 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { useSidebar } from '@/hooks/use-sidebar';
-import secretariumHandler from '@/lib/secretarium-handler';
 // import { StatusBar } from '@/components/status-bar';
 import { CUR_USER_KEY } from '@/lib/constants';
+import secretariumHandler from '@/lib/secretarium-handler';
 
 export function NavFooter({
     user
@@ -43,7 +43,7 @@ export function NavFooter({
     return (
         <>
             <SidebarMenu>
-                <SidebarMenuItem className='hidden'>
+                <SidebarMenuItem className="hidden">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuButton

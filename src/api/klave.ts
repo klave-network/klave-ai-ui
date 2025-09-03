@@ -1,5 +1,3 @@
-import secretariumHandler from '@/lib/secretarium-handler';
-import { klaveKlaveAIContract, waitForConnection } from '@/api';
 import type {
     BackendVersion,
     QuoteResponse,
@@ -7,15 +5,19 @@ import type {
     VerifyResponse
 } from '@/lib/types';
 
-export const isConnected = async (): Promise<boolean> =>
-    secretariumHandler.isConnected()
+import { klaveKlaveAIContract, waitForConnection } from '@/api';
+import secretariumHandler from '@/lib/secretarium-handler';
 
-export const getQuote = async ({
+export async function isConnected(): Promise<boolean> {
+    return secretariumHandler.isConnected();
+}
+
+export async function getQuote({
     challenge
 }: {
     challenge: number[];
-}): Promise<QuoteResponse> =>
-    waitForConnection()
+}): Promise<QuoteResponse> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -25,7 +27,7 @@ export const getQuote = async ({
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: QuoteResponse) => {
                         // console.log('klave.get_quote', result);
@@ -37,9 +39,10 @@ export const getQuote = async ({
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const verifyQuote = async (args: VerifyArgs): Promise<VerifyResponse> =>
-    waitForConnection()
+export async function verifyQuote(args: VerifyArgs): Promise<VerifyResponse> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -49,7 +52,7 @@ export const verifyQuote = async (args: VerifyArgs): Promise<VerifyResponse> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: VerifyResponse) => {
                         // console.log('klave.verify_quote', result);
@@ -61,9 +64,10 @@ export const verifyQuote = async (args: VerifyArgs): Promise<VerifyResponse> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const getBackendVersion = async (): Promise<BackendVersion> =>
-    waitForConnection()
+export async function getBackendVersion(): Promise<BackendVersion> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -73,7 +77,7 @@ export const getBackendVersion = async (): Promise<BackendVersion> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: BackendVersion) => {
                         // console.log('klave.version', result);
@@ -85,3 +89,4 @@ export const getBackendVersion = async (): Promise<BackendVersion> =>
                     tx.send().catch(reject);
                 })
         );
+}

@@ -8,7 +8,7 @@ export const Route = createFileRoute('/files')({
 });
 
 function FilesComponent() {
-    "use client"
+    'use client';
     // const [files] = useState<File[]>([]);
 
     return null;

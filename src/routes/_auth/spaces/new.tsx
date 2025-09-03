@@ -1,5 +1,10 @@
-import { useState, useCallback } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import { Database, Upload, X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+
+import { ragAddDocument, ragCreate, ragDocumentList } from '@/api/klave-ai';
+import { pgsqlCreate, pgsqlList } from '@/api/klave-pg';
 import { Button } from '@/components/ui/button';
 import {
     FileUpload,
@@ -11,18 +16,9 @@ import {
     FileUploadList,
     FileUploadTrigger
 } from '@/components/ui/file-upload';
-import { Upload, X, Database } from 'lucide-react';
-import { toast } from 'sonner';
-import {
-    getModels,
-    ragCreate,
-    ragAddDocument,
-    ragDocumentList
-} from '@/api/klave-ai';
-import { pgsqlCreate, pgsqlList } from '@/api/klave-pg';
 import { CUR_USER_KEY } from '@/lib/constants';
 
-export const Route = createFileRoute('/_auth/data/new')({
+export const Route = createFileRoute('/_auth/spaces/new')({
     component: RouteComponent
 });
 
@@ -43,7 +39,8 @@ function RouteComponent() {
                 const content = e.target?.result;
                 if (typeof content === 'string') {
                     resolve(content);
-                } else {
+                }
+                else {
                     reject(new Error('Failed to read file as text'));
                 }
             };
@@ -52,15 +49,11 @@ function RouteComponent() {
         });
     };
 
-    const buildRag = async (currentUser: string) => {
+    const buildRag = async () => {
         try {
-            // Get available models
-            const models = await getModels();
-            console.log('Available models:', models);
-
             // Create PostgreSQL database
             const database_id = await pgsqlCreate({
-                host: 'cuyegue.secretivecomputing.tech',
+                host: 'hellomylovelies.secretivecomputing.org',
                 dbname: 'klave_rag',
                 user: 'klave',
                 password: 'RlOsujsb3M6zZ78'
@@ -73,7 +66,7 @@ function RouteComponent() {
 
             // Create RAG instance
             const rag_id = await ragCreate({
-                database_id: database_id,
+                database_id,
                 rag_name: 'rag_demo1',
                 model_name: 'mistral'
             });
@@ -84,27 +77,27 @@ function RouteComponent() {
                 const file = files[i];
 
                 // Only process text files
-                if (
-                    !file.type.startsWith('text/') &&
-                    !file.name.endsWith('.txt') &&
-                    !file.name.endsWith('.md')
-                ) {
-                    toast.error(`Skipping ${file.name}`, {
-                        description: 'Only text files are supported for RAG'
-                    });
-                    continue;
-                }
+                // if (
+                //     !file.type.startsWith('text/') &&
+                //     !file.name.endsWith('.txt') &&
+                //     !file.name.endsWith('.md')
+                // ) {
+                //     toast.error(`Skipping ${file.name}`, {
+                //         description: 'Only text files are supported for RAG'
+                //     });
+                //     continue;
+                // }
 
                 try {
                     const content = await readFileAsText(file);
 
                     await ragAddDocument({
-                        rag_id: rag_id,
+                        rag_id,
                         document: {
                             url: file.name,
                             version: '1.0',
                             length: content.length,
-                            content: content,
+                            content,
                             date: new Date().toISOString().split('T')[0], // Format: YYYY-MM-DD
                             content_type: file.type || 'text/plain',
                             controller_public_key:
@@ -115,7 +108,8 @@ function RouteComponent() {
                     toast.success(`Document added: ${file.name}`, {
                         description: `Content length: ${content.length} characters`
                     });
-                } catch (error) {
+                }
+                catch (error) {
                     console.error(`Error processing file ${file.name}:`, error);
                     toast.error(`Failed to process ${file.name}`, {
                         description:
@@ -127,7 +121,7 @@ function RouteComponent() {
             }
 
             // List documents to verify addition
-            const doc_list = await ragDocumentList({ rag_id: rag_id });
+            const doc_list = await ragDocumentList({ rag_id });
             console.log('Documents in RAG:', doc_list);
 
             toast.success('RAG setup completed!', {
@@ -135,7 +129,8 @@ function RouteComponent() {
             });
 
             return rag_id;
-        } catch (error) {
+        }
+        catch (error) {
             console.error('Error building RAG:', error);
             toast.error('Failed to build RAG', {
                 description:
@@ -163,26 +158,29 @@ function RouteComponent() {
 
         setIsProcessing(true);
         try {
-            await buildRag(currentUser);
-        } catch (error) {
+            await buildRag();
+        }
+        catch (error) {
             // Error handling is done in buildRag function
-        } finally {
+            console.error('Error building RAG:', error);
+        }
+        finally {
             setIsProcessing(false);
         }
     };
 
     return (
         <div className="p-4 space-y-6 w-full">
-            <h3 className="text-xl font-medium">Upload new file</h3>
+            <h3 className="text-xl font-medium">Upload new files</h3>
             <FileUpload
-                maxFiles={2}
+                maxFiles={10}
                 maxSize={5 * 1024 * 1024}
                 className="w-full max-w-md"
                 value={files}
                 onValueChange={setFiles}
                 onFileReject={onFileReject}
                 multiple
-                accept="text/*,.txt,.md"
+                accept="text/*,.txt,.md,.csv,.xlsx,.xls,.doc,.docx,.ppt,.pptx,.pdf"
             >
                 <FileUploadDropzone>
                     <div className="flex flex-col items-center gap-1 text-center">
@@ -193,8 +191,7 @@ function RouteComponent() {
                             Drag & drop text files here
                         </p>
                         <p className="text-muted-foreground text-xs">
-                            Or click to browse (max 2 text files, up to 5MB
-                            each)
+                            Or click to browse (max 10 files, up to 5MB each)
                         </p>
                     </div>
                     <FileUploadTrigger asChild>
@@ -235,8 +232,8 @@ function RouteComponent() {
                     >
                         <Database className="size-4" />
                         {isProcessing
-                            ? 'Building RAG...'
-                            : 'Build RAG Database'}
+                            ? 'Adding files to space...'
+                            : 'Add files to space'}
                     </Button>
                 </div>
             )}

@@ -1,9 +1,10 @@
-import secretariumHandler from '@/lib/secretarium-handler';
-import { klaveKlaveAIContract, waitForConnection } from '@/api';
-import { type PgsqlCreateInput } from '@/lib/types';
+import type { PgsqlCreateInput } from '@/lib/types';
 
-export const pgsqlCreate = async (args: PgsqlCreateInput): Promise<any> =>
-    waitForConnection()
+import { klaveKlaveAIContract, waitForConnection } from '@/api';
+import secretariumHandler from '@/lib/secretarium-handler';
+
+export async function pgsqlCreate(args: PgsqlCreateInput): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -13,7 +14,7 @@ export const pgsqlCreate = async (args: PgsqlCreateInput): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
                         resolve(result);
@@ -24,9 +25,10 @@ export const pgsqlCreate = async (args: PgsqlCreateInput): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}
 
-export const pgsqlList = async (): Promise<any> =>
-    waitForConnection()
+export async function pgsqlList(): Promise<any> {
+    return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 klaveKlaveAIContract,
@@ -36,7 +38,7 @@ export const pgsqlList = async (): Promise<any> =>
             )
         )
         .then(
-            (tx) =>
+            tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
                         resolve(result);
@@ -47,3 +49,4 @@ export const pgsqlList = async (): Promise<any> =>
                     tx.send().catch(reject);
                 })
         );
+}

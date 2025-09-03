@@ -1,10 +1,12 @@
-import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { type VariantProps, cva } from 'class-variance-authority';
-import { PanelLeftIcon } from 'lucide-react';
+import type { VariantProps } from 'class-variance-authority';
 
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
+import { cva } from 'class-variance-authority';
+import { PanelLeftIcon } from 'lucide-react';
+import * as React from 'react';
+
+import type { SidebarContextProps } from '@/hooks/use-sidebar';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
@@ -22,7 +24,9 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
-import { SidebarContext, useSidebar, type SidebarContextProps } from '@/hooks/use-sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { SidebarContext, useSidebar } from '@/hooks/use-sidebar';
+import { cn } from '@/lib/utils';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -56,7 +60,8 @@ function SidebarProvider({
             const openState = typeof value === 'function' ? value(open) : value;
             if (setOpenProp) {
                 setOpenProp(openState);
-            } else {
+            }
+            else {
                 _setOpen(openState);
             }
 
@@ -69,16 +74,16 @@ function SidebarProvider({
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
         return isMobile
-            ? setOpenMobile((open) => !open)
-            : setOpen((open) => !open);
+            ? setOpenMobile(open => !open)
+            : setOpen(open => !open);
     }, [isMobile, setOpen, setOpenMobile]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (
-                event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-                (event.metaKey || event.ctrlKey)
+                event.key === SIDEBAR_KEYBOARD_SHORTCUT
+                && (event.metaKey || event.ctrlKey)
             ) {
                 event.preventDefault();
                 toggleSidebar();
@@ -115,7 +120,7 @@ function SidebarProvider({
     );
 
     return (
-        <SidebarContext.Provider value={contextValue}>
+        <SidebarContext value={contextValue}>
             <TooltipProvider delayDuration={0}>
                 <div
                     data-slot="sidebar-wrapper"
@@ -135,7 +140,7 @@ function SidebarProvider({
                     {children}
                 </div>
             </TooltipProvider>
-        </SidebarContext.Provider>
+        </SidebarContext>
     );
 }
 
@@ -567,8 +572,8 @@ function SidebarMenuAction({
                 'peer-data-[size=default]/menu-button:top-1.5',
                 'peer-data-[size=lg]/menu-button:top-2.5',
                 'group-data-[collapsible=icon]:hidden',
-                showOnHover &&
-                'peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0',
+                showOnHover
+                && 'peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0',
                 className
             )}
             {...props}

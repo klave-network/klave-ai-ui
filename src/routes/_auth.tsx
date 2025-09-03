@@ -1,13 +1,14 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { zodValidator } from '@tanstack/zod-adapter';
+import { z } from 'zod';
+
 import { AppSidebar } from '@/components/app-sidebar';
+import { LoadingDots } from '@/components/loading-dots';
+import { Logo } from '@/components/logo';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { LOC_KEY } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
-import { zodValidator } from '@tanstack/zod-adapter';
-import { z } from 'zod';
-import { Logo } from '@/components/logo';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoadingDots } from '@/components/loading-dots';
 
 const searchSchema = z.object({
     g: z.string().optional(),
@@ -34,8 +35,9 @@ export const Route = createFileRoute('/_auth')({
                     <Card>
                         <CardHeader className="text-center">
                             <CardTitle className="text-xl mb-5 flex flex-col text-center justify-center">
-                                <Logo className='mb-8' />
-                                <span className='text-gray-400'>Loading</span><br />
+                                <Logo className="mb-8" />
+                                <span className="text-gray-400">Loading</span>
+                                <br />
                                 <div className="flex flex-col justify-center items-center text-center mb-4">
                                     <LoadingDots />
                                 </div>
@@ -53,8 +55,9 @@ export const Route = createFileRoute('/_auth')({
                     <Card>
                         <CardHeader className="text-center">
                             <CardTitle className="text-xl mb-5 flex flex-col justify-center">
-                                <Logo className='mb-8' />
-                                <span className='text-gray-400'>Oops! Something went wrong</span><br />
+                                <Logo className="mb-8" />
+                                <span className="text-gray-400">Oops! Something went wrong</span>
+                                <br />
                                 <span className="block text-sm max-w-[500px] border border-red-500 bg-red-100 rounded-lg p-3">
                                     {error instanceof Error
                                         ? error.message

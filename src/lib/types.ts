@@ -1,4 +1,4 @@
-import { type EncryptedKeyPair } from '@secretarium/connector';
+import type { EncryptedKeyPair } from '@secretarium/connector';
 
 export type KeyPair = EncryptedKeyPair & {
     id: string;
@@ -6,25 +6,61 @@ export type KeyPair = EncryptedKeyPair & {
 };
 
 export type Model = {
-    access: number;
-    description: string;
-    encryption_type: number;
-    file_size: number;
-    hash: string[];
-    hash_type: number;
-    inactivity_timeout: number;
-    is_loaded: boolean;
-    local_path: string;
-    max_concurrent_queries: number;
-    max_concurrent_queries_per_user: number;
-    max_threads: number;
-    model_format: number;
     name: string;
+    metadata: {
+        type: number;
+        local_path: string;
+        url: string;
+        description: {
+            brief: string;
+            task: string;
+        };
+        format: number;
+        engine_type: number;
+        tensor_type: number;
+        engine_config: {
+            multimodal: boolean;
+        };
+        dependencies: (null | unknown)[];
+        parent_component: null | unknown;
+    };
     status: number;
-    system_prompt: number[];
-    tensor_type: number;
-    tokenizer_name: string;
-    url: string;
+    file_size: number;
+};
+
+// export type Model = {
+//     access: number;
+//     description: {
+//         brief: string;
+//         task: string;
+//     };
+//     encryption_type: number;
+//     file_size: number;
+//     hash: string[];
+//     hash_type: number;
+//     inactivity_timeout: number;
+//     is_loaded: boolean;
+//     local_path: string;
+//     max_concurrent_queries: number;
+//     max_concurrent_queries_per_user: number;
+//     max_threads: number;
+//     model_format: number;
+//     name: string;
+//     status: number;
+//     system_prompt: number[];
+//     tensor_type: number;
+//     tokenizer_name: string;
+//     url: string;
+// };
+
+export type AddRagPromptResult = {
+    references: Reference[];
+    user_prompt: string;
+};
+
+export type Reference = {
+    filename: string;
+    content: string;
 };
 
 export type Tokenizer = {
@@ -54,6 +90,7 @@ export type ContextInput = {
     sliding_window: boolean;
     mode: string;
     embeddings: boolean;
+    multimodal: boolean;
 };
 
 // Base context type
@@ -68,7 +105,7 @@ export type PromptInput = BaseContext & {
 };
 
 export type InferenceResponseInput = BaseContext & {
-    nb_pieces: number;
+    nb_pieces?: number;
 };
 
 export type PromptInputRag = BaseContext & {
@@ -76,6 +113,11 @@ export type PromptInputRag = BaseContext & {
     rag_id: string;
     n_rag_chunks: number;
     n_max_augmentations: number;
+};
+
+export type FrameInput = BaseContext & {
+    frame_bytes_b64: string;
+    user_prompt: string;
 };
 
 export type ChunkResult = {
@@ -164,4 +206,29 @@ export type Document = {
     date: string;
     content_type: string;
     controller_public_key: string;
+};
+
+export type Component = {
+    name: string;
+    metadata: {
+        type: string;
+        local_path: string;
+        url: string;
+        description: string;
+        format: string;
+        engine_type: string;
+        engine_config: {
+            multimodal: boolean;
+        };
+        tensor_type: string;
+        dependencies: string[];
+        parent_component: string;
+    };
+    encryption_type: string;
+    encryption_key: string[];
+    hash_type: string;
+    hash: string[];
+    is_loaded: boolean;
+    access: string;
+    inactivity_timeout: number;
 };
