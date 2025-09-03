@@ -1,35 +1,25 @@
-# Build stage
-FROM node:22-alpine AS build
-
-# Set working directory
+# Base stage
+FROM node:22-alpine AS base
 WORKDIR /app
-
-# Copy package files
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 COPY package.json ./
-COPY yarn.lock ./
-RUN echo 'nodeLinker: "node-modules"' > ./.yarnrc.yml
-RUN corepack enable && yarn --frozen-lockfile
+COPY pnpm-lock.yaml ./
 
-# Install dependencies
-RUN yarn install
+# Install prod dependencies
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-# Copy all files
+# Install all deps and build
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
+RUN pnpm run build
 
-# Build the app
-RUN yarn build
-
-# Serve stage
+# Final stage: serve with nginx
 FROM nginx:alpine
-
-# Copy built files from build stage
 COPY --from=build --chmod=755 /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration (we'll create this next)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
 EXPOSE 80
-
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -3,7 +3,6 @@
     "type": "module",
     "version": "0.0.0",
     "private": true,
-    "packageManager": "yarn@4.9.2",
     "scripts": {
         "backend": "node ./server/index.ts",
         "build": "vite build",
@@ -14,7 +13,8 @@
         "prepare": "husky",
         "serve": "vite preview",
         "start": "vite --port 3000",
-        "test": "vitest run"
+        "test": "vitest run",
+        "dockerize": "DOCKER_BUILDKIT=1 docker build --platform linux/amd64 -t secretarium/demo-klave-ai-website ."
     },
     "dependencies": {
         "@cubone/react-file-manager": "^1.24.0",
