@@ -12,6 +12,12 @@ type ChatMessage = {
     timestamp?: number;
 };
 
+type LenseSettings = {
+    systemPrompt: string;
+    snapshotFrequency: number;
+    userPrompt: string;
+};
+
 type ChatSettings = {
     systemPrompt: string;
     temperature: number;
@@ -33,6 +39,7 @@ export type ChatHistory = {
 
 type UserData = {
     chatSettings: ChatSettings;
+    lenseSettings: LenseSettings;
     chats?: ChatHistory[];
     vlModels?: Model[];
     llModels?: Model[];
@@ -52,6 +59,12 @@ const defaultChatSettings: ChatSettings = {
     currentVlModel: '',
     ragSpace: '',
     ragChunks: 2
+};
+
+const defaultLenseSettings = {
+    systemPrompt: 'You are a helpful assistant.',
+    userPrompt: 'What do you see?',
+    snapshotFrequency: 10000
 };
 
 const initialState: KlaveAIState = {};
@@ -115,6 +128,13 @@ export function useUserChatSettings(keyname: string) {
     );
 }
 
+export function useUserLenseSettings(keyname: string) {
+    return useStore(
+        store,
+        state => state[keyname]?.lenseSettings ?? defaultLenseSettings
+    );
+}
+
 export const useUserDocumentSets = (keyname: string) => [keyname];
 
 export function useUserDocumentSet(keyname: string, documentSet: string) {
@@ -138,7 +158,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             if (userData.chats?.some(chat => chat.id === chatId)) {
@@ -161,6 +182,33 @@ export const storeActions = {
         });
     },
 
+    updateLenseSettings: (
+        userKeyname: string,
+        settings: Partial<LenseSettings>
+    ) => {
+        store.setState((state) => {
+            const userData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
+            };
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    lenseSettings: {
+                        ...userData.lenseSettings,
+                        ...settings
+                    }
+                }
+            };
+        });
+    },
+
     updateChatSettings: (
         userKeyname: string,
         settings: Partial<ChatSettings>
@@ -171,7 +219,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             return {
@@ -194,7 +243,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             const updatedChats = userData.chats?.filter(
@@ -223,7 +273,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             const updatedChats = userData.chats?.map((chat) => {
@@ -276,7 +327,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             const llModels = models.filter(
@@ -321,7 +373,8 @@ export const storeActions = {
                 llModels: [],
                 vlModels: [],
                 ragDataSets: [],
-                chatSettings: defaultChatSettings
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
             };
 
             return {

@@ -29,7 +29,7 @@ const routes = {
         },
         {
             title: 'Lense',
-            url: '/chat/video',
+            url: '/chat/lense',
             icon: Video,
             className: 'bg-gradient-to-br from-kbl to-kor/90 text-white'
         }

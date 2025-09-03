@@ -33,7 +33,7 @@ import { Route as AuthSpacesNewRouteImport } from './routes/_auth/spaces/new'
 import { Route as AuthSpacesNameRouteImport } from './routes/_auth/spaces/$name'
 import { Route as AuthModelsNameRouteImport } from './routes/_auth/models/$name'
 import { Route as AuthDocumentsSetRouteImport } from './routes/_auth/documents/$set'
-import { Route as AuthChatVideoRouteImport } from './routes/_auth/chat/video'
+import { Route as AuthChatLenseRouteImport } from './routes/_auth/chat/lense'
 import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
 import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
 
@@ -156,9 +156,9 @@ const AuthDocumentsSetRoute = AuthDocumentsSetRouteImport.update({
   path: '/$set',
   getParentRoute: () => AuthDocumentsRouteRoute,
 } as any)
-const AuthChatVideoRoute = AuthChatVideoRouteImport.update({
-  id: '/video',
-  path: '/video',
+const AuthChatLenseRoute = AuthChatLenseRouteImport.update({
+  id: '/lense',
+  path: '/lense',
   getParentRoute: () => AuthChatRouteRoute,
 } as any)
 const AuthChatAttestRoute = AuthChatAttestRouteImport.update({
@@ -190,7 +190,7 @@ export interface FileRoutesByFullPath {
   '/login/': typeof LoginIndexRoute
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
-  '/chat/video': typeof AuthChatVideoRoute
+  '/chat/lense': typeof AuthChatLenseRoute
   '/documents/$set': typeof AuthDocumentsSetRoute
   '/models/$name': typeof AuthModelsNameRoute
   '/spaces/$name': typeof AuthSpacesNameRoute
@@ -213,7 +213,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
-  '/chat/video': typeof AuthChatVideoRoute
+  '/chat/lense': typeof AuthChatLenseRoute
   '/documents/$set': typeof AuthDocumentsSetRoute
   '/models/$name': typeof AuthModelsNameRoute
   '/spaces/$name': typeof AuthSpacesNameRoute
@@ -243,7 +243,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/_auth/chat/$id': typeof AuthChatIdRoute
   '/_auth/chat/attest': typeof AuthChatAttestRoute
-  '/_auth/chat/video': typeof AuthChatVideoRoute
+  '/_auth/chat/lense': typeof AuthChatLenseRoute
   '/_auth/documents/$set': typeof AuthDocumentsSetRoute
   '/_auth/models/$name': typeof AuthModelsNameRoute
   '/_auth/spaces/$name': typeof AuthSpacesNameRoute
@@ -273,7 +273,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/chat/$id'
     | '/chat/attest'
-    | '/chat/video'
+    | '/chat/lense'
     | '/documents/$set'
     | '/models/$name'
     | '/spaces/$name'
@@ -296,7 +296,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/chat/$id'
     | '/chat/attest'
-    | '/chat/video'
+    | '/chat/lense'
     | '/documents/$set'
     | '/models/$name'
     | '/spaces/$name'
@@ -325,7 +325,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/_auth/chat/$id'
     | '/_auth/chat/attest'
-    | '/_auth/chat/video'
+    | '/_auth/chat/lense'
     | '/_auth/documents/$set'
     | '/_auth/models/$name'
     | '/_auth/spaces/$name'
@@ -513,11 +513,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDocumentsSetRouteImport
       parentRoute: typeof AuthDocumentsRouteRoute
     }
-    '/_auth/chat/video': {
-      id: '/_auth/chat/video'
-      path: '/video'
-      fullPath: '/chat/video'
-      preLoaderRoute: typeof AuthChatVideoRouteImport
+    '/_auth/chat/lense': {
+      id: '/_auth/chat/lense'
+      path: '/lense'
+      fullPath: '/chat/lense'
+      preLoaderRoute: typeof AuthChatLenseRouteImport
       parentRoute: typeof AuthChatRouteRoute
     }
     '/_auth/chat/attest': {
@@ -554,14 +554,14 @@ const LoginRouteRouteWithChildren = LoginRouteRoute._addFileChildren(
 interface AuthChatRouteRouteChildren {
   AuthChatIdRoute: typeof AuthChatIdRoute
   AuthChatAttestRoute: typeof AuthChatAttestRoute
-  AuthChatVideoRoute: typeof AuthChatVideoRoute
+  AuthChatLenseRoute: typeof AuthChatLenseRoute
   AuthChatIndexRoute: typeof AuthChatIndexRoute
 }
 
 const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
   AuthChatIdRoute: AuthChatIdRoute,
   AuthChatAttestRoute: AuthChatAttestRoute,
-  AuthChatVideoRoute: AuthChatVideoRoute,
+  AuthChatLenseRoute: AuthChatLenseRoute,
   AuthChatIndexRoute: AuthChatIndexRoute,
 }
 

@@ -92,7 +92,8 @@ function RouteComponent() {
                 steps: chatSettings?.steps ?? 256,
                 sliding_window: chatSettings?.slidingWindow ?? false,
                 mode: currentMode,
-                embeddings: false
+                embeddings: false,
+                multimodal: false
             });
 
             if (chatSettings?.ragSpace) {
