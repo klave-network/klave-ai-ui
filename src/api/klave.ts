@@ -5,11 +5,11 @@ import type {
     VerifyResponse
 } from '@/lib/types';
 
-import { klaveKlaveAIContract, waitForConnection } from '@/api';
+import { klaveAiMultimodalFqdn, klaveAiMultimodalNode, waitForConnection } from '@/api/klave-ai-multimodal';
 import secretariumHandler from '@/lib/secretarium-handler';
 
 export async function isConnected(): Promise<boolean> {
-    return secretariumHandler.isConnected();
+    return secretariumHandler.isConnected(klaveAiMultimodalNode);
 }
 
 export async function getQuote({
@@ -20,10 +20,11 @@ export async function getQuote({
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaveAIContract,
+                klaveAiMultimodalFqdn,
                 'klave.get_quote',
                 { challenge },
-                `klave.get_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `klave.get_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                klaveAiMultimodalNode
             )
         )
         .then(
@@ -45,10 +46,11 @@ export async function verifyQuote(args: VerifyArgs): Promise<VerifyResponse> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaveAIContract,
+                klaveAiMultimodalFqdn,
                 'klave.verify_quote',
                 args,
-                `klave.verify_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `klave.verify_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                klaveAiMultimodalNode
             )
         )
         .then(
@@ -70,10 +72,11 @@ export async function getBackendVersion(): Promise<BackendVersion> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveKlaveAIContract,
+                klaveAiMultimodalFqdn,
                 'klave.version',
                 {},
-                `klave.version-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+                `klave.version-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                klaveAiMultimodalNode
             )
         )
         .then(
