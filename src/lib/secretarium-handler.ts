@@ -1,10 +1,8 @@
 import type { ClearKeyPair, EncryptedKeyPairV2, Transaction } from '@secretarium/connector';
 
 import {
-
     Key,
     SCP,
-
     Utils
 } from '@secretarium/connector';
 
@@ -28,16 +26,22 @@ type ConnectionInformation = {
     socket: SCP;
 };
 
-const handlerStore: {
-    currentConnection: SCP;
-    currentKey?: Key;
+type ConnectionInstance = {
+    connection: SCP;
     clusters?: SecretariumClusterConfig;
+    currentGateway: number;
+    isConnected: boolean;
+};
+
+const handlerStore: {
+    connections: Map<string, ConnectionInstance>;
+    currentKey?: Key;
     fileService?: string;
+    defaultConnectionId: string;
 } = {
-    currentConnection: new SCP({
-        logger: console
-    }),
-    currentKey: undefined
+    connections: new Map(),
+    currentKey: undefined,
+    defaultConnectionId: 'default'
 };
 
 function gatewaysConfigReducer(config: SecretariumClusterConfig, current: string): SecretariumClusterConfig {
@@ -58,15 +62,15 @@ function gatewaysConfigReducer(config: SecretariumClusterConfig, current: string
     return config;
 }
 
-function printClusterInfo(): void {
-    if (!handlerStore.clusters)
+function printClusterInfo(connectionId: string, clusters: SecretariumClusterConfig): void {
+    if (!clusters)
         return;
 
     const printableConfig: {
         [key: string]: string;
     } = {};
 
-    Object.entries(handlerStore.clusters).forEach(
+    Object.entries(clusters).forEach(
         ([name, configuration], cindex) => {
             printableConfig[`c${cindex}_name`] = name;
             configuration.gateways.forEach((gateway, gindex) => {
@@ -77,21 +81,37 @@ function printClusterInfo(): void {
         }
     );
 
-    console.info('Klave AI App now using the following cluster configuration:');
+    console.info(`Klave AI App connection [${connectionId}] using the following cluster configuration:`);
     console.table(printableConfig);
 }
 
-const processClusterConfig: Window['appKlaveCluster'] = (config) => {
+function processClusterConfig(config: string | SecretariumClusterConfig, connectionId: string): void {
+    let clusters: SecretariumClusterConfig;
+
     if (typeof config === 'string') {
-        handlerStore.clusters = config
+        clusters = config
             .split(',')
             .reduce<SecretariumClusterConfig>(gatewaysConfigReducer, {});
     }
     else {
-        handlerStore.clusters = config as SecretariumClusterConfig;
+        clusters = config as SecretariumClusterConfig;
     }
-    printClusterInfo();
-};
+
+    const connectionInstance = handlerStore.connections.get(connectionId);
+    if (connectionInstance) {
+        connectionInstance.clusters = clusters;
+    }
+    else {
+        handlerStore.connections.set(connectionId, {
+            connection: new SCP({ logger: console }),
+            clusters,
+            currentGateway: -1,
+            isConnected: false
+        });
+    }
+
+    printClusterInfo(connectionId, clusters);
+}
 
 // Function to extract the gateway address from URL params
 function getGatewayFromUrl(): string | null {
@@ -109,42 +129,54 @@ function getGatewayFromUrl(): string | null {
     return null;
 }
 
-let currentGateway = -1;
-
 const secretariumHandler = {
-    initialize: (): void => {
-        // First check if gateway is provided in URL
-        const urlGateway = getGatewayFromUrl();
+    initialize: (gatewayConfig?: string, connectionId: string = 'default'): void => {
+        // First check if gateway is provided in URL (only for default connection)
+        if (connectionId === 'default') {
+            const urlGateway = getGatewayFromUrl();
 
-        // If URL has gateway info, use that directly
-        if (urlGateway) {
-            // Format for the gateway config
-            const clusterName = 'default';
-            const gatewayName = 'url-provided';
-            const formattedConfig = `${clusterName}#${gatewayName}#wss://${urlGateway}`;
-            processClusterConfig(formattedConfig);
-            return;
+            // If URL has gateway info, use that directly
+            if (urlGateway) {
+                // Format for the gateway config
+                const clusterName = 'default';
+                const gatewayName = 'url-provided';
+                const formattedConfig = `${clusterName}#${gatewayName}#wss://${urlGateway}`;
+                processClusterConfig(formattedConfig, connectionId);
+                return;
+            }
         }
 
-        let clusterConfigBase
-            = import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS ?? '';
+        let clusterConfigBase = gatewayConfig || import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS || '';
 
-        fetch(
-            `/config.json?v=${import.meta.env.VITE_APP_VERSION ?? '0.0.0'}&t=${Date.now()}`
-        )
-            .then(response => response.json())
-            .then((config: any) => {
-                if (config.SECRETARIUM_GATEWAYS)
-                    clusterConfigBase = config.SECRETARIUM_GATEWAYS;
-                if (config.DK_SERVICES)
-                    handlerStore.fileService = config.DK_SERVICES;
-                processClusterConfig(clusterConfigBase);
-                console.info('Klave AI App now using config.json overrides');
-            })
-            .catch(() => {
-                processClusterConfig(clusterConfigBase);
-            });
+        // Only fetch config.json for the default connection to avoid multiple requests
+        if (connectionId === 'default') {
+            fetch(
+                `/config.json?v=${import.meta.env.VITE_APP_VERSION ?? '0.0.0'}&t=${Date.now()}`
+            )
+                .then(response => response.json())
+                .then((config: any) => {
+                    if (config.SECRETARIUM_GATEWAYS)
+                        clusterConfigBase = config.SECRETARIUM_GATEWAYS;
+                    if (config.DK_SERVICES)
+                        handlerStore.fileService = config.DK_SERVICES;
+                    processClusterConfig(clusterConfigBase, connectionId);
+                    console.info(`Klave AI App connection [${connectionId}] now using config.json overrides`);
+                })
+                .catch(() => {
+                    processClusterConfig(clusterConfigBase, connectionId);
+                });
+        }
+        else {
+            processClusterConfig(clusterConfigBase, connectionId);
+        }
     },
+
+    initializeMultiple: (configs: { [connectionId: string]: string }): void => {
+        Object.entries(configs).forEach(([connectionId, gatewayConfig]) => {
+            secretariumHandler.initialize(gatewayConfig, connectionId);
+        });
+    },
+
     createKeyPair: (values: any): Promise<EncryptedKeyPairV2> =>
         new Promise((resolve, reject) => {
             Key.createKey()
@@ -160,6 +192,7 @@ const secretariumHandler = {
                 })
                 .catch(e => reject(e));
         }),
+
     createEphemeral: (): Promise<EncryptedKeyPairV2> =>
         new Promise((resolve, reject) => {
             Key.createKey()
@@ -169,6 +202,7 @@ const secretariumHandler = {
                 })
                 .catch(e => reject(e));
         }),
+
     encryptKey: (
         keyPair: ClearKeyPair,
         password: string
@@ -176,6 +210,7 @@ const secretariumHandler = {
         Key.importKey(keyPair)
             .then(key => key.seal(password))
             .then(encKey => encKey.exportEncryptedKey()),
+
     use: (keyPair: KeyPair, password: string): Promise<ClearKeyPair> => {
         return new Promise((resolve, reject) => {
             Key.importEncryptedKeyPair(keyPair, password)
@@ -186,88 +221,134 @@ const secretariumHandler = {
                 .catch(e => reject(e));
         });
     },
-    connect: (): Promise<ConnectionInformation> =>
+
+    connect: (connectionId: string = 'default'): Promise<ConnectionInformation> =>
         new Promise((resolve, reject) => {
+            const connectionInstance = handlerStore.connections.get(connectionId);
+
+            if (!connectionInstance) {
+                return reject(new Error(`Connection ${connectionId} not initialized`));
+            }
+
             const clusters = Object.entries<SecretariumGatewayConfig>(
-                handlerStore.clusters ?? {}
+                connectionInstance.clusters ?? {}
             );
 
-            if (!handlerStore.clusters) {
+            if (!connectionInstance.clusters) {
                 return setTimeout(() => {
-                    resolve(secretariumHandler.connect());
+                    resolve(secretariumHandler.connect(connectionId));
                 }, 500);
             }
 
             if (!clusters[0]) {
-                console.error('There are no cluster configured !');
-                return reject(new Error('There are no cluster configured !'));
+                console.error(`There are no cluster configured for connection ${connectionId}!`);
+                return reject(new Error(`There are no cluster configured for connection ${connectionId}!`));
             }
 
             const cluster = clusters[0];
-            let nextGateway = currentGateway;
+            let nextGateway = connectionInstance.currentGateway;
             do {
                 nextGateway = Math.floor(
                     Math.random() * cluster[1].gateways.length
                 );
             } while (
-                (nextGateway === currentGateway
+                (nextGateway === connectionInstance.currentGateway
                     && cluster[1].gateways?.length > 1)
                 || nextGateway < 0
                 || nextGateway >= cluster[1].gateways.length
             );
 
-            currentGateway = nextGateway;
+            connectionInstance.currentGateway = nextGateway;
             const endpoint = cluster[1].gateways?.[nextGateway]?.endpoint;
+
             if (cluster && endpoint && handlerStore.currentKey) {
                 console.info(
-                    'Klave AI now using the following gateway:',
+                    `Klave AI connection [${connectionId}] now using the following gateway:`,
                     endpoint
                 );
-                handlerStore.currentConnection
+                connectionInstance.connection
                     .reset()
                     .onError((e: string) => {
-                        console.error('Connection error:', e);
+                        console.error(`Connection [${connectionId}] error:`, e);
+                        connectionInstance.isConnected = false;
                     })
                     .connect(endpoint, handlerStore.currentKey)
                     .then(() => {
+                        connectionInstance.isConnected = true;
                         resolve({
                             cluster: cluster[0],
                             gateway:
                                 cluster[1]?.gateways?.[nextGateway]?.name ?? '',
                             endpoint,
-                            socket: handlerStore.currentConnection
+                            socket: connectionInstance.connection
                         });
                     })
-                    .catch((e: Error) => reject(e));
+                    .catch((e: Error) => {
+                        connectionInstance.isConnected = false;
+                        reject(e);
+                    });
             }
             else {
-                reject(new Error('Cluster not configured'));
+                reject(new Error(`Cluster not configured for connection ${connectionId}`));
             }
         }),
-    isConnected: () => {
-        return handlerStore.currentConnection?.state === 1;
-    },
-    disconnect: (hold = false): Promise<void> =>
-        new Promise((resolve) => {
-            handlerStore.currentConnection?.reset();
-            handlerStore.currentConnection?.close();
 
-            handlerStore.currentConnection = new SCP({
-                logger: console
-            });
+    connectAll: async (): Promise<{ [connectionId: string]: ConnectionInformation }> => {
+        const results: { [connectionId: string]: ConnectionInformation } = {};
+        const connections = Array.from(handlerStore.connections.keys());
+
+        await Promise.all(connections.map(async (connectionId) => {
+            try {
+                results[connectionId] = await secretariumHandler.connect(connectionId);
+            }
+            catch (error) {
+                console.error(`Failed to connect ${connectionId}:`, error);
+            }
+        }));
+
+        return results;
+    },
+
+    isConnected: (connectionId: string = 'default'): boolean => {
+        const connectionInstance = handlerStore.connections.get(connectionId);
+        return connectionInstance?.connection?.state === 1 && connectionInstance?.isConnected === true;
+    },
+
+    disconnect: (connectionId: string = 'default', hold = false): Promise<void> =>
+        new Promise((resolve) => {
+            const connectionInstance = handlerStore.connections.get(connectionId);
+
+            if (connectionInstance) {
+                connectionInstance.connection?.reset();
+                connectionInstance.connection?.close();
+                connectionInstance.connection = new SCP({ logger: console });
+                connectionInstance.isConnected = false;
+            }
+
             if (!hold)
                 handlerStore.currentKey = undefined;
             resolve();
         }),
+
+    disconnectAll: async (hold = false): Promise<void> => {
+        const connections = Array.from(handlerStore.connections.keys());
+        await Promise.all(connections.map(connectionId =>
+            secretariumHandler.disconnect(connectionId, hold)
+        ));
+    },
+
     request: (
         dcApp: string,
         command: string,
         args: Record<string, unknown> | string,
-        id: string
+        id: string,
+        connectionId: string = 'default'
     ): Promise<Transaction> =>
         new Promise((resolve, reject) => {
-            if (handlerStore.currentConnection) {
-                const queryHandle = handlerStore.currentConnection.newTx(
+            const connectionInstance = handlerStore.connections.get(connectionId);
+
+            if (connectionInstance?.connection && connectionInstance.isConnected) {
+                const queryHandle = connectionInstance.connection.newTx(
                     dcApp,
                     command,
                     id,
@@ -276,27 +357,49 @@ const secretariumHandler = {
                 resolve(queryHandle);
             }
             else {
-                reject(new Error('No connection to Secretarium.'));
+                reject(new Error(`No connection to Secretarium for ${connectionId}.`));
             }
         }),
+
+    getConnection: (connectionId: string = 'default'): SCP | null => {
+        const connectionInstance = handlerStore.connections.get(connectionId);
+        return connectionInstance?.connection || null;
+    },
+
+    getAllConnections: (): { [connectionId: string]: SCP } => {
+        const connections: { [connectionId: string]: SCP } = {};
+        handlerStore.connections.forEach((instance, connectionId) => {
+            connections[connectionId] = instance.connection;
+        });
+        return connections;
+    },
+
     utils: Utils
 };
 
-if (
-    (import.meta.env.NODE_ENV === 'development'
-        || import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_OVERWRITABLE
-        === 'true')
-    && window
-) {
-    window.appKlaveCluster = processClusterConfig;
-    window.appKlaveCommand = (dcApp, command, args, id): void => {
-        secretariumHandler
-            .request(dcApp, command, args ?? {}, id ?? `${Math.random()}`)
-            .then((query) => {
-                query.send();
-            });
-    };
-    window.appKlaveHandlerStore = handlerStore;
-}
+// Legacy support - maintain backwards compatibility
+// Object.defineProperty(secretariumHandler, 'currentConnection', {
+//     get: () => {
+//         const defaultInstance = handlerStore.connections.get(handlerStore.defaultConnectionId);
+//         return defaultInstance?.connection;
+//     }
+// });
+
+// if (
+//     (import.meta.env.NODE_ENV === 'development'
+//         || import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_OVERWRITABLE
+//         === 'true')
+//     && window
+// ) {
+//     window.appKlaveCluster = config => processClusterConfig(config, handlerStore.defaultConnectionId);
+//     window.appKlaveCommand = (dcApp, command, args, id): void => {
+//         secretariumHandler
+//             .request(dcApp, command, args ?? {}, id ?? `${Math.random()}`)
+//             .then((query) => {
+//                 query.send();
+//             });
+//     };
+//     window.appKlaveHandlerStore = handlerStore;
+// }
 
 export default secretariumHandler;

@@ -313,9 +313,9 @@ type FileUploadRootProps = {
     multiple?: boolean;
     required?: boolean;
 } & Omit<
-        React.ComponentPropsWithoutRef<'div'>,
+    React.ComponentPropsWithoutRef<'div'>,
         'defaultValue' | 'onChange'
-    >;
+>;
 
 function FileUploadRoot({ ref: forwardedRef, ...props }: FileUploadRootProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
     const {
@@ -432,9 +432,9 @@ function FileUploadRoot({ ref: forwardedRef, ...props }: FileUploadRootProps & {
             }
             catch (error) {
                 const errorMessage
-                        = error instanceof Error
-                            ? error.message
-                            : 'Upload failed';
+                    = error instanceof Error
+                        ? error.message
+                        : 'Upload failed';
                 for (const file of files) {
                     store.dispatch({
                         variant: 'SET_ERROR',
@@ -464,7 +464,7 @@ function FileUploadRoot({ ref: forwardedRef, ...props }: FileUploadRootProps & {
 
                 if (remainingSlotCount < filesToProcess.length) {
                     const rejectedFiles
-                            = filesToProcess.slice(remainingSlotCount);
+                        = filesToProcess.slice(remainingSlotCount);
                     invalid = true;
 
                     filesToProcess = filesToProcess.slice(
@@ -477,7 +477,7 @@ function FileUploadRoot({ ref: forwardedRef, ...props }: FileUploadRootProps & {
 
                         if (propsRef.current.onFileValidate) {
                             const validationMessage
-                                    = propsRef.current.onFileValidate(file);
+                                = propsRef.current.onFileValidate(file);
                             if (validationMessage) {
                                 rejectionMessage = validationMessage;
                             }
@@ -500,7 +500,7 @@ function FileUploadRoot({ ref: forwardedRef, ...props }: FileUploadRootProps & {
 
                 if (propsRef.current.onFileValidate) {
                     const validationMessage
-                            = propsRef.current.onFileValidate(file);
+                        = propsRef.current.onFileValidate(file);
                     if (validationMessage) {
                         rejectionMessage = validationMessage;
                         propsRef.current.onFileReject?.(
