@@ -5,6 +5,79 @@ export type KeyPair = EncryptedKeyPair & {
     name: string;
 };
 
+export type Capabilities = {
+    logging: {
+        level: string;
+    };
+    prompts: {
+        listChanged: boolean;
+    };
+    resources: {
+        listChanged: boolean;
+        subscribe: boolean;
+    };
+    sampling: string;
+    tools: {
+        listChanged: boolean;
+    };
+};
+
+export type McpSessionInitArgs = {
+    server_id: string;
+    capabilities: Capabilities;
+};
+
+export type LlmContextCreateInputArgs = {
+    context: ContextInput;
+    session_ids: string[];
+};
+
+export type McpCapabilities = {
+    success: boolean;
+    note: string;
+    capabilities: Capabilities;
+};
+
+export type McpSession = {
+    session_id: string;
+    server_id: string;
+    capabilities: Capabilities;
+    created_at: string;
+    last_activity: string;
+    status: string;
+};
+
+export type McpServer = {
+    id: string;
+    name: string;
+    url: string;
+    auth_type: string;
+    auth_config: {
+        auth_type: string;
+        token: string;
+        username: string;
+        password: string;
+    };
+    init_config: {
+        protocolVersion: string;
+        capabilities: {
+            roots: {
+                listChanged: boolean;
+            };
+            sampling: string;
+        };
+    };
+    clientInfo: {
+        name: string;
+        version: string;
+    };
+    description: string;
+    created_at: string;
+    last_connected: string;
+    is_active: boolean;
+    tools: string[];
+};
+
 export type Model = {
     name: string;
     metadata: {
@@ -27,31 +100,6 @@ export type Model = {
     status: number;
     file_size: number;
 };
-
-// export type Model = {
-//     access: number;
-//     description: {
-//         brief: string;
-//         task: string;
-//     };
-//     encryption_type: number;
-//     file_size: number;
-//     hash: string[];
-//     hash_type: number;
-//     inactivity_timeout: number;
-//     is_loaded: boolean;
-//     local_path: string;
-//     max_concurrent_queries: number;
-//     max_concurrent_queries_per_user: number;
-//     max_threads: number;
-//     model_format: number;
-//     name: string;
-//     status: number;
-//     system_prompt: number[];
-//     tensor_type: number;
-//     tokenizer_name: string;
-//     url: string;
-// };
 
 export type AddRagPromptResult = {
     references: Reference[];
@@ -108,6 +156,11 @@ export type InferenceResponseInput = BaseContext & {
     nb_pieces?: number;
 };
 
+export type LlmResponseInput = BaseContext & {
+    session_id: string;
+    nb_pieces?: number;
+};
+
 export type PromptInputRag = BaseContext & {
     user_prompt: string;
     rag_id: string;
@@ -123,6 +176,20 @@ export type FrameInput = BaseContext & {
 export type ChunkResult = {
     piece: number[];
     complete: boolean;
+};
+
+export type McpChunkResult = {
+    piece: number[];
+    complete: boolean;
+    has_tool_call: boolean;
+    tool_call: {
+        function_name: string;
+        arguments: {
+            agentPrompt: string;
+            nChunks: number;
+        };
+    };
+    message_before_tool: string;
 };
 
 export type BackendVersion = {
