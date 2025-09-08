@@ -1,6 +1,6 @@
 import { Store, useStore } from '@tanstack/react-store';
 
-import type { Model, Rag, Reference } from '@/lib/types';
+import type { McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
 
 import { STORE_KEY } from '@/lib/constants';
 
@@ -27,8 +27,10 @@ type ChatSettings = {
     useRag: boolean;
     currentLlModel: string;
     currentVlModel: string;
+    currentMcpServer: string;
     ragSpace: string;
     ragChunks: number;
+    sessionId?: string;
 };
 
 export type ChatHistory = {
@@ -44,6 +46,8 @@ type UserData = {
     vlModels?: Model[];
     llModels?: Model[];
     ragDataSets?: Rag[];
+    mcpServers?: McpServer[];
+    mcpSessions?: McpSession[];
 };
 
 type KlaveAIState = Record<string, UserData>;
@@ -57,6 +61,7 @@ const defaultChatSettings: ChatSettings = {
     useRag: false,
     currentLlModel: '',
     currentVlModel: '',
+    currentMcpServer: '',
     ragSpace: '',
     ragChunks: 2
 };
@@ -121,6 +126,24 @@ export function useUserRagDataSet(keyname: string, ragId: string) {
         state[keyname]?.ragDataSets?.find(rag => rag.rag_id === ragId));
 }
 
+export function useUserMcpServers(keyname: string) {
+    return useStore(store, state => state[keyname]?.mcpServers ?? []);
+}
+
+export function useUserMcpServer(keyname: string, serverId: string) {
+    return useStore(store, state =>
+        state[keyname]?.mcpServers?.find(server => server.id === serverId));
+}
+
+export function useUserMcpSessions(keyname: string) {
+    return useStore(store, state => state[keyname]?.mcpSessions ?? []);
+}
+
+export function useUserMcpSession(keyname: string, sessionId: string) {
+    return useStore(store, state =>
+        state[keyname]?.mcpSessions?.find(session => session.session_id === sessionId));
+}
+
 export function useUserChatSettings(keyname: string) {
     return useStore(
         store,
@@ -157,6 +180,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -191,6 +216,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -218,6 +245,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -242,6 +271,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -272,6 +303,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -326,6 +359,8 @@ export const storeActions = {
                 chats: [],
                 llModels: [],
                 vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
                 ragDataSets: [],
                 chatSettings: defaultChatSettings,
                 lenseSettings: defaultLenseSettings
@@ -382,6 +417,54 @@ export const storeActions = {
                 [userKeyname]: {
                     ...userData,
                     ragDataSets
+                }
+            };
+        });
+    },
+
+    // add MCP servers fetched from the backend
+    addMcpServers: (userKeyname: string, mcpServers: McpServer[]) => {
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
+            };
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    mcpServers
+                }
+            };
+        });
+    },
+
+    // add MCP sessions created on the frontend
+    addMcpSessions: (userKeyname: string, mcpSessions: McpSession[]) => {
+        store.setState((state) => {
+            const userData: UserData = state[userKeyname] ?? {
+                chats: [],
+                llModels: [],
+                vlModels: [],
+                mcpSessions: [],
+                mcpServers: [],
+                ragDataSets: [],
+                chatSettings: defaultChatSettings,
+                lenseSettings: defaultLenseSettings
+            };
+
+            return {
+                ...state,
+                [userKeyname]: {
+                    ...userData,
+                    mcpSessions
                 }
             };
         });

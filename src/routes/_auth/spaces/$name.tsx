@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 import type { Document } from '@/lib/types';
 
-import { ragDocumentList } from '@/api/klave-ai';
+import { ragDocumentList } from '@/api/klave-ai-rag-mcp-server';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

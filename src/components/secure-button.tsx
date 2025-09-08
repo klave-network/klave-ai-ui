@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
-import { klaveKlaveAIContract } from '@/api';
+import { klaveAiMultimodalFqdn as klaveKlaveAIContract } from '@/api/klave-ai-multimodal';
 import { Button } from '@/components/ui/button';
 import {
     Popover,

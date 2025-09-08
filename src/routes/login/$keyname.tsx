@@ -94,7 +94,10 @@ function RouteComponent() {
                 // Show loading toast and keep its ID
                 const toastId = toast.loading('Connecting...');
 
-                await secretariumHandler.connect();
+                // Connect to all 3 nodes
+                await secretariumHandler.connect('thranduil1:5035');
+                await secretariumHandler.connect('thranduil1:5036');
+                await secretariumHandler.connect('thranduil1:5037');
 
                 // Replace loading toast with success
                 toast.success(`Connected with ${key.name}.`, { id: toastId });

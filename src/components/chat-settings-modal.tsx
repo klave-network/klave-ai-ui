@@ -49,6 +49,7 @@ const defaultChatSettings = {
     useRag: false,
     currentLlModel: '',
     currentVlModel: '',
+    currentMcpServer: '',
     ragSpace: '',
     ragChunks: 2
 };

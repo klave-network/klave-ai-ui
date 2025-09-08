@@ -3,8 +3,7 @@ import { Database, Upload, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
-import { ragAddDocument, ragCreate, ragDocumentList } from '@/api/klave-ai';
-import { pgsqlCreate, pgsqlList } from '@/api/klave-pg';
+import { pgsqlCreate, pgsqlList, ragAddDocument, ragCreate, ragDocumentList } from '@/api/klave-ai-rag-mcp-server';
 import { Button } from '@/components/ui/button';
 import {
     FileUpload,

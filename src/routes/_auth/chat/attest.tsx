@@ -2,8 +2,8 @@ import { Utils } from '@secretarium/connector';
 import { createFileRoute } from '@tanstack/react-router';
 import { SquareArrowOutUpRight } from 'lucide-react';
 
-import { klaveKlaveAIContract } from '@/api';
 import { getBackendVersion, getQuote, verifyQuote } from '@/api/klave';
+import { klaveAiMultimodalFqdn as klaveKlaveAIContract } from '@/api/klave-ai-multimodal';
 import { Label } from '@/components/ui/label';
 
 export const Route = createFileRoute('/_auth/chat/attest')({

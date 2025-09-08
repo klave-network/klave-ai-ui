@@ -4,14 +4,18 @@ import ReactDOM from 'react-dom/client';
 
 import { Toaster } from '@/components/ui/sonner';
 
-import secretariumHandler from './lib/secretarium-handler.ts';
 import './styles.css';
+import secretariumHandler from './lib/secretarium-handler.ts';
 import reportWebVitals from './reportWebVitals.ts';
 // Import the generated route tree
 import { routeTree } from './routeTree.gen';
 
-secretariumHandler.initialize();
-
+// Initialize multiple SCP connections with different gateway configurations
+secretariumHandler.initializeMultiple({
+    'thranduil1:5035': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_1,
+    'thranduil1:5036': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_2,
+    'thranduil1:5037': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_3
+});
 // Create a new router instance
 const router = createRouter({
     routeTree,

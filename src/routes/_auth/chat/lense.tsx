@@ -9,7 +9,7 @@ import {
     graphDeleteExecutionContext,
     graphInitExecutionContext,
     inferenceAddFrame
-} from '@/api/klave-ai';
+} from '@/api/klave-ai-multimodal';
 import { StreamedResponse } from '@/components/streamed-response';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { useUserChatSettings, useUserLenseSettings, useUserVlModels } from '@/store';

@@ -21,10 +21,11 @@ export const Route = createFileRoute('/_auth')({
     beforeLoad: async () => {
         // if there are no user keys in localStorage, redirect to login page
         const userKeys = localStorage.getItem(LOC_KEY);
+
         if (!userKeys) {
             throw redirect({ to: '/login' });
         }
-        if (!secretariumHandler.isConnected()) {
+        if (!secretariumHandler.isConnected('thranduil1:5035')) {
             throw redirect({ to: '/login' });
         }
     },
