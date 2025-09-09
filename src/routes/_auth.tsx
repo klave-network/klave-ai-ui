@@ -7,7 +7,7 @@ import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { LOC_KEY } from '@/lib/constants';
+import { KLAVE_AI_MULTIMODAL_NODE, LOC_KEY } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
 
 const searchSchema = z.object({
@@ -25,7 +25,7 @@ export const Route = createFileRoute('/_auth')({
         if (!userKeys) {
             throw redirect({ to: '/login' });
         }
-        if (!secretariumHandler.isConnected('thranduil1:5035')) {
+        if (!secretariumHandler.isConnected(KLAVE_AI_MULTIMODAL_NODE)) {
             throw redirect({ to: '/login' });
         }
     },

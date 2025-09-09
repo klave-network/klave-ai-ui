@@ -24,6 +24,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     CUR_USER_KEY,
+    KLAVE_AI_MCP_CLIENT_NODE,
+    KLAVE_AI_MULTIMODAL_NODE,
+    KLAVE_AI_RAG_MCP_SERVER_NODE,
     KLAVE_CONNECTION_KEYPAIR_PWD,
     LOC_KEY
 } from '@/lib/constants';
@@ -95,9 +98,9 @@ function RouteComponent() {
                 const toastId = toast.loading('Connecting...');
 
                 // Connect to all 3 nodes
-                await secretariumHandler.connect('thranduil1:5035');
-                await secretariumHandler.connect('thranduil1:5036');
-                await secretariumHandler.connect('thranduil1:5037');
+                await secretariumHandler.connect(KLAVE_AI_MULTIMODAL_NODE);
+                await secretariumHandler.connect(KLAVE_AI_MCP_CLIENT_NODE);
+                await secretariumHandler.connect(KLAVE_AI_RAG_MCP_SERVER_NODE);
 
                 // Replace loading toast with success
                 toast.success(`Connected with ${key.name}.`, { id: toastId });
