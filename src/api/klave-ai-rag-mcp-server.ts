@@ -275,7 +275,6 @@ export async function getRagList(): Promise<Rag[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log('Rag list:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {

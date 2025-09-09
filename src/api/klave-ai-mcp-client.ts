@@ -1,8 +1,11 @@
 import type {
     Component,
+    InferenceResponseInput,
     LlmContextCreateInputArgs,
     McpCapabilities,
+    McpChunkResult,
     McpServer,
+    McpSession,
     McpSessionInitArgs,
     Model
 } from '@/lib/types';
@@ -146,7 +149,6 @@ export async function getMcpServerCapabilities(args: { server_id: string }): Pro
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result) => {
-                        console.log('caps', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -182,7 +184,7 @@ export async function getMcpTools(): Promise<any> {
         );
 }
 
-export async function callMcpTool(args: { function_name: string; arguments: any }): Promise<any> {
+export async function callMcpTool(args: { session_id: string; tool_name: string; arguments: any }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -208,7 +210,7 @@ export async function callMcpTool(args: { function_name: string; arguments: any 
 }
 
 // MCP Session Management
-export async function initMcpSession(args: McpSessionInitArgs): Promise<any> {
+export async function initMcpSession(args: McpSessionInitArgs): Promise<McpSession> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -384,27 +386,32 @@ export async function sendLlmContextPrompt(args: { context_name: string; user_pr
         );
 }
 
-export async function getLlmContextResponse(args: { context_name: string; nb_pieces: number }): Promise<any> {
-    return waitForConnection()
-        .then(() =>
-            secretariumHandler.request(
-                klaveAiMcpClientFqdn,
-                'llm_context_get_response',
-                args,
-                `llm_context_get_response-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMcpClientNode
-            )
-        )
-        .then(
-            tx =>
-                new Promise((resolve, reject) => {
-                    tx.onResult((result: any) => {
-                        resolve(result);
-                    });
-                    tx.onError((error) => {
-                        reject(error);
-                    });
-                    tx.send().catch(reject);
-                })
-        );
+export async function getLlmContextResponse(args: InferenceResponseInput, resolveCallback: (result: McpChunkResult) => boolean): Promise<void> {
+    await waitForConnection();
+    if (args.nb_pieces === undefined || args.nb_pieces < 1)
+        args.nb_pieces = 5; // Default to 5 pieces if not specified
+    if (args.nb_pieces > 20)
+        args.nb_pieces = 20; // Limit to a maximum of 20 pieces
+    const tx = await secretariumHandler.request(
+        klaveAiMcpClientFqdn,
+        'llm_context_get_response',
+        args,
+        `llm_context_get_response-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+        klaveAiMcpClientNode
+    );
+
+    return new Promise<void>((resolve, reject) => {
+        tx.onResult((result: McpChunkResult) => {
+            if (resolveCallback(result)) {
+                resolve();
+            }
+        });
+
+        tx.onError((error) => {
+            console.error(`llm_context_get_response error: ${error.message}`);
+            reject(error);
+        });
+
+        tx.send().catch(reject);
+    });
 }

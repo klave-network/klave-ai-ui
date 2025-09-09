@@ -45,7 +45,6 @@ export async function getModels(): Promise<Model[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        console.log('Models:', result);
                         const parsedResult = JSON.parse(result) as Model[];
                         resolve(parsedResult);
                     });
