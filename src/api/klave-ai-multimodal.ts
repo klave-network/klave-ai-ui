@@ -6,21 +6,18 @@ import type {
     FrameInput,
     InferenceResponseInput,
     Model,
-    PgsqlCreateInput,
     PromptInput,
     PromptInputRag,
     Tokenizer
 } from '@/lib/types';
 
+import { KLAVE_AI_MULTIMODAL_FQDN, KLAVE_AI_MULTIMODAL_NODE } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
-
-export const klaveAiMultimodalFqdn = import.meta.env.VITE_APP_KLAVE_FQDN_MULTI_MODAL;
-export const klaveAiMultimodalNode = 'thranduil1:5035';
 
 export function waitForConnection() {
     return new Promise<void>((resolve) => {
         const loopCondition = () => {
-            const isConnected = secretariumHandler.isConnected(klaveAiMultimodalNode);
+            const isConnected = secretariumHandler.isConnected(KLAVE_AI_MULTIMODAL_NODE);
             if (isConnected)
                 resolve();
             else setTimeout(loopCondition, 1000);
@@ -34,11 +31,11 @@ export async function getModels(): Promise<Model[]> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'graph_models',
                 '',
                 `graph_models-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -60,40 +57,11 @@ export async function graphSaveComponent(args: Component): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'graph_save_component',
                 args,
                 `graph_save_component-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
-            )
-        )
-        .then(
-            tx =>
-                new Promise((resolve, reject) => {
-                    tx.onResult((result: any) => {
-                        resolve(result);
-                    });
-                    tx.onError((error) => {
-                        reject(error);
-                    });
-                    tx.send().catch(reject);
-                })
-        );
-}
-
-export async function graphLoadByName({
-    model_name
-}: {
-    model_name: string;
-}): Promise<any> {
-    return waitForConnection()
-        .then(() =>
-            secretariumHandler.request(
-                klaveAiMultimodalFqdn,
-                'graph_load_by_name',
-                { model_name },
-                `graph_load_by_name-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -114,11 +82,11 @@ export async function getTokenizers(): Promise<Tokenizer[]> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'graph_tokenizers',
                 '',
                 `graph_tokenizers-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -140,11 +108,11 @@ export async function graphInitExecutionContext(args: ContextInput): Promise<any
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'graph_init_execution_context',
                 args,
                 `graph_init_execution_context-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -165,11 +133,11 @@ export async function graphDeleteExecutionContext(contextName: string): Promise<
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'graph_delete_execution_context',
                 contextName,
                 `graph_delete_execution_context-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -194,11 +162,11 @@ export async function inferenceGetResponse(args: InferenceResponseInput, resolve
     if (args.nb_pieces > 20)
         args.nb_pieces = 20; // Limit to a maximum of 20 pieces
     const tx = await secretariumHandler.request(
-        klaveAiMultimodalFqdn,
+        KLAVE_AI_MULTIMODAL_FQDN,
         'inference_get_pieces',
         args,
         `inference_get_pieces-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-        klaveAiMultimodalNode
+        KLAVE_AI_MULTIMODAL_NODE
     );
 
     return new Promise<void>((resolve, reject) => {
@@ -221,11 +189,11 @@ export async function inferenceAddFrame(args: FrameInput): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'inference_add_frame',
                 args,
                 `inference_add_frame-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -246,11 +214,11 @@ export async function inferenceAddPrompt(args: PromptInput): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'inference_add_prompt',
                 args,
                 `inference_add_prompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -271,11 +239,11 @@ export async function inferenceAddRagPrompt(args: PromptInputRag): Promise<AddRa
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'inference_rag_add_prompt',
                 args,
                 `inference_rag_add_prompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -293,15 +261,15 @@ export async function inferenceAddRagPrompt(args: PromptInputRag): Promise<AddRa
 }
 
 // POSTGRESQL
-export async function pgsqlCreate(args: PgsqlCreateInput): Promise<any> {
+export async function pgsqlCreate(args: { host: string; dbname: string; user: string; password: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'pgsql_create',
                 args,
                 `pgsql_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
@@ -322,11 +290,11 @@ export async function pgsqlList(): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'pgsql_list',
                 '',
                 `pgsql_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(

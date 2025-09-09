@@ -15,13 +15,13 @@ import React, { useState } from 'react';
 
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
-import { klaveAiMultimodalFqdn as klaveKlaveAIContract } from '@/api/klave-ai-multimodal';
 import { Button } from '@/components/ui/button';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger
 } from '@/components/ui/popover';
+import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
 type SecureButtonProps = {
     currentTime: number;
@@ -142,7 +142,7 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                                             Attestation
                                         </span>
                                         <a
-                                            download={`intel_quote_${klaveKlaveAIContract}_${currentTime}.bin`}
+                                            download={`intel_quote_${KLAVE_AI_MULTIMODAL_FQDN}_${currentTime}.bin`}
                                             href={URL.createObjectURL(
                                                 downloadableQuote
                                             )}

@@ -5,11 +5,12 @@ import type {
     VerifyResponse
 } from '@/lib/types';
 
-import { klaveAiMultimodalFqdn, klaveAiMultimodalNode, waitForConnection } from '@/api/klave-ai-multimodal';
+import { waitForConnection } from '@/api/klave-ai-multimodal';
+import { KLAVE_AI_MULTIMODAL_FQDN, KLAVE_AI_MULTIMODAL_NODE } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
 
 export async function isConnected(): Promise<boolean> {
-    return secretariumHandler.isConnected(klaveAiMultimodalNode);
+    return secretariumHandler.isConnected(KLAVE_AI_MULTIMODAL_NODE);
 }
 
 export async function getQuote({
@@ -20,18 +21,17 @@ export async function getQuote({
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'klave.get_quote',
                 { challenge },
                 `klave.get_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: QuoteResponse) => {
-                        // console.log('klave.get_quote', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -46,18 +46,17 @@ export async function verifyQuote(args: VerifyArgs): Promise<VerifyResponse> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'klave.verify_quote',
                 args,
                 `klave.verify_quote-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: VerifyResponse) => {
-                        // console.log('klave.verify_quote', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -72,18 +71,17 @@ export async function getBackendVersion(): Promise<BackendVersion> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiMultimodalFqdn,
+                KLAVE_AI_MULTIMODAL_FQDN,
                 'klave.version',
                 {},
                 `klave.version-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiMultimodalNode
+                KLAVE_AI_MULTIMODAL_NODE
             )
         )
         .then(
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: BackendVersion) => {
-                        // console.log('klave.version', result);
                         resolve(result);
                     });
                     tx.onError((error) => {

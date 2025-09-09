@@ -22,16 +22,6 @@ export type Capabilities = {
     };
 };
 
-export type McpSessionInitArgs = {
-    server_id: string;
-    capabilities: Capabilities;
-};
-
-export type LlmContextCreateInputArgs = {
-    context: ContextInput;
-    session_ids: string[];
-};
-
 export type McpCapabilities = {
     success: boolean;
     note: string;
@@ -227,34 +217,6 @@ export type VerifyResponse = {
 export type VerifyArgs = {
     quote: number[];
     current_time: number;
-};
-
-export type PgsqlCreateInput = {
-    host: string;
-    dbname: string;
-    user: string;
-    password: string;
-};
-
-export type RagCreateInput = {
-    database_id: string;
-    rag_name: string;
-    model_name: string;
-    chunk_length?: number;
-};
-
-export type RagDocumentInput = {
-    rag_id: string;
-    document: any; // Replace with proper document metadata type
-};
-
-export type RagDeleteDocumentInput = {
-    rag_id: string;
-    document_id: string;
-};
-
-export type RagDocumentListInput = {
-    rag_id: string;
 };
 
 export type Rag = {

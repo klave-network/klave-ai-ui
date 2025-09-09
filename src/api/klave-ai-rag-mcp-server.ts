@@ -2,23 +2,16 @@ import type {
     Component,
     Document,
     Model,
-    PgsqlCreateInput,
-    Rag,
-    RagCreateInput,
-    RagDeleteDocumentInput,
-    RagDocumentInput,
-    RagDocumentListInput
+    Rag
 } from '@/lib/types';
 
+import { KLAVE_AI_RAG_MCP_SERVER_FQDN, KLAVE_AI_RAG_MCP_SERVER_NODE } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
-
-export const klaveAiRagMcpServerFqdn = import.meta.env.VITE_APP_KLAVE_FQDN_RAG;
-export const klaveAiRagMcpServerNode = 'thranduil1:5037';
 
 export function waitForConnection() {
     return new Promise<void>((resolve) => {
         const loopCondition = () => {
-            const isConnected = secretariumHandler.isConnected(klaveAiRagMcpServerNode);
+            const isConnected = secretariumHandler.isConnected(KLAVE_AI_RAG_MCP_SERVER_NODE);
             if (isConnected)
                 resolve();
             else setTimeout(loopCondition, 1000);
@@ -32,11 +25,11 @@ export async function getModels(): Promise<Model[]> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'graph_models',
                 '',
                 `graph_models-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -58,40 +51,11 @@ export async function graphSaveComponent(args: Component): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'graph_save_component',
                 args,
                 `graph_save_component-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
-            )
-        )
-        .then(
-            tx =>
-                new Promise((resolve, reject) => {
-                    tx.onResult((result: any) => {
-                        resolve(result);
-                    });
-                    tx.onError((error) => {
-                        reject(error);
-                    });
-                    tx.send().catch(reject);
-                })
-        );
-}
-
-export async function graphLoadByName({
-    model_name
-}: {
-    model_name: string;
-}): Promise<any> {
-    return waitForConnection()
-        .then(() =>
-            secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
-                'graph_load_by_name',
-                { model_name },
-                `graph_load_by_name-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -109,15 +73,15 @@ export async function graphLoadByName({
 }
 
 // POSTGRESQL
-export async function pgsqlCreate(args: PgsqlCreateInput): Promise<any> {
+export async function pgsqlCreate(args: { host: string; dbname: string; user: string; password: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'pgsql_create',
                 args,
                 `pgsql_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -138,11 +102,11 @@ export async function pgsqlList(): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'pgsql_list',
                 '',
                 `pgsql_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -160,15 +124,15 @@ export async function pgsqlList(): Promise<any> {
 }
 
 // RAG
-export async function ragCreate(args: RagCreateInput): Promise<any> {
+export async function ragCreate(args: { database_id: string; rag_name: string; model_name: string; chunk_length?: number }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_create',
                 { ...args, chunk_length: args.chunk_length ?? 255 },
                 `rag_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -185,15 +149,15 @@ export async function ragCreate(args: RagCreateInput): Promise<any> {
         );
 }
 
-export async function ragAddDocument(args: RagDocumentInput): Promise<any> {
+export async function ragAddDocument(args: { rag_id: string; document: any }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_add_document',
                 args,
                 `rag_add_document-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -210,15 +174,15 @@ export async function ragAddDocument(args: RagDocumentInput): Promise<any> {
         );
 }
 
-export async function ragDeleteDocument(args: RagDeleteDocumentInput): Promise<any> {
+export async function ragDeleteDocument(args: { rag_id: string; document_id: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_delete_document',
                 args,
                 `rag_delete_document-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -235,15 +199,15 @@ export async function ragDeleteDocument(args: RagDeleteDocumentInput): Promise<a
         );
 }
 
-export async function ragDocumentList(args: RagDocumentListInput): Promise<Document[]> {
+export async function ragDocumentList(args: { rag_id: string }): Promise<Document[]> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_document_list',
                 args,
                 `rag_document_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(
@@ -264,11 +228,11 @@ export async function getRagList(): Promise<Rag[]> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
-                klaveAiRagMcpServerFqdn,
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_list',
                 '',
                 `rag_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                klaveAiRagMcpServerNode
+                KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )
         .then(

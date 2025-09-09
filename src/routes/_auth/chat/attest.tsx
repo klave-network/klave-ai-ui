@@ -3,8 +3,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { SquareArrowOutUpRight } from 'lucide-react';
 
 import { getBackendVersion, getQuote, verifyQuote } from '@/api/klave';
-import { klaveAiMultimodalFqdn as klaveKlaveAIContract } from '@/api/klave-ai-multimodal';
 import { Label } from '@/components/ui/label';
+import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/chat/attest')({
     component: RouteComponent,
@@ -115,7 +115,7 @@ function RouteComponent() {
             <div className="space-y-2">
                 <Label>Quote Information</Label>
                 <a
-                    download={`intel_quote_${klaveKlaveAIContract}_${currentTime}.bin`}
+                    download={`intel_quote_${KLAVE_AI_MULTIMODAL_FQDN}_${currentTime}.bin`}
                     href={URL.createObjectURL(downloadableQuote)}
                     className="text-blue-400 hover:underline flex align-middle items-center"
                 >
