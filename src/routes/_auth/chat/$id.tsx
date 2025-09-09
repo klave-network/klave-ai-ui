@@ -9,13 +9,14 @@ import {
     isConnected as isKlaveConnected,
     verifyQuote
 } from '@/api/klave';
-import { inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai';
+import { callMcpTool, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client'; // Add these imports
+import { inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai-multimodal';
 import { ChatInput } from '@/components/chat-input';
 import { LoadingDots } from '@/components/loading-dots';
 import { StreamedResponse } from '@/components/streamed-response';
 import { CUR_USER_KEY } from '@/lib/constants';
 import { generateSimpleId } from '@/lib/utils';
-import { store, storeActions, useUserChat } from '@/store';
+import { store, storeActions, useUserChat, useUserChatSettings } from '@/store';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
     component: RouteComponent,
@@ -97,11 +98,15 @@ function RouteComponent() {
         = Route.useLoaderData();
     const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
     const chat = useUserChat(currentUser ?? '', chatId);
+    const chatSettings = useUserChatSettings(currentUser);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Track AI message currently streaming
     const [streamingMessageId, setStreamingMessageId]
         = useState<string>(firstResponseId);
+
+    // Track tool call processing
+    const [processingToolCall, setProcessingToolCall] = useState(false);
 
     const handleSend = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -192,6 +197,54 @@ function RouteComponent() {
         }
     };
 
+    // Handle MCP tool calls
+    const handleToolCallRequired = useCallback(async (toolCall: any) => {
+        if (!chatSettings.sessionId || processingToolCall)
+            return;
+
+        setProcessingToolCall(true);
+
+        try {
+            console.log('Processing tool call:', toolCall);
+
+            // Call the MCP tool
+            const toolResult = await callMcpTool({
+                session_id: chatSettings.sessionId,
+                tool_name: toolCall.function_name,
+                arguments: toolCall.arguments
+            });
+
+            console.log('Tool call result:', toolResult);
+
+            // Send the tool result back to the LLM context
+            const promptResult = await sendLlmContextPrompt({
+                context_name: `stories_context_${chatId}`,
+                user_prompt: `Tool result: ${JSON.stringify(toolResult)}`
+            });
+
+            console.log('LLM prompt sent with tool result:', promptResult);
+
+            // Create a new AI message for the tool response and start streaming again
+            const aiMessageId = generateSimpleId();
+
+            storeActions.addMessage(currentUser, chatId, {
+                id: aiMessageId,
+                content: '',
+                role: 'ai',
+                timestamp: Date.now()
+            });
+
+            setStreamingMessageId(aiMessageId);
+        }
+        catch (error) {
+            console.error('Error processing tool call:', error);
+            setError('Failed to process tool call');
+        }
+        finally {
+            setProcessingToolCall(false);
+        }
+    }, [chatId, currentUser, chatSettings.sessionId, processingToolCall]);
+
     // Scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -226,6 +279,7 @@ function RouteComponent() {
                                                         id,
                                                         fullResponse
                                                     )}
+                                                onToolCallRequired={handleToolCallRequired}
                                             />
                                         )
                                     : (
@@ -257,6 +311,17 @@ function RouteComponent() {
                         </Fragment>
                     );
                 })}
+
+                {/* Show tool processing indicator */}
+                {processingToolCall && (
+                    <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
+                        <div className="flex flex-col">
+                            <span className="animate-pulse text-blue-600">Processing tool call...</span>
+                            <LoadingDots />
+                        </div>
+                    </div>
+                )}
+
                 <div ref={messagesEndRef} />
             </div>
 
@@ -266,7 +331,7 @@ function RouteComponent() {
                 setUserPrompt={setUserPrompt}
                 error={error}
                 onSend={handleSend}
-                isDisabled={streamingMessageId !== ''}
+                isDisabled={streamingMessageId !== '' || processingToolCall}
                 secureButton={{ currentTime, challenge, quote, verification }}
             />
         </div>

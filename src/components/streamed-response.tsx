@@ -1,25 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { inferenceGetResponse } from '@/api/klave-ai';
+import { getLlmContextResponse } from '@/api/klave-ai-mcp-client';
+import { inferenceGetResponse } from '@/api/klave-ai-multimodal';
 import { LoadingDots } from '@/components/loading-dots';
+import { CUR_USER_KEY } from '@/lib/constants';
+import { useUserChatSettings } from '@/store';
 
 type StreamedResponseProps = {
     context_name: string;
     onComplete: (fullResponse: string) => void;
+    onToolCallRequired?: (toolCall: any) => void; // New callback for tool calls
 };
 
 export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     context_name,
-    onComplete
+    onComplete,
+    onToolCallRequired
 }) => {
     const [response, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const isMountedRef = useRef(true);
     const fullResponseRef = useRef(''); // accumulate full response here
+    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const chatSettings = useUserChatSettings(currentUser);
 
     useEffect(() => {
-        // console.log('is this streaming again');
         isMountedRef.current = true;
 
         setResponse('');
@@ -27,30 +33,66 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
         setLoading(true);
         setError(null);
 
-        inferenceGetResponse({ context_name }, (result) => {
-            if (!isMountedRef.current)
-                return true; // stop if unmounted
+        if (chatSettings.currentMcpServer) {
+            getLlmContextResponse({ context_name }, (result) => {
+                if (!isMountedRef.current)
+                    return true; // stop if unmounted
 
-            if (typeof result === 'string') {
-                setError(result);
-                setLoading(false);
-                isMountedRef.current = false;
-                return true; // stop streaming on error
-            }
+                if (typeof result === 'string') {
+                    setError(result);
+                    setLoading(false);
+                    isMountedRef.current = false;
+                    return true; // stop streaming on error
+                }
 
-            const chunkText = String.fromCharCode(...result.piece);
-            fullResponseRef.current += chunkText;
-            setResponse(fullResponseRef.current);
+                const chunkText = String.fromCharCode(...result.piece);
+                fullResponseRef.current += chunkText;
+                setResponse(fullResponseRef.current);
 
-            if (result.complete === true) {
-                setLoading(false);
-                onComplete(fullResponseRef.current);
-                isMountedRef.current = false;
-            }
+                // If tool call is detected, delegate to parent instead of handling here
+                if (result.has_tool_call && onToolCallRequired) {
+                    console.log('Tool call detected, delegating to parent:', result.tool_call);
+                    setLoading(false);
+                    onToolCallRequired(result.tool_call);
+                    isMountedRef.current = false;
+                    return true; // stop current streaming
+                }
 
-            return result.complete === true;
-        });
-    }, [context_name, onComplete]);
+                if (result.complete === true) {
+                    setLoading(false);
+                    onComplete(fullResponseRef.current);
+                    isMountedRef.current = false;
+                }
+
+                return result.complete === true;
+            });
+        }
+        else {
+            inferenceGetResponse({ context_name }, (result) => {
+                if (!isMountedRef.current)
+                    return true; // stop if unmounted
+
+                if (typeof result === 'string') {
+                    setError(result);
+                    setLoading(false);
+                    isMountedRef.current = false;
+                    return true; // stop streaming on error
+                }
+
+                const chunkText = String.fromCharCode(...result.piece);
+                fullResponseRef.current += chunkText;
+                setResponse(fullResponseRef.current);
+
+                if (result.complete === true) {
+                    setLoading(false);
+                    onComplete(fullResponseRef.current);
+                    isMountedRef.current = false;
+                }
+
+                return result.complete === true;
+            });
+        }
+    }, [context_name, onComplete, onToolCallRequired]);
 
     // Count words in the current response
     const wordCount = response.trim().split(/\s+/).filter(Boolean).length;

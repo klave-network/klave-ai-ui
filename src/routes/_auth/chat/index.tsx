@@ -5,11 +5,12 @@ import { useCallback, useState } from 'react';
 import type { Reference } from '@/lib/types';
 
 import { getQuote, verifyQuote } from '@/api/klave';
+import { createLlmContext, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client';
 import {
     graphInitExecutionContext,
     inferenceAddPrompt,
     inferenceAddRagPrompt
-} from '@/api/klave-ai';
+} from '@/api/klave-ai-multimodal';
 import { ChatInput } from '@/components/chat-input';
 import { LoadingDots } from '@/components/loading-dots';
 import { CUR_MODE_KEY, CUR_USER_KEY } from '@/lib/constants';
@@ -81,67 +82,129 @@ function RouteComponent() {
         let references: Reference[] = [];
 
         try {
-            await graphInitExecutionContext({
-                model_name: currentModel,
-                context_name: contextName,
-                system_prompt:
-                    chatSettings?.systemPrompt
-                    ?? 'You are a helpful assistant.',
-                temperature: chatSettings?.temperature ?? 0.8,
-                topp: chatSettings?.topp ?? 0.9,
-                steps: chatSettings?.steps ?? 256,
-                sliding_window: chatSettings?.slidingWindow ?? false,
-                mode: currentMode,
-                embeddings: false,
-                multimodal: false
-            });
-
-            if (chatSettings?.ragSpace) {
-                const result = await inferenceAddRagPrompt({
-                    context_name: contextName,
-                    user_prompt: userPrompt,
-                    rag_id: chatSettings.ragSpace,
-                    n_rag_chunks: chatSettings.ragChunks ?? 2,
-                    n_max_augmentations: 2
+            if (chatSettings.currentMcpServer) {
+                // Step 1: Create LLM Context with MCP Integration
+                console.log('🔧 Creating LLM context with MCP integration...');
+                const result = await createLlmContext({
+                    context: {
+                        model_name: currentModel,
+                        context_name: contextName,
+                        mode: 'chat',
+                        system_prompt: `You are a helpful assistant with deep expertise in Secretarium’s protocols, identity systems, and secure computing concepts. You have access to a knowledge base of Secretarium documents and a set of specialized tools via the MCP server, including:
+                        - Document search and retrieval
+                        - Identity protocol analysis
+                        - Ceremony process review
+                        - Security and cryptography best practices
+                        When users ask about Secretarium, its identity protocol, ceremony processes, or trustless self-sovereign identity, use the available tools to fetch, analyze, and present the most relevant information from the RAG database. Always reference document details and explain concepts clearly for both technical and non-technical users. If a question involves security, privacy, or cryptography, use the tools to highlight best practices and important considerations. Today is ${new Date().toLocaleDateString()}.`,
+                        temperature: 0.3, // Lower temperature for more factual responses
+                        topp: 0.9,
+                        steps: 512,
+                        sliding_window: true,
+                        embeddings: false,
+                        multimodal: false
+                    },
+                    session_ids: [chatSettings.sessionId ?? '']
                 });
-
-                const seen = new Set<string>();
-                references = result.references.filter(
-                    ref => !seen.has(ref.filename) && seen.add(ref.filename)
-                );
-            }
-            else {
-                await inferenceAddPrompt({
+                console.log('LLM context created', result);
+                // Step 2: Send prompt to LLM Context
+                const promptResult = await sendLlmContextPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt
                 });
+                console.log('LLM prompt sent', promptResult);
+
+                const message = {
+                    id: generateSimpleId(),
+                    content: userPrompt,
+                    role: 'user' as const,
+                    references
+                };
+
+                // Prepare settings matching your store's ChatSettings type
+                const settings = {
+                    systemPrompt:
+                        chatSettings?.systemPrompt
+                        ?? 'You are a helpful assistant.',
+                    temperature: 0.3,
+                    topp: 0.9,
+                    steps: 512,
+                    slidingWindow: chatSettings?.slidingWindow ?? false,
+                    useRag: chatSettings?.useRag ?? false,
+                    currentLlModel: currentModel,
+                    currentVlModel: chatSettings?.currentVlModel ?? '',
+                    currentMcpServer: chatSettings?.currentMcpServer ?? '',
+                    ragSpace: chatSettings?.ragSpace ?? '',
+                    ragChunks: chatSettings?.ragChunks ?? 2,
+                    sessionId: chatSettings.sessionId
+                };
+
+                storeActions.createChat(currentUser, contextId, message, settings);
+                navigate({ to: `/chat/${contextId}`, search: true });
             }
+            else {
+                await graphInitExecutionContext({
+                    model_name: currentModel,
+                    context_name: contextName,
+                    system_prompt:
+                        chatSettings?.systemPrompt
+                        ?? 'You are a helpful assistant.',
+                    temperature: chatSettings?.temperature ?? 0.8,
+                    topp: chatSettings?.topp ?? 0.9,
+                    steps: chatSettings?.steps ?? 256,
+                    sliding_window: chatSettings?.slidingWindow ?? false,
+                    mode: currentMode,
+                    embeddings: false,
+                    multimodal: false
+                });
 
-            const message = {
-                id: generateSimpleId(),
-                content: userPrompt,
-                role: 'user' as const,
-                references
-            };
+                if (chatSettings?.ragSpace) {
+                    const result = await inferenceAddRagPrompt({
+                        context_name: contextName,
+                        user_prompt: userPrompt,
+                        rag_id: chatSettings.ragSpace,
+                        n_rag_chunks: chatSettings.ragChunks ?? 2,
+                        n_max_augmentations: 2
+                    });
 
-            // Prepare settings matching your store's ChatSettings type
-            const settings = {
-                systemPrompt:
-                    chatSettings?.systemPrompt
-                    ?? 'You are a helpful assistant.',
-                temperature: chatSettings?.temperature ?? 0.8,
-                topp: chatSettings?.topp ?? 0.9,
-                steps: chatSettings?.steps ?? 256,
-                slidingWindow: chatSettings?.slidingWindow ?? false,
-                useRag: chatSettings?.useRag ?? false,
-                currentLlModel: currentModel,
-                currentVlModel: chatSettings?.currentVlModel ?? '',
-                ragSpace: chatSettings?.ragSpace ?? '',
-                ragChunks: chatSettings?.ragChunks ?? 2
-            };
+                    const seen = new Set<string>();
+                    references = result.references.filter(
+                        ref => !seen.has(ref.filename) && seen.add(ref.filename)
+                    );
+                }
+                else {
+                    await inferenceAddPrompt({
+                        context_name: contextName,
+                        user_prompt: userPrompt
+                    });
+                }
 
-            storeActions.createChat(currentUser, contextId, message, settings);
-            navigate({ to: `/chat/${contextId}`, search: true });
+                const message = {
+                    id: generateSimpleId(),
+                    content: userPrompt,
+                    role: 'user' as const,
+                    references
+                };
+
+                // Prepare settings matching your store's ChatSettings type
+                const settings = {
+                    systemPrompt:
+                        chatSettings?.systemPrompt
+                        ?? 'You are a helpful assistant.',
+                    temperature: chatSettings?.temperature ?? 0.8,
+                    topp: chatSettings?.topp ?? 0.9,
+                    steps: chatSettings?.steps ?? 256,
+                    slidingWindow: chatSettings?.slidingWindow ?? false,
+                    useRag: chatSettings?.useRag ?? false,
+                    currentLlModel: currentModel,
+                    currentVlModel: chatSettings?.currentVlModel ?? '',
+                    currentMcpServer: chatSettings?.currentMcpServer ?? '',
+                    ragSpace: chatSettings?.ragSpace ?? '',
+                    ragChunks: chatSettings?.ragChunks ?? 2
+                };
+
+                storeActions.createChat(currentUser, contextId, message, settings);
+                navigate({ to: `/chat/${contextId}`, search: true });
+            }
         }
         catch (err) {
             console.error('Error: ', err);
