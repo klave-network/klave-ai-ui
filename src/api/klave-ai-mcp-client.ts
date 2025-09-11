@@ -40,7 +40,6 @@ export async function getModels(): Promise<Model[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        console.log('graph_models 2:', result);
                         const parsedResult = JSON.parse(result) as Model[];
                         resolve(parsedResult);
                     });
@@ -93,7 +92,6 @@ export async function getMcpServers(): Promise<McpServer[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: { servers: McpServer[] }) => {
-                        console.log('mcp_server_list:', result);
                         resolve(result.servers);
                     });
                     tx.onError((error) => {
@@ -119,7 +117,6 @@ export async function getMcpServerCapabilities(args: { server_id: string }): Pro
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result) => {
-                        console.log('mcp_capabilities_list:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -196,7 +193,6 @@ export async function initMcpSession(args: { server_id: string; capabilities: Ca
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log('mcp_session_initialize:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {

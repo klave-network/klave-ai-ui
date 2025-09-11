@@ -41,7 +41,6 @@ export async function getModels(): Promise<Model[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
-                        console.log('graph_models 1:', result);
                         const parsedResult = JSON.parse(result) as Model[];
                         resolve(parsedResult);
                     });
