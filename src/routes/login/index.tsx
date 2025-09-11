@@ -6,7 +6,6 @@ import {
     useRouter
 } from '@tanstack/react-router';
 import { KeyRound } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { KeyPair } from '@/lib/types';
@@ -21,12 +20,12 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
+import { useKeyPairs } from '@/hooks/use-klave-ai-store';
 import {
-    CUR_USER_KEY,
-    KLAVE_CONNECTION_KEYPAIR_PWD,
-    LOC_KEY
+    KLAVE_CONNECTION_KEYPAIR_PWD
 } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
+import { storeActions } from '@/store';
 
 export const Route = createFileRoute('/login/')({
     component: RouteComponent
@@ -35,35 +34,11 @@ export const Route = createFileRoute('/login/')({
 function RouteComponent() {
     const router = useRouter();
     const navigate = useNavigate();
-    const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
-
-    // Load key pairs from localStorage on component mount
-    useEffect(() => {
-        const storedKeyPairs = localStorage.getItem(LOC_KEY);
-        if (storedKeyPairs) {
-            try {
-                setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
-            }
-            catch (error) {
-                console.error('Failed to parse stored key pairs:', error);
-                // Initialize with empty array if parsing fails
-                localStorage.setItem(LOC_KEY, JSON.stringify([]));
-            }
-        }
-        else {
-            // Initialize with empty array if no key pairs are stored
-            localStorage.setItem(LOC_KEY, JSON.stringify([]));
-        }
-    }, []);
+    const keyPairs = useKeyPairs();
 
     const handleFileUpload = async (key: KeyPair | null) => {
         if (key) {
-            // Update state
-            const updatedKeyPairs = [...keyPairs, key];
-            setKeyPairs(updatedKeyPairs);
-
-            // Update localStorage directly
-            localStorage.setItem(LOC_KEY, JSON.stringify(updatedKeyPairs));
+            storeActions.addKeyPair(key);
 
             await secretariumHandler.disconnect();
             const promise = secretariumHandler
@@ -88,8 +63,11 @@ function RouteComponent() {
                 error: `Failed to connect with ${key.name}.`
             });
 
-            await promise; // Wait for the connection to complete
-            localStorage.setItem(CUR_USER_KEY, key.name);
+            await promise;
+
+            // Set current user in store
+            storeActions.setCurrentUser(key.name);
+
             router.invalidate();
             navigate({ to: '/', search: true });
         }

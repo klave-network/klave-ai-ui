@@ -2,16 +2,14 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { File, Upload } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserRagDataSets } from '@/store';
+import { useRagDataSets } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/spaces')({
     component: RouteComponent
 });
 
 function RouteComponent() {
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const rags = useUserRagDataSets(currentUser);
+    const rags = useRagDataSets();
 
     return (
         <div className="flex flex-col h-full">

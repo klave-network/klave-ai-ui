@@ -5,8 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserLlModel } from '@/store';
+import { useLlModel } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/documents/$set')({
     component: RouteComponent
@@ -14,8 +13,7 @@ export const Route = createFileRoute('/_auth/documents/$set')({
 
 function RouteComponent() {
     const { set } = Route.useParams();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const model = useUserLlModel(currentUser, set);
+    const model = useLlModel(set);
 
     // Handle copy to clipboard
     const copyToClipboard = (text: string, field: string) => {
@@ -50,14 +48,14 @@ function RouteComponent() {
             <div className="space-y-2">
                 <Label>Model description</Label>
                 <div className="flex items-center gap-2">
-                    <Input disabled value={model.description.brief} />
+                    <Input disabled value={model.metadata.description.brief} />
                     <Button
                         variant="ghost"
                         size="icon"
                         className="size-6 hover:cursor-pointer"
                         onClick={() =>
                             copyToClipboard(
-                                model.description.brief,
+                                model.metadata.description.brief,
                                 'Model Description'
                             )}
                     >
@@ -69,31 +67,15 @@ function RouteComponent() {
             <div className="space-y-2">
                 <Label>Model URL</Label>
                 <div className="flex items-center gap-2">
-                    <Input disabled value={model.url} />
+                    <Input disabled value={model.metadata.url} />
                     <Button
                         variant="ghost"
                         size="icon"
                         className="size-6 hover:cursor-pointer"
-                        onClick={() => copyToClipboard(model.url, 'Model URL')}
+                        onClick={() => copyToClipboard(model.metadata.url, 'Model URL')}
                     >
                         <CopyIcon className="h-3.5 w-3.5" />
                         <span className="sr-only">Copy model url</span>
-                    </Button>
-                </div>
-            </div>
-            <div className="space-y-2">
-                <Label>Model tokenizer</Label>
-                <div className="flex items-center gap-2">
-                    <Input disabled value={model.tokenizer_name} />
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-6 hover:cursor-pointer"
-                        onClick={() =>
-                            copyToClipboard(model.name, 'Model Tokenizer Name')}
-                    >
-                        <CopyIcon className="h-3.5 w-3.5" />
-                        <span className="sr-only">Copy tokenizer name</span>
                     </Button>
                 </div>
             </div>

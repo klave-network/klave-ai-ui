@@ -9,8 +9,7 @@ import { CachePolicies, useFetch } from 'use-http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserLlModel, useUserVlModel } from '@/store';
+import { useLlModel, useVlModel } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/models/$name')({
     component: RouteComponent
@@ -33,11 +32,10 @@ const sessionModelDetails: Record<string, ModelDetails | undefined> = {};
 
 function RouteComponent() {
     const { name } = Route.useParams();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
 
     // Try to find model in LL models first, then VL models
-    const llModel = useUserLlModel(currentUser, name);
-    const vlModel = useUserVlModel(currentUser, name);
+    const llModel = useLlModel(name);
+    const vlModel = useVlModel(name);
 
     // Prefer LL model if exists, otherwise VL model
     const model = llModel ?? vlModel ?? null;

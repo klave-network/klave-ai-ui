@@ -19,9 +19,8 @@ import { ragDocumentList } from '@/api/klave-ai-rag-mcp-server';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CUR_USER_KEY } from '@/lib/constants';
+import { useRagDataSet } from '@/hooks/use-klave-ai-store';
 import { truncateId } from '@/lib/utils';
-import { useUserRagDataSet } from '@/store';
 
 export const Route = createFileRoute('/_auth/spaces/$name')({
     component: RouteComponent,
@@ -39,8 +38,7 @@ export const Route = createFileRoute('/_auth/spaces/$name')({
 function RouteComponent() {
     const { name } = Route.useParams();
     const { ragDocList } = Route.useLoaderData();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const rag = useUserRagDataSet(currentUser, name);
+    const rag = useRagDataSet(name);
 
     // Handle copy to clipboard
     const copyToClipboard = (text: string, field: string) => {

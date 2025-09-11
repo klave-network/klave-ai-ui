@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { getLlmContextResponse } from '@/api/klave-ai-mcp-client';
 import { inferenceGetResponse } from '@/api/klave-ai-multimodal';
 import { LoadingDots } from '@/components/loading-dots';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserChatSettings } from '@/store';
+import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
 
 type StreamedResponseProps = {
     context_name: string;
@@ -22,8 +21,7 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     const [error, setError] = useState<string | null>(null);
     const isMountedRef = useRef(true);
     const fullResponseRef = useRef(''); // accumulate full response here
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const chatSettings = useUserChatSettings(currentUser);
+    const chatSettings = useCurrentUserChatSettings();
 
     useEffect(() => {
         isMountedRef.current = true;
@@ -102,7 +100,7 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
             {loading && wordCount < 5
                 ? (
                         <div className="flex flex-col">
-                            <span className="animate-pulse">Generating</span>
+                            <span className="animate-pulse">Generating...</span>
                             <LoadingDots />
                         </div>
                     )

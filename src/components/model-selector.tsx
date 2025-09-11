@@ -9,31 +9,27 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { CUR_USER_KEY } from '@/lib/constants';
+import { useCurrentUser, useCurrentUserChatSettings, useLlModels, useUserChat, useVlModels } from '@/hooks/use-klave-ai-store';
 import {
-    storeActions,
-    useUserChat,
-    useUserChatSettings,
-    useUserLlModels,
-    useUserVlModels
+    storeActions
 } from '@/store';
 
 export function ModelSelector() {
     const location = useLocation();
     const params = useParams({ strict: false });
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentUser = useCurrentUser() ?? '';
 
     const isVideoChat = location.pathname.includes('/lense');
     const isChatView
         = location.pathname === '/chat' || location.pathname === '/chat/lense';
 
-    const llModels = useUserLlModels(currentUser);
-    const vlModels = useUserVlModels(currentUser);
+    const llModels = useLlModels();
+    const vlModels = useVlModels();
 
     const models = isVideoChat ? vlModels : llModels;
 
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const globalChatSettings = useUserChatSettings(currentUser);
+    const globalChatSettings = useCurrentUserChatSettings();
 
     const chatExists = Boolean(currentChat);
 

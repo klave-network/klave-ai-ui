@@ -36,23 +36,8 @@ import {
 } from '@/components/ui/select';
 import { SliderTooltip } from '@/components/ui/slider-tooltip';
 import { Switch } from '@/components/ui/switch';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { storeActions, useUserChat, useUserChatSettings } from '@/store';
-
-// Default chat settings fallback
-const defaultChatSettings = {
-    systemPrompt: 'You are a helpful assistant.',
-    temperature: 0.8,
-    topp: 0.9,
-    steps: 256,
-    slidingWindow: false,
-    useRag: false,
-    currentLlModel: '',
-    currentVlModel: '',
-    currentMcpServer: '',
-    ragSpace: '',
-    ragChunks: 2
-};
+import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
+import { storeActions } from '@/store';
 
 const formSchema = z.object({
     systemPrompt: z.string().min(1, 'System prompt is required'),
@@ -72,10 +57,9 @@ type FormValues = z.infer<typeof formSchema>;
 export function ChatSettingsModal() {
     const location = useLocation();
     const params = useParams({ strict: false });
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentUser = useCurrentUser() ?? '';
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const chatSettings
-        = useUserChatSettings(currentUser) ?? defaultChatSettings;
+    const chatSettings = useCurrentUserChatSettings();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 

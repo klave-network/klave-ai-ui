@@ -7,8 +7,9 @@ import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { KLAVE_AI_MULTIMODAL_NODE, LOC_KEY } from '@/lib/constants';
+import { KLAVE_AI_MULTIMODAL_NODE } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
+import { store } from '@/store';
 
 const searchSchema = z.object({
     g: z.string().optional(),
@@ -20,9 +21,9 @@ export const Route = createFileRoute('/_auth')({
     validateSearch: zodValidator(searchSchema),
     beforeLoad: async () => {
         // if there are no user keys in localStorage, redirect to login page
-        const userKeys = localStorage.getItem(LOC_KEY);
+        const userKeys = store.state.keyPairs;
 
-        if (!userKeys) {
+        if (userKeys.length === 0) {
             throw redirect({ to: '/login' });
         }
         if (!secretariumHandler.isConnected(KLAVE_AI_MULTIMODAL_NODE)) {

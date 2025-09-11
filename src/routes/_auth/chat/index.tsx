@@ -13,9 +13,9 @@ import {
 } from '@/api/klave-ai-multimodal';
 import { ChatInput } from '@/components/chat-input';
 import { LoadingDots } from '@/components/loading-dots';
-import { CUR_MODE_KEY, CUR_USER_KEY } from '@/lib/constants';
+import { useCurrentUser, useCurrentUserChatSettings, useLlModels } from '@/hooks/use-klave-ai-store';
 import { generateSimpleId } from '@/lib/utils';
-import { storeActions, useUserChatSettings, useUserLlModels } from '@/store';
+import { storeActions } from '@/store';
 
 export const Route = createFileRoute('/_auth/chat/')({
     component: RouteComponent,
@@ -54,20 +54,15 @@ function RouteComponent() {
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentUser = useCurrentUser();
 
     // Use LL models
-    const llModels = useUserLlModels(currentUser);
-
+    const llModels = useLlModels();
     // Use chat settings from store
-    const chatSettings = useUserChatSettings(currentUser);
+    const chatSettings = useCurrentUserChatSettings();
 
     // Determine current model from chatSettings or fallback to first LL model
-    const currentModel
-        = chatSettings?.currentLlModel || llModels[0]?.name || '';
-
-    // Determine current mode (fallback to 'chat')
-    const currentMode = localStorage.getItem(CUR_MODE_KEY) ?? 'chat';
+    const currentModel = chatSettings?.currentLlModel || llModels[0]?.name || '';
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -138,7 +133,7 @@ function RouteComponent() {
                     sessionId: chatSettings.sessionId
                 };
 
-                storeActions.createChat(currentUser, contextId, message, settings);
+                storeActions.createChat(currentUser ?? '', contextId, message, settings);
                 navigate({ to: `/chat/${contextId}`, search: true });
             }
             else {
@@ -152,7 +147,7 @@ function RouteComponent() {
                     topp: chatSettings?.topp ?? 0.9,
                     steps: chatSettings?.steps ?? 256,
                     sliding_window: chatSettings?.slidingWindow ?? false,
-                    mode: currentMode,
+                    mode: 'chat',
                     embeddings: false,
                     multimodal: false
                 });
@@ -202,7 +197,7 @@ function RouteComponent() {
                     ragChunks: chatSettings?.ragChunks ?? 2
                 };
 
-                storeActions.createChat(currentUser, contextId, message, settings);
+                storeActions.createChat(currentUser ?? '', contextId, message, settings);
                 navigate({ to: `/chat/${contextId}`, search: true });
             }
         }
@@ -214,7 +209,6 @@ function RouteComponent() {
         userPrompt,
         currentModel,
         chatSettings,
-        currentMode,
         currentUser,
         navigate
     ]);

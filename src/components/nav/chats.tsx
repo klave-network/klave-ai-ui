@@ -18,16 +18,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem
 } from '@/components/ui/sidebar';
+import { useCurrentUser, useCurrentUserChats } from '@/hooks/use-klave-ai-store';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { storeActions, useUserChatHistory } from '@/store';
+import { storeActions } from '@/store';
 
 export function NavChats({
     ...props
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
     const { isMobile } = useSidebar();
-    const currentUser = localStorage.getItem(CUR_USER_KEY);
-    const chatHistory = useUserChatHistory(currentUser ?? '') ?? [];
+    const currentUser = useCurrentUser();
+    const chatHistory = useCurrentUserChats();
 
     const [showAll, setShowAll] = React.useState(false);
 

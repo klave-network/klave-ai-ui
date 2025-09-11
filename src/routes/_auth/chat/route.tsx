@@ -5,8 +5,7 @@ import { LenseSettingsModal } from '@/components/lense-settings-modal';
 import { McpSelector } from '@/components/mcp-selector';
 import { ModelSelector } from '@/components/model-selector';
 import { SpaceSelector } from '@/components/space-selector';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserChatSettings } from '@/store';
+import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/chat')({
     component: RouteComponent
@@ -14,8 +13,7 @@ export const Route = createFileRoute('/_auth/chat')({
 
 function RouteComponent() {
     const location = useLocation();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const chatSettings = useUserChatSettings(currentUser);
+    const chatSettings = useCurrentUserChatSettings();
 
     const currentLlModel = chatSettings.currentLlModel;
     return (

@@ -27,15 +27,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { SliderTooltip } from '@/components/ui/slider-tooltip';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { storeActions, useUserChat, useUserLenseSettings } from '@/store';
-
-// Default chat settings fallback
-const defaultLenseSettings = {
-    systemPrompt: 'You are a helpful assistant.',
-    userPrompt: 'What do you see?',
-    snapshotFrequency: 10000
-};
+import { useCurrentUser, useCurrentUserLenseSettings, useUserChat } from '@/hooks/use-klave-ai-store';
+import { storeActions } from '@/store';
 
 const formSchema = z.object({
     systemPrompt: z.string().min(1, 'System prompt is required'),
@@ -47,10 +40,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LenseSettingsModal() {
     const params = useParams({ strict: false });
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentUser = useCurrentUser() ?? '';
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const chatSettings
-        = useUserLenseSettings(currentUser) ?? defaultLenseSettings;
+    const chatSettings = useCurrentUserLenseSettings();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 

@@ -149,29 +149,6 @@ function RouteComponent() {
                     Secretarium DCAP
                 </pre>
             </div>
-
-            {/* <h3 className="mt-5 mb-3">Quote infromation</h3>
-            <a
-                download={`intel_quote_${address}_${verifyArgs.current_time}.bin`}
-                href={URL.createObjectURL(downloadableQuote)}
-                className="text-klave-light-blue hover:underline flex align-middle items-center"
-            >
-                Download Quote .bin{' '}
-                <UilDownloadAlt className="inline-block h-4" />
-            </a>
-            <h3 className="mt-5 mb-3">Applicable Intel Security Advisories</h3>
-            {verifyResult.sa_list?.split(',')?.map((sa: string) => (
-                <a
-                    key={sa}
-                    title={sa}
-                    href={`https://www.intel.com/content/www/us/en/security-center/advisory/${sa.toLocaleLowerCase()}.html`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-klave-light-blue hover:underline flex align-middle items-center"
-                >
-                    {sa} <UilExternalLinkAlt className="inline-block h-4" />
-                </a>
-            ))} */}
         </div>
     );
 }

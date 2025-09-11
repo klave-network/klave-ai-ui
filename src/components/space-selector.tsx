@@ -12,44 +12,21 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { CUR_USER_KEY } from '@/lib/constants';
-import {
-    storeActions,
-    useUserChat,
-    useUserChatSettings,
-    useUserRagDataSets
-} from '@/store';
-
-// Default chat settings fallback
-const defaultChatSettings = {
-    systemPrompt: 'You are a helpful assistant.',
-    temperature: 0.8,
-    topp: 0.9,
-    steps: 256,
-    slidingWindow: false,
-    useRag: false,
-    currentLlModel: '',
-    currentVlModel: '',
-    currentMcpServer: '',
-    ragSpace: '',
-    ragChunks: 2
-};
+import { useCurrentUser, useCurrentUserChatSettings, useRagDataSets, useUserChat } from '@/hooks/use-klave-ai-store';
+import { storeActions } from '@/store';
 
 export function SpaceSelector() {
     const location = useLocation();
     const params = useParams({ strict: false });
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const rags = useUserRagDataSets(currentUser);
-
-    const chatSettings
-        = useUserChatSettings(currentUser) ?? defaultChatSettings;
+    const currentUser = useCurrentUser() ?? '';
+    const rags = useRagDataSets();
+    const chatSettings = useCurrentUserChatSettings();
     const currentChat = useUserChat(currentUser, params?.id ?? '');
 
     const isInChatView = location.pathname === '/chat';
 
     // Get selected ragSpace from currentChat settings or fallback
-    const selectedRag
-        = currentChat?.chatSettings.ragSpace ?? chatSettings.ragSpace ?? '';
+    const selectedRag = currentChat?.chatSettings.ragSpace ?? chatSettings.ragSpace ?? '';
 
     // Handle selection change (toggle deselect on same selection)
     const handleChange = (value: string) => {

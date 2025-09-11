@@ -11,8 +11,7 @@ import {
     inferenceAddFrame
 } from '@/api/klave-ai-multimodal';
 import { StreamedResponse } from '@/components/streamed-response';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserChatSettings, useUserLenseSettings, useUserVlModels } from '@/store';
+import { useCurrentUserChatSettings, useCurrentUserLenseSettings, useVlModels } from '@/hooks/use-klave-ai-store';
 
 // Define a type for the saved responses
 type SavedResponse = {
@@ -20,13 +19,6 @@ type SavedResponse = {
     timestamp: Date;
     response: string;
     contextName: string;
-};
-
-// Default chat settings fallback
-const defaultLenseSettings = {
-    systemPrompt: 'You are a helpful assistant.',
-    userPrompt: 'What do you see?',
-    snapshotFrequency: 10000
 };
 
 export const Route = createFileRoute('/_auth/chat/lense')({
@@ -40,12 +32,10 @@ function RouteComponent() {
     const [shouldRun, setShouldRun] = useState(true);
     const [hasQueried, setHasQueried] = useState(false);
     const [savedResponses, setSavedResponses] = useState<SavedResponse[]>([]);
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const lenseSettings = useUserLenseSettings(currentUser) ?? defaultLenseSettings;
 
-    // Get VL models and chat settings for current user
-    const vlModels = useUserVlModels(currentUser);
-    const chatSettings = useUserChatSettings(currentUser);
+    const lenseSettings = useCurrentUserLenseSettings();
+    const vlModels = useVlModels();
+    const chatSettings = useCurrentUserChatSettings();
 
     // Use current VL model from chat settings or fallback to first VL model
     const currentModel = chatSettings?.currentVlModel || vlModels[0]?.name || '';
@@ -102,7 +92,7 @@ function RouteComponent() {
     }, [cameraRef, captureFrame, shouldRun, lenseSettings.snapshotFrequency]);
 
     const handleStreamComplete = (fullResponse: string) => {
-        if (!vlModels.length || !currentUser || !currentContextName.current)
+        if (!vlModels.length || !currentContextName.current)
             return;
 
         // Check if response is empty or only whitespace

@@ -9,22 +9,22 @@ import {
     isConnected as isKlaveConnected,
     verifyQuote
 } from '@/api/klave';
-import { callMcpTool, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client'; // Add these imports
+import { callMcpTool, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client';
 import { inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai-multimodal';
 import { ChatInput } from '@/components/chat-input';
 import { LoadingDots } from '@/components/loading-dots';
 import { StreamedResponse } from '@/components/streamed-response';
-import { CUR_USER_KEY } from '@/lib/constants';
+import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
 import { generateSimpleId } from '@/lib/utils';
-import { store, storeActions, useUserChat, useUserChatSettings } from '@/store';
+import { store, storeActions } from '@/store';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
     component: RouteComponent,
     loader: async ({ params }) => {
         // On mount: if AI message missing, add placeholder and start streaming
         const { id: chatId } = params;
-        const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-        const chat = store.state[currentUser]?.chats?.find(
+        const currentUser = store.state.currentUser ?? '';
+        const chat = store.state.userData[currentUser]?.chats?.find(
             chat => chat.id === chatId
         );
 
@@ -96,9 +96,9 @@ function RouteComponent() {
     const { id: chatId } = Route.useParams();
     const { firstResponseId, challenge, currentTime, quote, verification }
         = Route.useLoaderData();
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const chat = useUserChat(currentUser ?? '', chatId);
-    const chatSettings = useUserChatSettings(currentUser);
+    const currentUser = useCurrentUser() ?? '';
+    const chat = useUserChat(currentUser, chatId);
+    const chatSettings = useCurrentUserChatSettings();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Track AI message currently streaming
@@ -170,27 +170,12 @@ function RouteComponent() {
         if (!chat || !currentUser)
             return;
 
-        store.setState((prev) => {
-            const userChats = prev[currentUser]?.chats || [];
-            const updatedChats = userChats.map((c) => {
-                if (c.id !== chatId)
-                    return c;
-                const updatedMessages = c.messages.map(msg =>
-                    msg.id === messageId
-                        ? { ...msg, content: fullResponse }
-                        : msg
-                );
-                return { ...c, messages: updatedMessages };
-            });
-
-            return {
-                ...prev,
-                [currentUser]: {
-                    ...prev[currentUser],
-                    chats: updatedChats
-                }
-            };
-        });
+        storeActions.updateMessage(
+            currentUser,
+            chatId,
+            messageId,
+            { content: fullResponse }
+        );
 
         if (streamingMessageId === messageId) {
             setStreamingMessageId('');
@@ -206,7 +191,6 @@ function RouteComponent() {
 
         try {
             console.log('Processing tool call:', toolCall);
-
             // Call the MCP tool
             const toolResult = await callMcpTool({
                 session_id: chatSettings.sessionId,
@@ -231,7 +215,8 @@ function RouteComponent() {
                 id: aiMessageId,
                 content: '',
                 role: 'ai',
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                toolCalled: toolCall.function_name
             });
 
             setStreamingMessageId(aiMessageId);
@@ -257,7 +242,7 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Chat */}
             <div className="max-w-xl flex-1 overflow-auto mb-4 w-full">
-                {chat.messages.map(({ id, role, content, references }) => {
+                {chat.messages.map(({ id, role, content, references, toolCalled }) => {
                     const isStreaming
                         = streamingMessageId === id && role === 'ai';
                     return (
@@ -308,6 +293,17 @@ function RouteComponent() {
                                         </div>
                                     )
                                 : null}
+                            {(toolCalled && !isStreaming && !processingToolCall) && (
+                                <div className="text-xs flex items-center gap-2 px-4">
+                                    <h2 className="font-semibold mb-2">
+                                        Tools called:
+                                        {' '}
+                                    </h2>
+                                    <div className="text-xs mb-2 bg-blue-200 rounded-lg px-2 py-1">
+                                        {toolCalled}
+                                    </div>
+                                </div>
+                            )}
                         </Fragment>
                     );
                 })}
@@ -316,7 +312,9 @@ function RouteComponent() {
                 {processingToolCall && (
                     <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
                         <div className="flex flex-col">
-                            <span className="animate-pulse text-blue-600">Processing tool call...</span>
+                            <span className="animate-pulse text-blue-600">
+                                Calling MCP tool...
+                            </span>
                             <LoadingDots />
                         </div>
                     </div>

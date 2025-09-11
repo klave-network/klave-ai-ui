@@ -5,10 +5,8 @@ import {
     useNavigate,
     useRouter
 } from '@tanstack/react-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-
-import type { KeyPair } from '@/lib/types';
 
 import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
@@ -22,15 +20,15 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useKeyPair, useKeyPairs } from '@/hooks/use-klave-ai-store';
 import {
-    CUR_USER_KEY,
     KLAVE_AI_MCP_CLIENT_NODE,
     KLAVE_AI_MULTIMODAL_NODE,
     KLAVE_AI_RAG_MCP_SERVER_NODE,
-    KLAVE_CONNECTION_KEYPAIR_PWD,
-    LOC_KEY
+    KLAVE_CONNECTION_KEYPAIR_PWD
 } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
+import { storeActions } from '@/store';
 
 export const Route = createFileRoute('/login/$keyname')({
     component: RouteComponent
@@ -41,23 +39,9 @@ function RouteComponent() {
     const hasSubmitted = useRef(false);
     const router = useRouter();
     const navigate = useNavigate();
-    const [keyPairs, setKeyPairs] = useState<KeyPair[]>([]);
-    const [keyPairsLoaded, setKeyPairsLoaded] = useState(false);
-
-    // Load key pairs from localStorage on component mount
-    useEffect(() => {
-        const storedKeyPairs = localStorage.getItem(LOC_KEY);
-        if (storedKeyPairs) {
-            try {
-                setKeyPairs(JSON.parse(storedKeyPairs) as KeyPair[]);
-            }
-            catch (error) {
-                console.error('Failed to parse stored key pairs:', error);
-                setKeyPairs([]);
-            }
-        }
-        setKeyPairsLoaded(true);
-    }, []);
+    const keyPairs = useKeyPairs();
+    const decodedKeyname = decodeURIComponent(keyname);
+    const key = useKeyPair(decodedKeyname);
 
     const handleLogin = useCallback(
         async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -72,9 +56,6 @@ function RouteComponent() {
                 e.nativeEvent.stopPropagation();
                 e.nativeEvent.preventDefault();
             }
-
-            const decodedKeyname = decodeURIComponent(keyname);
-            const key = keyPairs.find(kp => kp.name === decodedKeyname);
 
             if (!key) {
                 toast.error('A user with this key does not exist');
@@ -94,17 +75,17 @@ function RouteComponent() {
                     true
                 );
 
-                // Show loading toast and keep its ID
                 const toastId = toast.loading('Connecting...');
 
-                // Connect to all 3 nodes
                 await secretariumHandler.connect(KLAVE_AI_MULTIMODAL_NODE);
                 await secretariumHandler.connect(KLAVE_AI_MCP_CLIENT_NODE);
                 await secretariumHandler.connect(KLAVE_AI_RAG_MCP_SERVER_NODE);
 
-                // Replace loading toast with success
                 toast.success(`Connected with ${key.name}.`, { id: toastId });
-                localStorage.setItem(CUR_USER_KEY, key.name);
+
+                // Set current user in store
+                storeActions.setCurrentUser(key.name);
+
                 router.invalidate();
                 navigate({ to: '/', search: true });
             }
@@ -115,14 +96,16 @@ function RouteComponent() {
             }
             return false;
         },
-        [keyname, keyPairs, router, navigate]
+        [key, router, navigate] // Update dependencies
     );
 
     useEffect(() => {
-        if (hasSubmitted.current || !keyPairsLoaded)
+        if (hasSubmitted.current)
             return;
-        handleLogin();
-    }, [handleLogin, keyPairsLoaded]);
+        if (keyPairs.length > 0) { // Only run when keyPairs are loaded
+            handleLogin();
+        }
+    }, [handleLogin, keyPairs.length]);
 
     const hasLoadedKeys = keyPairs.length > 0;
 

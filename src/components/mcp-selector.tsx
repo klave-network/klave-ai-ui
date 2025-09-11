@@ -11,37 +11,17 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { CUR_USER_KEY } from '@/lib/constants';
-import {
-    storeActions,
-    useUserChat,
-    useUserChatSettings,
-    useUserMcpServers
-} from '@/store';
-
-// Default chat settings fallback
-const defaultChatSettings = {
-    systemPrompt: 'You are a helpful assistant.',
-    temperature: 0.8,
-    topp: 0.9,
-    steps: 256,
-    slidingWindow: false,
-    useRag: false,
-    currentLlModel: '',
-    currentVlModel: '',
-    currentMcpServer: '',
-    ragSpace: '',
-    ragChunks: 2
-};
+import { useCurrentUser, useCurrentUserChatSettings, useMcpServers, useUserChat } from '@/hooks/use-klave-ai-store';
+import { storeActions } from '@/store';
 
 export function McpSelector() {
     const location = useLocation();
     const params = useParams({ strict: false });
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-    const chatSettings = useUserChatSettings(currentUser) ?? defaultChatSettings;
+    const currentUser = useCurrentUser() ?? '';
+    const chatSettings = useCurrentUserChatSettings();
 
     const isChatView = location.pathname === '/chat' || location.pathname === '/chat/lense';
-    const mcpServers = useUserMcpServers(currentUser);
+    const mcpServers = useMcpServers();
 
     const currentChat = useUserChat(currentUser, params?.id ?? '');
 

@@ -15,7 +15,6 @@ import {
     FileUploadList,
     FileUploadTrigger
 } from '@/components/ui/file-upload';
-import { CUR_USER_KEY } from '@/lib/constants';
 
 export const Route = createFileRoute('/_auth/spaces/new')({
     component: RouteComponent
@@ -143,14 +142,6 @@ function RouteComponent() {
         if (files.length === 0) {
             toast.error('No files to process', {
                 description: 'Please upload at least one file before processing'
-            });
-            return;
-        }
-
-        const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-        if (!currentUser) {
-            toast.error('User not found', {
-                description: 'Please ensure you are logged in'
             });
             return;
         }

@@ -7,14 +7,14 @@ import {
     SidebarGroup,
     SidebarGroupContent
 } from '@/components/ui/sidebar';
-import { CUR_USER_KEY } from '@/lib/constants';
+import { useCurrentUser } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/documents')({
     component: RouteComponent
 });
 
 function RouteComponent() {
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+    const currentUser = useCurrentUser() ?? '';
     const filerUrl = import.meta.env.VITE_APP_KLAVE_AI_FILER;
     const { loading, error } = useFetch(`${filerUrl}/sets?user=${currentUser}`, {
 

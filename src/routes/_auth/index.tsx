@@ -3,26 +3,20 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getModels as getMcpModels, getMcpServers } from '@/api/klave-ai-mcp-client';
 import { getModels as getMultimodalModels } from '@/api/klave-ai-multimodal';
 import { getRagList } from '@/api/klave-ai-rag-mcp-server';
-import { CUR_USER_KEY } from '@/lib/constants';
-import { storeActions } from '@/store';
+import { store, storeActions } from '@/store';
 
 export const Route = createFileRoute('/_auth/')({
     component: RouteComponent,
     loader: async () => {
-        const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
+        const currentUser = store.state.currentUser ?? '';
         const models = await getMultimodalModels();
         const mcpModels = await getMcpModels();
         const ragSets = await getRagList();
         const mcpServers = await getMcpServers();
-        // const caps = await getMcpServerCapabilities({ server_id: mcpServers[0].id });
-        // const session = await initMcpSession({ server_id: mcpServers[0].id, capabilities: caps.capabilities });
-        console.log('Logs: ', ragSets, mcpServers);
+
         storeActions.addModels(currentUser, [...models, ...mcpModels]);
-        storeActions.addMcpServers(currentUser, mcpServers);
-        storeActions.addRagDataSets(
-            currentUser,
-            Array.isArray(ragSets) ? ragSets : []
-        );
+        storeActions.addMcpServers(mcpServers);
+        storeActions.addRagDataSets(ragSets);
     },
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">

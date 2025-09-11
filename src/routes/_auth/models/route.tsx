@@ -1,19 +1,16 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { Puzzle } from 'lucide-react';
 
-import { CUR_USER_KEY } from '@/lib/constants';
-import { useUserLlModels, useUserVlModels } from '@/store';
+import { useLlModels, useVlModels } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/models')({
     component: RouteComponent
 });
 
 function RouteComponent() {
-    const currentUser = localStorage.getItem(CUR_USER_KEY) ?? '';
-
     // Fetch LL and VL models separately
-    const llModels = useUserLlModels(currentUser);
-    const vlModels = useUserVlModels(currentUser);
+    const llModels = useLlModels();
+    const vlModels = useVlModels();
 
     // Combine both model lists
     const models = [...llModels, ...vlModels];
