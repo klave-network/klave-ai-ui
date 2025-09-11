@@ -4,7 +4,6 @@ import type {
     Component,
     ContextInput,
     FrameInput,
-    InferenceResponseInput,
     Model,
     PromptInput,
     PromptInputRag,
@@ -42,6 +41,7 @@ export async function getModels(): Promise<Model[]> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: string) => {
+                        console.log('graph_models 1:', result);
                         const parsedResult = JSON.parse(result) as Model[];
                         resolve(parsedResult);
                     });
@@ -155,7 +155,7 @@ export async function graphDeleteExecutionContext(contextName: string): Promise<
 }
 
 // INFERENCE
-export async function inferenceGetResponse(args: InferenceResponseInput, resolveCallback: (result: ChunkResult) => boolean): Promise<void> {
+export async function inferenceGetResponse(args: { context_name: string; nb_pieces?: number }, resolveCallback: (result: ChunkResult) => boolean): Promise<void> {
     await waitForConnection();
     if (args.nb_pieces === undefined || args.nb_pieces < 1)
         args.nb_pieces = 2; // Default to 2 pieces if not specified
