@@ -1,6 +1,6 @@
-import { Store, useStore } from '@tanstack/react-store';
+import { Store } from '@tanstack/react-store';
 
-import type { McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
+import type { KeyPair, McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
 
 import { STORE_KEY } from '@/lib/constants';
 
@@ -10,6 +10,7 @@ type ChatMessage = {
     content: string;
     references?: Reference[];
     timestamp?: number;
+    toolCalled?: string;
 };
 
 type LenseSettings = {
@@ -42,17 +43,21 @@ export type ChatHistory = {
 type UserData = {
     chatSettings: ChatSettings;
     lenseSettings: LenseSettings;
-    chats?: ChatHistory[];
-    vlModels?: Model[];
-    llModels?: Model[];
-    ragDataSets?: Rag[];
-    mcpServers?: McpServer[];
-    mcpSessions?: McpSession[];
+    chats: ChatHistory[];
+    mcpSessions: McpSession[];
 };
 
-type KlaveAIState = Record<string, UserData>;
+type KlaveAIState = {
+    currentUser: string | null;
+    keyPairs: KeyPair[];
+    userData: Record<string, UserData>;
+    vlModels: Model[];
+    llModels: Model[];
+    ragDataSets: Rag[];
+    mcpServers: McpServer[];
+};
 
-const defaultChatSettings: ChatSettings = {
+export const defaultChatSettings: ChatSettings = {
     systemPrompt: 'You are a helpful assistant.',
     temperature: 0.8,
     topp: 0.9,
@@ -66,13 +71,30 @@ const defaultChatSettings: ChatSettings = {
     ragChunks: 2
 };
 
-const defaultLenseSettings = {
+export const defaultLenseSettings = {
     systemPrompt: 'You are a helpful assistant.',
     userPrompt: 'What do you see?',
     snapshotFrequency: 10000
 };
 
-const initialState: KlaveAIState = {};
+function getDefaultUserData(): UserData {
+    return {
+        chats: [],
+        mcpSessions: [],
+        chatSettings: defaultChatSettings,
+        lenseSettings: defaultLenseSettings
+    };
+}
+
+const initialState: KlaveAIState = {
+    currentUser: null,
+    keyPairs: [],
+    userData: {},
+    vlModels: [],
+    llModels: [],
+    ragDataSets: [],
+    mcpServers: []
+};
 
 export const store = new Store(initialState);
 
@@ -89,86 +111,49 @@ if (savedState) {
     }));
 }
 
-// Hooks
-export function useUserChatHistory(keyname: string) {
-    return useStore(store, state => state[keyname]?.chats ?? []);
-}
-
-export function useUserChat(keyname: string, chatId: string) {
-    return useStore(store, state =>
-        state[keyname]?.chats?.find(chat => chat.id === chatId));
-}
-
-export function useUserLlModels(keyname: string) {
-    return useStore(store, state => state[keyname]?.llModels ?? []);
-}
-
-export function useUserLlModel(keyname: string, modelName: string) {
-    return useStore(store, state =>
-        state[keyname]?.llModels?.find(model => model.name === modelName));
-}
-
-export function useUserVlModels(keyname: string) {
-    return useStore(store, state => state[keyname]?.vlModels ?? []);
-}
-
-export function useUserVlModel(keyname: string, modelName: string) {
-    return useStore(store, state =>
-        state[keyname]?.vlModels?.find(model => model.name === modelName));
-}
-
-export function useUserRagDataSets(keyname: string) {
-    return useStore(store, state => state[keyname]?.ragDataSets ?? []);
-}
-
-export function useUserRagDataSet(keyname: string, ragId: string) {
-    return useStore(store, state =>
-        state[keyname]?.ragDataSets?.find(rag => rag.rag_id === ragId));
-}
-
-export function useUserMcpServers(keyname: string) {
-    return useStore(store, state => state[keyname]?.mcpServers ?? []);
-}
-
-export function useUserMcpServer(keyname: string, serverId: string) {
-    return useStore(store, state =>
-        state[keyname]?.mcpServers?.find(server => server.id === serverId));
-}
-
-export function useUserMcpSessions(keyname: string) {
-    return useStore(store, state => state[keyname]?.mcpSessions ?? []);
-}
-
-export function useUserMcpSession(keyname: string, sessionId: string) {
-    return useStore(store, state =>
-        state[keyname]?.mcpSessions?.find(session => session.session_id === sessionId));
-}
-
-export function useUserChatSettings(keyname: string) {
-    return useStore(
-        store,
-        state => state[keyname]?.chatSettings ?? defaultChatSettings
-    );
-}
-
-export function useUserLenseSettings(keyname: string) {
-    return useStore(
-        store,
-        state => state[keyname]?.lenseSettings ?? defaultLenseSettings
-    );
-}
-
-export const useUserDocumentSets = (keyname: string) => [keyname];
-
-export function useUserDocumentSet(keyname: string, documentSet: string) {
-    return [
-        keyname,
-        documentSet
-    ];
-}
-
 // Actions
 export const storeActions = {
+    addKeyPair: (keyPair: KeyPair) => {
+        store.setState((state) => {
+            // Check if key pair already exists
+            if (state.keyPairs.some(kp => kp.name === keyPair.name)) {
+                return state; // Avoid duplicates
+            }
+
+            return {
+                ...state,
+                keyPairs: [...state.keyPairs, keyPair]
+            };
+        });
+    },
+
+    removeKeyPair: (keyname: string) => {
+        store.setState(state => ({
+            ...state,
+            keyPairs: state.keyPairs.filter(kp => kp.name !== keyname),
+            // If removing current user's key, logout
+            currentUser: state.currentUser === keyname ? null : state.currentUser
+        }));
+    },
+
+    setCurrentUser: (userKeyname: string) => {
+        store.setState(state => ({
+            ...state,
+            currentUser: userKeyname,
+            // Ensure user data exists when they become current user
+            userData: {
+                ...state.userData,
+                [userKeyname]: state.userData[userKeyname] ?? getDefaultUserData()
+            }
+        }));
+    },
+
+    logout: () => {
+        store.setState(state => ({
+            ...state,
+            currentUser: null
+        }));
+    },
     createChat: (
         userKeyname: string,
         chatId: string,
@@ -176,18 +161,9 @@ export const storeActions = {
         settings: ChatSettings
     ) => {
         store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
-            if (userData.chats?.some(chat => chat.id === chatId)) {
+            if (userData.chats.some(chat => chat.id === chatId)) {
                 return state; // Avoid duplicates
             }
 
@@ -199,9 +175,12 @@ export const storeActions = {
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    chats: [...(userData.chats ?? []), newChat]
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chats: [...userData.chats, newChat]
+                    }
                 }
             };
         });
@@ -212,24 +191,18 @@ export const storeActions = {
         settings: Partial<LenseSettings>
     ) => {
         store.setState((state) => {
-            const userData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    lenseSettings: {
-                        ...userData.lenseSettings,
-                        ...settings
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        lenseSettings: {
+                            ...userData.lenseSettings,
+                            ...settings
+                        }
                     }
                 }
             };
@@ -241,24 +214,18 @@ export const storeActions = {
         settings: Partial<ChatSettings>
     ) => {
         store.setState((state) => {
-            const userData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    chatSettings: {
-                        ...userData.chatSettings,
-                        ...settings
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chatSettings: {
+                            ...userData.chatSettings,
+                            ...settings
+                        }
                     }
                 }
             };
@@ -267,26 +234,20 @@ export const storeActions = {
 
     deleteChat: (userKeyname: string, chatId: string) => {
         store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
-            const updatedChats = userData.chats?.filter(
+            const updatedChats = userData.chats.filter(
                 chat => chat.id !== chatId
             );
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    chats: updatedChats
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chats: updatedChats
+                    }
                 }
             };
         });
@@ -299,18 +260,9 @@ export const storeActions = {
         updatedContent: Partial<Pick<ChatMessage, 'content' | 'timestamp'>>
     ) => {
         store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
-            const updatedChats = userData.chats?.map((chat) => {
+            const updatedChats = userData.chats.map((chat) => {
                 if (chat.id !== chatId)
                     return chat;
 
@@ -323,148 +275,106 @@ export const storeActions = {
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    chats: updatedChats
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chats: updatedChats
+                    }
                 }
             };
         });
     },
 
     addMessage: (userKeyname: string, chatId: string, message: ChatMessage) => {
-        const userData = store.state[userKeyname];
-        if (!userData)
-            return;
+        store.setState((state) => {
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
-        const updatedChats = userData.chats?.map(chat =>
-            chat.id === chatId
-                ? { ...chat, messages: [...chat.messages, message] }
-                : chat
-        );
+            const updatedChats = userData.chats.map(chat =>
+                chat.id === chatId
+                    ? { ...chat, messages: [...chat.messages, message] }
+                    : chat
+            );
 
-        store.setState(state => ({
-            ...state,
-            [userKeyname]: {
-                ...userData,
-                chats: updatedChats
-            }
-        }));
+            return {
+                ...state,
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chats: updatedChats
+                    }
+                }
+            };
+        });
     },
 
     // add models fetched from the backend
     // and set initial chat settings
     addModels: (userKeyname: string, models: Model[]) => {
+        const llModels = models.filter(
+            m => m.metadata.description.task === 'text-generation'
+        );
+        const vlModels = models.filter(
+            m => m.metadata.description.task === 'image-to-text'
+        );
+
+        const firstLlm = llModels[0];
+        const firstVlm = vlModels[0];
+
         store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
-
-            const llModels = models.filter(
-                m => m.metadata.description.task === 'text-generation'
-            );
-            const vlModels = models.filter(
-                m => m.metadata.description.task === 'image-to-text'
-            );
-
-            const firstLlm = llModels[0];
-            const firstVlm = vlModels[0];
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    chatSettings: {
-                        ...userData.chatSettings,
-                        systemPrompt: 'You are a helpful assistant.',
-                        temperature: 0.8,
-                        topp: 0.9,
-                        steps: 256,
-                        slidingWindow: false,
-                        useRag: false,
-                        currentLlModel: firstLlm?.name ?? '',
-                        currentVlModel: firstVlm?.name ?? '',
-                        ragSpace: '',
-                        ragChunks: 2
-                    },
-                    llModels,
-                    vlModels
+                // Update global models
+                llModels,
+                vlModels,
+                // Update user chat settings with first available models
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        chatSettings: {
+                            ...userData.chatSettings,
+                            currentLlModel: firstLlm?.name ?? '',
+                            currentVlModel: firstVlm?.name ?? ''
+                        }
+                    }
                 }
             };
         });
     },
 
     // add RAG data sets fetched from the backend
-    addRagDataSets: (userKeyname: string, ragDataSets: Rag[]) => {
-        store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
-
-            return {
-                ...state,
-                [userKeyname]: {
-                    ...userData,
-                    ragDataSets
-                }
-            };
-        });
+    addRagDataSets: (ragDataSets: Rag[]) => {
+        store.setState(state => ({
+            ...state,
+            ragDataSets
+        }));
     },
 
     // add MCP servers fetched from the backend
-    addMcpServers: (userKeyname: string, mcpServers: McpServer[]) => {
-        store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
-
-            return {
-                ...state,
-                [userKeyname]: {
-                    ...userData,
-                    mcpServers
-                }
-            };
-        });
+    addMcpServers: (mcpServers: McpServer[]) => {
+        store.setState(state => ({
+            ...state,
+            mcpServers
+        }));
     },
 
     // add MCP sessions created on the frontend
     addMcpSessions: (userKeyname: string, mcpSessions: McpSession[]) => {
         store.setState((state) => {
-            const userData: UserData = state[userKeyname] ?? {
-                chats: [],
-                llModels: [],
-                vlModels: [],
-                mcpSessions: [],
-                mcpServers: [],
-                ragDataSets: [],
-                chatSettings: defaultChatSettings,
-                lenseSettings: defaultLenseSettings
-            };
+            const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
             return {
                 ...state,
-                [userKeyname]: {
-                    ...userData,
-                    mcpSessions
+                userData: {
+                    ...state.userData,
+                    [userKeyname]: {
+                        ...userData,
+                        mcpSessions
+                    }
                 }
             };
         });
