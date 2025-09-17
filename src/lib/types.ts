@@ -261,3 +261,18 @@ export type Component = {
     access: string;
     inactivity_timeout: number;
 };
+
+export type Ocr = {
+    host: string;
+    ocr_id: string;
+};
+
+// Chunking strategy enum
+export const ChunkingStrategy = {
+    SEMANTIC: 'semantic',
+    FIXED: 'fixed',
+    SENTENCE: 'sentence',
+    PARAGRAPH: 'paragraph'
+} as const;
+
+export type ChunkingStrategyType = typeof ChunkingStrategy[keyof typeof ChunkingStrategy];

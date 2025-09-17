@@ -1,7 +1,9 @@
 import type {
+    ChunkingStrategyType,
     Component,
     Document,
     Model,
+    Ocr,
     Rag
 } from '@/lib/types';
 
@@ -149,7 +151,15 @@ export async function ragCreate(args: { database_id: string; rag_name: string; m
         );
 }
 
-export async function ragAddDocument(args: { rag_id: string; document: any }): Promise<any> {
+export async function ragAddDocument(args: {
+    rag_id: string;
+    document: any;
+    nb_tokens_per_chunk: number;
+    embd_window_size: number;
+    chunking_strategy: ChunkingStrategyType;
+    ocr_id: string;
+    perform_ocr: boolean;
+}): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -214,6 +224,7 @@ export async function ragDocumentList(args: { rag_id: string }): Promise<Documen
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
+                        console.log('ragDocumentList result:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
@@ -232,6 +243,31 @@ export async function getRagList(): Promise<Rag[]> {
                 'rag_list',
                 '',
                 `rag_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                KLAVE_AI_RAG_MCP_SERVER_NODE
+            )
+        )
+        .then(
+            tx =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+}
+
+export async function getOcrList(): Promise<Ocr[]> {
+    return waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                KLAVE_AI_RAG_MCP_SERVER_FQDN,
+                'ocr_list',
+                '',
+                `ocr_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
                 KLAVE_AI_RAG_MCP_SERVER_NODE
             )
         )

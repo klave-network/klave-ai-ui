@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { File, Upload } from 'lucide-react';
+import { File, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useRagDataSets } from '@/hooks/use-klave-ai-store';
@@ -14,12 +14,12 @@ function RouteComponent() {
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between h-28 px-4 border-b">
-                <b>Manage Spaces</b>
+                <p className="font-medium text-xl">Manage Spaces</p>
                 <Button className="mx-4 hover:cursor-pointer" asChild>
                     <Link to="/spaces/new">
-                        Upload files
+                        Create space
                         {' '}
-                        <Upload />
+                        <Plus />
                     </Link>
                 </Button>
             </div>

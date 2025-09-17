@@ -17,8 +17,8 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center h-28 px-5 border-b">
-                <b>Manage Models</b>
+            <div className="flex items-center h-28 px-4 border-b">
+                <p className="font-medium text-xl">Manage Models</p>
             </div>
             <div className="flex h-full">
                 <div className="flex flex-col w-[250px] border-r shrink-0">
