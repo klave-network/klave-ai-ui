@@ -59,6 +59,7 @@ export function ModelSelector() {
 
         storeActions.updateChatSettings(currentUser, {
             ...baseSettings,
+            ragSpace: '',
             currentMcpServer: '',
             currentLlModel: isVideoChat
                 ? (baseSettings.currentLlModel ?? '')

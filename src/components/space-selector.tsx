@@ -1,17 +1,15 @@
 import { useLocation, useParams } from '@tanstack/react-router';
-import { ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select';
 import { useCurrentUser, useCurrentUserChatSettings, useRagDataSets, useUserChat } from '@/hooks/use-klave-ai-store';
 import { storeActions } from '@/store';
 
@@ -66,41 +64,27 @@ export function SpaceSelector() {
         );
     }
 
-    const getDisplayText = () => {
-        if (!selectedRag)
-            return 'Spaces';
-        return `1 space selected`;
-    };
-
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild disabled={!isInChatView}>
-                <Button
-                    variant="outline"
-                    className="w-[180px] justify-between font-normal"
-                >
-                    {getDisplayText()}
-                    <ChevronDown className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-auto">
-                <DropdownMenuGroup>
-                    <DropdownMenuLabel>Available spaces</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup
-                        value={selectedRag}
-                        onValueChange={handleChange}
-                    >
-                        {rags.map(rag => (
-                            <DropdownMenuRadioItem
-                                key={rag.rag_id}
-                                value={rag.rag_id}
-                            >
-                                {rag.table_name}
-                            </DropdownMenuRadioItem>
-                        ))}
-                    </DropdownMenuRadioGroup>
-                </DropdownMenuGroup>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <Select value={selectedRag} onValueChange={handleChange}>
+            <SelectTrigger
+                className="w-[180px]"
+                disabled={!isInChatView}
+            >
+                <SelectValue placeholder="Select RAG space" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>Available spaces</SelectLabel>
+                    {rags.map(rag => (
+                        <SelectItem
+                            key={rag.rag_id}
+                            value={rag.rag_id}
+                        >
+                            {rag.table_name}
+                        </SelectItem>
+                    ))}
+                </SelectGroup>
+            </SelectContent>
+        </Select>
     );
 }
