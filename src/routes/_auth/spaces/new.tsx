@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Database, Upload, X } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { ChunkingStrategyType } from '@/lib/types';
@@ -55,7 +55,6 @@ const OCR_EXTENSIONS = ['.pdf', '.docx', '.pptx', '.doc', '.ppt', '.odt', '.png'
 
 // Chunking strategy options for the dropdown
 const CHUNKING_STRATEGY_OPTIONS = [
-    { value: ChunkingStrategy.SEMANTIC, label: 'Semantic', description: 'Semantic splitting' },
     { value: ChunkingStrategy.FIXED, label: 'Fixed Size', description: 'Split by fixed token count' },
     { value: ChunkingStrategy.SENTENCE, label: 'Sentence', description: 'Split by sentence boundaries' },
     { value: ChunkingStrategy.PARAGRAPH, label: 'Paragraph', description: 'Split by paragraph boundaries' }
@@ -71,7 +70,15 @@ function RouteComponent() {
     const [selectedModel, setSelectedModel] = useState<string>('');
     const [selectedChunkingStrategy, setSelectedChunkingStrategy] = useState<ChunkingStrategyType>(ChunkingStrategy.SENTENCE);
     const [spaceName, setSpaceName] = useState<string>('');
+    const [chunkSize, setChunkSize] = useState<number>(256);
     const llModels = useLlModels();
+
+    // Reset chunk size to default when switching away from fixed chunking strategy
+    useEffect(() => {
+        if (selectedChunkingStrategy !== ChunkingStrategy.FIXED) {
+            setChunkSize(256);
+        }
+    }, [selectedChunkingStrategy]);
 
     const onFileReject = useCallback((file: File, message: string) => {
         toast(message, {
@@ -176,7 +183,7 @@ function RouteComponent() {
                     controller_public_key: 'controller_public_key_example'
                 },
                 // Additional parameters for chunking and OCR
-                nb_tokens_per_chunk: 96,
+                nb_tokens_per_chunk: chunkSize,
                 embd_window_size: 128,
                 chunking_strategy: selectedChunkingStrategy,
                 ocr_id: ocr[0].ocr_id ?? '',
@@ -357,6 +364,29 @@ function RouteComponent() {
                                     <span className="text-xs text-muted-foreground">{option.description}</span>
                                 </SelectItem>
                             ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <Label>Select chunk size</Label>
+                <Select
+                    value={chunkSize.toString()}
+                    onValueChange={value => setChunkSize(Number(value))}
+                    disabled={selectedChunkingStrategy !== ChunkingStrategy.FIXED}
+                >
+                    <SelectTrigger className="w-[300px]">
+                        <SelectValue placeholder="Select chunk size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Chunk sizes (tokens)</SelectLabel>
+                            <SelectItem value="64">64</SelectItem>
+                            <SelectItem value="96">96</SelectItem>
+                            <SelectItem value="128">128</SelectItem>
+                            <SelectItem value="192">192</SelectItem>
+                            <SelectItem value="256">256</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
