@@ -218,7 +218,7 @@ function RouteComponent() {
             // Create RAG instance
             const rag_id = await ragCreate({
                 database_id,
-                rag_name: spaceName.trim() || `space_${Date.now()}`,
+                rag_name: `rag_dev_${spaceName.trim() || `rag_dev_${Date.now()}`}`,
                 model_name: selectedModel
             });
 

@@ -79,8 +79,7 @@ function RouteComponent() {
         try {
             if (chatSettings.currentMcpServer) {
                 // Step 1: Create LLM Context with MCP Integration
-                console.log('🔧 Creating LLM context with MCP integration...');
-                const result = await createLlmContext({
+                await createLlmContext({
                     context: {
                         model_name: currentModel,
                         context_name: contextName,
@@ -100,13 +99,11 @@ function RouteComponent() {
                     },
                     session_ids: [chatSettings.sessionId ?? '']
                 });
-                console.log('LLM context created', result);
                 // Step 2: Send prompt to LLM Context
-                const promptResult = await sendLlmContextPrompt({
+                await sendLlmContextPrompt({
                     context_name: contextName,
                     user_prompt: userPrompt
                 });
-                console.log('LLM prompt sent', promptResult);
 
                 const message = {
                     id: generateSimpleId(),

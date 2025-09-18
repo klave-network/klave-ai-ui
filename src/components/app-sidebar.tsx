@@ -1,4 +1,4 @@
-import { LifeBuoy, MessageCirclePlus, Settings, Video } from 'lucide-react';
+import { LifeBuoy, MessageCirclePlus, Settings } from 'lucide-react';
 import * as React from 'react';
 
 import { NavAdmin } from '@/components/nav/admin';
@@ -26,13 +26,13 @@ const routes = {
             url: '/chat',
             icon: MessageCirclePlus,
             className: 'bg-gradient-to-br from-kcy to-kbl/90 text-white'
-        },
-        {
-            title: 'Lense',
-            url: '/chat/lense',
-            icon: Video,
-            className: 'bg-gradient-to-br from-kbl to-kor/90 text-white'
         }
+        // {
+        //     title: 'Lense',
+        //     url: '/chat/lense',
+        //     icon: Video,
+        //     className: 'bg-gradient-to-br from-kbl to-kor/90 text-white'
+        // }
     ],
     navSecondary: [
         {
