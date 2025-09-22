@@ -33,3 +33,34 @@ export function truncateId(
 
     return `${id.slice(0, startChars)}...${id.slice(-endChars)}`;
 }
+
+export function formatTimestamp(timestampNanosStr: string): string {
+    try {
+        // Convert string to number
+        const timestampNanos = BigInt(timestampNanosStr);
+
+        // Convert nanoseconds to milliseconds (divide by 1,000,000)
+        const timestampMillis = Number(timestampNanos / 1000000n);
+
+        // Create Date object
+        const date = new Date(timestampMillis);
+
+        // Check if date is valid
+        if (Number.isNaN(date.getTime())) {
+            console.error('Invalid date from timestamp:', timestampNanosStr);
+            return 'Invalid date';
+        }
+
+        // Format the date (you can customize this format)
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    catch (error) {
+        console.error('Error formatting timestamp:', error);
+        return 'Invalid date format';
+    }
+}

@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_auth/')({
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">
             <div className="flex items-center gap-2">
-                <span>Loading models...</span>
+                <span>Initializing app...</span>
             </div>
         </div>
     )
@@ -31,10 +31,8 @@ function RouteComponent() {
     return (
         <div className="flex flex-col items-center h-full">
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-3xl">
-                    Welcome to
-                    {' '}
-                    <b>Klave AI</b>
+                <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">
+                    Welcome to Klave AI
                 </h2>
                 <p className="text-center max-w-xl text-gray-500">
                     Introducing Klave AI

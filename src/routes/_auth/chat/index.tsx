@@ -214,8 +214,8 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Welcome screen */}
             <div className="flex flex-col gap-6 items-center justify-center h-full">
-                <h2 className="text-2xl md:text-4xl">Welcome to Klave AI</h2>
-                <p className="text-center max-w-xl">
+                <h2 className="font-owners font-medium tracking-wide text-2xl md:text-4xl">Welcome to Klave AI</h2>
+                <p className="text-center max-w-xl text-gray-500">
                     Introducing Klave AI – an advanced AI to challenge
                     assumptions, generate ideas and help you think beyond the
                     obvious.

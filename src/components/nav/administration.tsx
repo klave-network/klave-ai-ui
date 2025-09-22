@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Blocks, Puzzle } from 'lucide-react';
 import * as React from 'react';
 
+import { MCPIcon } from '@/components/mcp-icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -44,6 +45,20 @@ export function NavAdministration({
                             >
                                 <Blocks />
                                 <span>Manage Spaces</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem key="manage-mcp-servers">
+                        <SidebarMenuButton asChild>
+                            <Link
+                                search
+                                to="/mcp-servers"
+                                activeProps={{
+                                    className: 'bg-sidebar-accent flex'
+                                }}
+                            >
+                                <MCPIcon />
+                                <span>Manage MCP Servers</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

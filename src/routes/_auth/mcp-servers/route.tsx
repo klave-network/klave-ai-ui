@@ -1,55 +1,50 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { Puzzle } from 'lucide-react';
 
-import { useLlModels, useVlModels } from '@/hooks/use-klave-ai-store';
+import { MCPIcon } from '@/components/mcp-icon';
+import { useMcpServers } from '@/hooks/use-klave-ai-store';
 
-export const Route = createFileRoute('/_auth/models')({
+export const Route = createFileRoute('/_auth/mcp-servers')({
     component: RouteComponent
 });
 
 function RouteComponent() {
-    // Fetch LL and VL models separately
-    const llModels = useLlModels();
-    const vlModels = useVlModels();
-
-    // Combine both model lists
-    const models = [...llModels, ...vlModels];
-
+    const mcpServers = useMcpServers();
+    console.log(mcpServers);
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center h-28 px-4 border-b">
-                <p className="font-owners font-medium tracking-wide text-xl">Manage Models</p>
+                <p className="font-owners font-medium tracking-wide text-xl">Manage MCP Servers</p>
             </div>
             <div className="flex h-full">
                 <div className="flex flex-col w-[250px] border-r shrink-0">
                     <div className="h-12 p-4 text-sm border-b">
-                        Available models loaded
+                        Available servers loaded
                     </div>
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto p-3">
-                        {models.length === 0 && (
+                        {mcpServers.length === 0 && (
                             <p className="text-gray-500 text-sm italic">
-                                No models available.
+                                No servers available.
                             </p>
                         )}
-                        {models.map(model => (
+                        {mcpServers.map(server => (
                             <Link
                                 search
-                                to="/models/$name"
-                                params={{ name: model.name }}
-                                key={model.name}
+                                to="/mcp-servers/$id"
+                                params={{ id: server.id }}
+                                key={server.id}
                                 activeProps={{
                                     className: 'bg-sidebar-accent'
                                 }}
                                 className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
                             >
                                 <div className="p-1 h-8 w-8 rounded-md text-white bg-kbl flex justify-center items-center">
-                                    <Puzzle className="h-4" />
+                                    <MCPIcon className="h-4" />
                                 </div>
                                 <span className="capitalize line-clamp-3">
-                                    {model.name}
+                                    {server.name}
                                     <br />
                                     <span className="text-xs text-gray-500">
-                                        {model.metadata.description.brief}
+                                        {server.description}
                                     </span>
                                 </span>
                             </Link>

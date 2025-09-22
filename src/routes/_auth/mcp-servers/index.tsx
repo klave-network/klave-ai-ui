@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_auth/models/')({
+export const Route = createFileRoute('/_auth/mcp-servers/')({
     component: RouteComponent
 });
 
@@ -12,7 +12,7 @@ function RouteComponent() {
                     Welcome to Klave AI
                 </h2>
                 <p className="text-center max-w-xl text-gray-500">
-                    Select a model
+                    Select a MCP server
                 </p>
             </div>
         </div>
