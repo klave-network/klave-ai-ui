@@ -1,7 +1,17 @@
 import type { ClassValue } from 'clsx';
 
 import { clsx } from 'clsx';
+import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
+
+// Handle copy to clipboard
+export function copyToClipboard(text: string, field: string) {
+    navigator.clipboard.writeText(text).then(() => {
+        toast('Copied to clipboard', {
+            description: `${field} has been copied to your clipboard.`
+        });
+    });
+}
 
 export function cn(...inputs: Array<ClassValue>) {
     return twMerge(clsx(inputs));

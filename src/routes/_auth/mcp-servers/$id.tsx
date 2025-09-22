@@ -1,13 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import {
-    CopyIcon
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { CopyIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMcpServer } from '@/hooks/use-klave-ai-store';
+import { copyToClipboard } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/mcp-servers/$id')({
     component: RouteComponent
@@ -16,15 +14,6 @@ export const Route = createFileRoute('/_auth/mcp-servers/$id')({
 function RouteComponent() {
     const { id } = Route.useParams();
     const mcpServer = useMcpServer(id);
-
-    // Handle copy to clipboard
-    const copyToClipboard = (text: string, field: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            toast('Copied to clipboard', {
-                description: `${field} has been copied to your clipboard.`
-            });
-        });
-    };
 
     if (!mcpServer)
         return <div className="p-4">Loading MCP server details...</div>;

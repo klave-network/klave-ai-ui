@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLlModel, useVlModel } from '@/hooks/use-klave-ai-store';
+import { copyToClipboard } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/models/$name')({
     component: RouteComponent
@@ -111,15 +112,6 @@ function RouteComponent() {
     const enhancedModelDetails = {
         ...model,
         remote: sessionModelDetails[model?.name ?? '']
-    };
-
-    // Copy to clipboard helper
-    const copyToClipboard = (text: string, field: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            toast(`Copied to clipboard`, {
-                description: `${field} has been copied to your clipboard.`
-            });
-        });
     };
 
     // Extract remote details safely

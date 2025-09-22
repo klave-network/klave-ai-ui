@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { CopyIcon } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLlModel } from '@/hooks/use-klave-ai-store';
+import { copyToClipboard } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/documents/$set')({
     component: RouteComponent
@@ -14,15 +14,6 @@ export const Route = createFileRoute('/_auth/documents/$set')({
 function RouteComponent() {
     const { set } = Route.useParams();
     const model = useLlModel(set);
-
-    // Handle copy to clipboard
-    const copyToClipboard = (text: string, field: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            toast('Copied to clipboard', {
-                description: `${field} has been copied to your clipboard.`
-            });
-        });
-    };
 
     if (!model)
         return <div className="p-4">Model not found</div>;

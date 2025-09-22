@@ -1,6 +1,8 @@
 import { Utils } from '@secretarium/connector';
 import { createFileRoute } from '@tanstack/react-router';
+import { CopyIcon } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 import type { Reference } from '@/lib/types';
 
@@ -14,8 +16,9 @@ import { inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai-multim
 import { ChatInput } from '@/components/chat-input';
 import { LoadingDots } from '@/components/loading-dots';
 import { StreamedResponse } from '@/components/streamed-response';
+import { Button } from '@/components/ui/button';
 import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
-import { generateSimpleId } from '@/lib/utils';
+import { copyToClipboard, generateSimpleId } from '@/lib/utils';
 import { store, storeActions } from '@/store';
 
 export const Route = createFileRoute('/_auth/chat/$id')({
@@ -268,11 +271,27 @@ function RouteComponent() {
                                             />
                                         )
                                     : (
-                                            <>
-                                                <div className="whitespace-pre-wrap">
-                                                    {content}
+                                            <div className="flex flex-col">
+                                                <div className="prose">
+                                                    <ReactMarkdown>
+                                                        {content}
+                                                    </ReactMarkdown>
                                                 </div>
-                                            </>
+                                                {role === 'ai' && (
+                                                    <div className="mt-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="size-6 hover:cursor-pointer"
+                                                            onClick={() =>
+                                                                copyToClipboard(content, 'Chat response')}
+                                                        >
+                                                            <CopyIcon className="h-3.5 w-3.5" />
+                                                            <span className="sr-only">Copy Chat response</span>
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
                             </div>
                             {references?.length

@@ -1,14 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
-import { getLlmContextResponse } from '@/api/klave-ai-mcp-client';
-import { inferenceGetResponse } from '@/api/klave-ai-multimodal';
 import { LoadingDots } from '@/components/loading-dots';
-import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
+import { useStreamedResponse } from '@/hooks/use-streamed-response';
 
 type StreamedResponseProps = {
     context_name: string;
     onComplete: (fullResponse: string) => void;
-    onToolCallRequired?: (toolCall: any) => void; // New callback for tool calls
+    onToolCallRequired?: (toolCall: any) => void;
 };
 
 export const StreamedResponse: React.FC<StreamedResponseProps> = ({
@@ -16,84 +15,11 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
     onComplete,
     onToolCallRequired
 }) => {
-    const [response, setResponse] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const isMountedRef = useRef(true);
-    const fullResponseRef = useRef(''); // accumulate full response here
-    const chatSettings = useCurrentUserChatSettings();
-
-    useEffect(() => {
-        isMountedRef.current = true;
-
-        setResponse('');
-        fullResponseRef.current = '';
-        setLoading(true);
-        setError(null);
-
-        if (chatSettings.currentMcpServer) {
-            getLlmContextResponse({ context_name }, (result) => {
-                if (!isMountedRef.current)
-                    return true; // stop if unmounted
-
-                if (typeof result === 'string') {
-                    setError(result);
-                    setLoading(false);
-                    isMountedRef.current = false;
-                    return true; // stop streaming on error
-                }
-
-                const chunkText = String.fromCharCode(...result.piece);
-                fullResponseRef.current += chunkText;
-                setResponse(fullResponseRef.current);
-
-                // If tool call is detected, delegate to parent instead of handling here
-                if (result.has_tool_call && onToolCallRequired) {
-                    console.log('Tool call detected, delegating to parent:', result.tool_call);
-                    setLoading(false);
-                    onToolCallRequired(result.tool_call);
-                    isMountedRef.current = false;
-                    return true; // stop current streaming
-                }
-
-                if (result.complete === true) {
-                    setLoading(false);
-                    onComplete(fullResponseRef.current);
-                    isMountedRef.current = false;
-                }
-
-                return result.complete === true;
-            });
-        }
-        else {
-            inferenceGetResponse({ context_name }, (result) => {
-                if (!isMountedRef.current)
-                    return true; // stop if unmounted
-
-                if (typeof result === 'string') {
-                    setError(result);
-                    setLoading(false);
-                    isMountedRef.current = false;
-                    return true; // stop streaming on error
-                }
-
-                const chunkText = String.fromCharCode(...result.piece);
-                fullResponseRef.current += chunkText;
-                setResponse(fullResponseRef.current);
-
-                if (result.complete === true) {
-                    setLoading(false);
-                    onComplete(fullResponseRef.current);
-                    isMountedRef.current = false;
-                }
-
-                return result.complete === true;
-            });
-        }
-    }, [context_name, onComplete, onToolCallRequired]);
-
-    // Count words in the current response
-    const wordCount = response.trim().split(/\s+/).filter(Boolean).length;
+    const { response, loading, error, wordCount } = useStreamedResponse({
+        context_name,
+        onComplete,
+        onToolCallRequired
+    });
 
     return (
         <div className="whitespace-pre-wrap">
@@ -105,11 +31,12 @@ export const StreamedResponse: React.FC<StreamedResponseProps> = ({
                         </div>
                     )
                 : (
-                        response
+                        <ReactMarkdown>{response}</ReactMarkdown>
                     )}
             {error && (
                 <span className="text-red-600">
                     Error:
+                    {' '}
                     {error}
                 </span>
             )}

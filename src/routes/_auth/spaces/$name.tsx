@@ -11,7 +11,6 @@ import {
     FileVideoIcon,
     PresentationIcon
 } from 'lucide-react';
-import { toast } from 'sonner';
 
 import type { Document } from '@/lib/types';
 
@@ -20,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRagDataSet } from '@/hooks/use-klave-ai-store';
-import { truncateId } from '@/lib/utils';
+import { copyToClipboard, truncateId } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/spaces/$name')({
     component: RouteComponent,
@@ -39,15 +38,6 @@ function RouteComponent() {
     const { name } = Route.useParams();
     const { ragDocList } = Route.useLoaderData();
     const rag = useRagDataSet(name);
-
-    // Handle copy to clipboard
-    const copyToClipboard = (text: string, field: string) => {
-        navigator.clipboard.writeText(text).then(() => {
-            toast('Copied to clipboard', {
-                description: `${field} has been copied to your clipboard.`
-            });
-        });
-    };
 
     const formatFileSize = (bytes: number) => {
         if (bytes === 0)
