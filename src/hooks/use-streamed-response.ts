@@ -69,7 +69,7 @@ export function useStreamedResponse({
         setLoading(true);
         setError(null);
 
-        const streamFn = chatSettings.currentMcpServer
+        const streamFn = chatSettings.currentLlModel.includes('Mistral-Small')
             ? getLlmContextResponse
             : inferenceGetResponse;
 

@@ -24,7 +24,7 @@ function RouteComponent() {
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                 <div className="w-full flex items-center gap-2 px-4">
                     <ModelSelector />
-                    {currentLlModel.includes('Mistral') && <McpSelector />}
+                    {currentLlModel.includes('Mistral-Small') && <McpSelector />}
                     {location.pathname === '/chat/lense' ? null : hasMatchingRagModel && <SpaceSelector />}
                     <div className="ml-auto">
                         {location.pathname === '/chat/lense' ? <LenseSettingsModal /> : <ChatSettingsModal />}

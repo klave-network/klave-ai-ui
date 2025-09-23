@@ -44,22 +44,22 @@ export type McpServer = {
     auth_type: string;
     auth_config: {
         auth_type: string;
-        token: string;
-        username: string;
-        password: string;
+        token: string | null;
+        username: string | null;
+        password: string | null;
     };
     init_config: {
         protocolVersion: string;
         capabilities: {
             roots: {
-                listChanged: boolean;
+                list_changed: boolean;
             };
-            sampling: string;
+            sampling: any;
         };
-    };
-    clientInfo: {
-        name: string;
-        version: string;
+        clientInfo: {
+            name: string;
+            version: string;
+        };
     };
     description: string;
     created_at: string;
@@ -67,6 +67,11 @@ export type McpServer = {
     is_active: boolean;
     tools: string[];
 };
+
+export type McpServerInput = Omit<
+    McpServer,
+  'id' | 'clientInfo' | 'created_at' | 'last_connected' | 'is_active' | 'tools'
+>;
 
 export type Model = {
     name: string;

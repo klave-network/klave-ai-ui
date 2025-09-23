@@ -77,7 +77,7 @@ function RouteComponent() {
         let references: Reference[] = [];
 
         try {
-            if (chatSettings.currentMcpServer) {
+            if (currentModel.includes('Mistral-Small')) {
                 // Step 1: Create LLM Context with MCP Integration
                 await createLlmContext({
                     context: {

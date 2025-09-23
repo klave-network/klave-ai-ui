@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
+import { Plus } from 'lucide-react';
 
 import { MCPIcon } from '@/components/mcp-icon';
+import { Button } from '@/components/ui/button';
 import { useMcpServers } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/mcp-servers')({
@@ -9,11 +11,20 @@ export const Route = createFileRoute('/_auth/mcp-servers')({
 
 function RouteComponent() {
     const mcpServers = useMcpServers();
-    console.log(mcpServers);
+
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center h-28 px-4 border-b">
-                <p className="font-owners font-medium tracking-wide text-xl">Manage MCP Servers</p>
+            <div className="flex items-center justify-between h-28 px-4 border-b">
+                <p className="font-owners font-medium tracking-wide text-xl">
+                    Manage MCP Servers
+                </p>
+                <Button className="mx-4 hover:cursor-pointer" asChild>
+                    <Link to="/mcp-servers/new">
+                        Add MCP Server
+                        {' '}
+                        <Plus />
+                    </Link>
+                </Button>
             </div>
             <div className="flex h-full">
                 <div className="flex flex-col w-[250px] border-r shrink-0">

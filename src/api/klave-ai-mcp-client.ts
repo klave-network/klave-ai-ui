@@ -5,6 +5,7 @@ import type {
     McpCapabilities,
     McpChunkResult,
     McpServer,
+    McpServerInput,
     McpSession,
     Model
 } from '@/lib/types';
@@ -77,6 +78,31 @@ export async function graphSaveComponent(args: Component): Promise<any> {
 }
 
 // MCP Tool Operations
+export async function createMcpServer(args: McpServerInput): Promise<any> {
+    return waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                KLAVE_AI_MCP_CLIENT_FQDN,
+                'mcp_server_create',
+                args,
+                `mcp_server_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                KLAVE_AI_MCP_CLIENT_NODE
+            )
+        )
+        .then(
+            tx =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+}
+
 export async function getMcpServers(): Promise<McpServer[]> {
     return waitForConnection()
         .then(() =>

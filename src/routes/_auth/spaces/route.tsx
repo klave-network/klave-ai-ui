@@ -14,7 +14,9 @@ function RouteComponent() {
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between h-28 px-4 border-b">
-                <p className="font-owners font-medium tracking-wide text-xl">Manage Spaces</p>
+                <p className="font-owners font-medium tracking-wide text-xl">
+                    Manage Spaces
+                </p>
                 <Button className="mx-4 hover:cursor-pointer" asChild>
                     <Link to="/spaces/new">
                         Create space

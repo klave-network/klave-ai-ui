@@ -42,6 +42,23 @@ function RouteComponent() {
                         </Button>
                     </div>
                 </div>
+
+                <div className="p-4 space-y-2">
+                    <Label>MCP Server URL</Label>
+                    <div className="flex items-center gap-2">
+                        <Input disabled value={mcpServer.url} />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 hover:cursor-pointer"
+                            onClick={() =>
+                                copyToClipboard(mcpServer.url, 'MCP Server URL')}
+                        >
+                            <CopyIcon className="h-3.5 w-3.5" />
+                            <span className="sr-only">Copy MCP Server URL</span>
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );
