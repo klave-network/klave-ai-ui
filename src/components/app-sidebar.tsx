@@ -1,9 +1,9 @@
-import { LifeBuoy, MessageCirclePlus, Settings, Video } from 'lucide-react';
+import { Bot, LifeBuoy, MessageCirclePlus, Settings, Video } from 'lucide-react';
 import * as React from 'react';
 
 import { NavAdmin } from '@/components/nav/admin';
-import { NavAdministration } from '@/components/nav/administration';
 import { NavChats } from '@/components/nav/chats';
+import { NavExplore } from '@/components/nav/explore';
 import { NavFooter } from '@/components/nav/footer';
 import { NavHeader } from '@/components/nav/header';
 import {
@@ -22,16 +22,22 @@ const routes = {
     },
     navMain: [
         {
-            title: 'Chat',
+            title: 'New chat',
             url: '/chat',
             icon: MessageCirclePlus,
-            className: 'bg-gradient-to-br from-kcy to-kbl/90 text-white'
+            className: 'bg-gradient-to-br from-kbl via-kbl to-kcy/90 text-white'
+        },
+        {
+            title: 'Agent mode',
+            url: '/chat/agent',
+            icon: Bot,
+            className: 'bg-gradient-to-br from-kcy via-kbl to-kbl/90 text-white'
         },
         {
             title: 'Lense',
             url: '/chat/lense',
             icon: Video,
-            className: 'bg-gradient-to-br from-kbl to-kor/90 text-white'
+            className: 'bg-gradient-to-br from-kbl via-kbl to-kcy/90 text-white'
         }
     ],
     navSecondary: [
@@ -57,7 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarHeader>
                 <SidebarContent>
                     <NavAdmin items={routes.navMain} />
-                    <NavAdministration />
+                    <NavExplore />
                     <NavChats />
                     {/* <NavSettings
                         items={routes.navSecondary}

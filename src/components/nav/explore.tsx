@@ -1,8 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { Blocks, Puzzle } from 'lucide-react';
+import { Blocks, Hammer, Puzzle } from 'lucide-react';
 import * as React from 'react';
 
-import { MCPIcon } from '@/components/mcp-icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -12,15 +11,15 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 
-export function NavAdministration({
+export function NavExplore({
     ...props
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
     return (
         <SidebarGroup {...props}>
-            <SidebarGroupLabel>Administration</SidebarGroupLabel>
+            <SidebarGroupLabel>Explore</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
-                    <SidebarMenuItem key="manage-models">
+                    <SidebarMenuItem key="models">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
@@ -30,11 +29,11 @@ export function NavAdministration({
                                 }}
                             >
                                 <Puzzle />
-                                <span>Manage Models</span>
+                                <span>Models</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem key="manage-spaces">
+                    <SidebarMenuItem key="spaces">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
@@ -44,21 +43,21 @@ export function NavAdministration({
                                 }}
                             >
                                 <Blocks />
-                                <span>Manage Spaces</span>
+                                <span>Spaces</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem key="manage-mcp-servers">
+                    <SidebarMenuItem key="tools">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
-                                to="/mcp-servers"
+                                to="/tools"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
                             >
-                                <MCPIcon />
-                                <span>Manage MCP Servers</span>
+                                <Hammer />
+                                <span>Tools</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

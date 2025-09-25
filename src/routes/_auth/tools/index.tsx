@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_auth/mcp-servers/')({
+export const Route = createFileRoute('/_auth/tools/')({
     component: RouteComponent
 });
 

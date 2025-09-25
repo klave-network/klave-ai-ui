@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useMcpServer } from '@/hooks/use-klave-ai-store';
 import { copyToClipboard } from '@/lib/utils';
 
-export const Route = createFileRoute('/_auth/mcp-servers/$id')({
+export const Route = createFileRoute('/_auth/tools/$id')({
     component: RouteComponent
 });
 

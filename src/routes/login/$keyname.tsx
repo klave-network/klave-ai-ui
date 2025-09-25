@@ -115,13 +115,13 @@ function RouteComponent() {
                 <CardHeader className="text-center">
                     <CardTitle className="text-xl mb-5">
                         <Logo className="mb-8" />
-                        <span className="text-gray-400">
+                        <span className="font-owners font-medium tracking-wide text-gray-400">
                             Welcome
                             {hasLoadedKeys ? ' back' : ''}
                             !
                         </span>
                         <br />
-                        <span>Logging you in</span>
+                        <span className="font-owners font-medium tracking-wide">Logging you in</span>
                     </CardTitle>
                     <CardDescription>
                         It will only take a few seconds, please wait...

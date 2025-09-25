@@ -31,16 +31,16 @@ export function NavAdmin({
                                 <Link
                                     search
                                     to={item.url}
-                                    className="h-12"
+                                    className="h-10"
                                     activeProps={{
                                         className: 'bg-sidebar-accent'
                                     }}
                                     activeOptions={{ exact: true }}
                                 >
-                                    <div className={cn('rounded-md w-8 h-8 p-1 flex justify-center items-center', item.className)}>
-                                        <item.icon className="h-5 w-5" />
+                                    <div className={cn('rounded-md size-8 p-1 flex justify-center items-center', item.className)}>
+                                        <item.icon className="size-5" />
                                     </div>
-                                    <span>{item.title}</span>
+                                    <span className="font-medium">{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

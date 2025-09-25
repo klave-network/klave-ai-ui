@@ -17,7 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { storeActions } from '@/store';
 
-export const Route = createFileRoute('/_auth/mcp-servers/new')({
+export const Route = createFileRoute('/_auth/tools/new')({
     component: RouteComponent
 });
 
@@ -72,7 +72,7 @@ function RouteComponent() {
             const mcpServers = await getMcpServers();
             storeActions.addMcpServers(mcpServers);
             toast.success('MCP server added successfully');
-            navigate({ to: `/mcp-servers/${result}`, search: true });
+            navigate({ to: `/tools/${result}`, search: true });
         }
         catch (error) {
             toast.error('Failed to add MCP server');
