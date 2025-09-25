@@ -214,12 +214,7 @@ function RouteComponent() {
         <div className="flex flex-col items-center h-full">
             {/* Welcome screen */}
             <div className="flex flex-col gap-6 items-center justify-center h-full w-full">
-                <h2 className="font-owners font-medium tracking-wide text-2xl md:text-4xl">Welcome to Klave AI</h2>
-                <p className="text-center max-w-xl text-gray-500">
-                    Introducing Klave AI – an advanced AI to challenge
-                    assumptions, generate ideas and help you think beyond the
-                    obvious.
-                </p>
+                <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">What's on your mind?</h2>
                 {/* Chat input */}
                 <ChatInput
                     userPrompt={userPrompt}
