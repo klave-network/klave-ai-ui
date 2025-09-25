@@ -40,7 +40,7 @@ export function NavAdmin({
                                     <div className={cn('rounded-md size-8 p-1 flex justify-center items-center', item.className)}>
                                         <item.icon className="size-5" />
                                     </div>
-                                    <span className="font-medium">{item.title}</span>
+                                    <span className="">{item.title}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
