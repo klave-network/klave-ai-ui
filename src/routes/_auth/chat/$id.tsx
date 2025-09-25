@@ -244,7 +244,7 @@ function RouteComponent() {
     return (
         <div className="flex flex-col items-center h-full">
             {/* Chat */}
-            <div className="max-w-xl flex-1 overflow-auto mb-4 w-full">
+            <div className="max-w-2xl flex-1 overflow-auto mb-4 w-full">
                 {chat.messages.map(({ id, role, content, references, toolCalled }) => {
                     const isStreaming
                         = streamingMessageId === id && role === 'ai';

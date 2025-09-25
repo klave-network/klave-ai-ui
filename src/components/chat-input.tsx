@@ -35,10 +35,22 @@ export function ChatInput({
     secureButton
 }: ChatInputProps) {
     const isDisconnected = !secureButton.quote || !secureButton.verification;
-    const isDisabled = isParentDisabling || isDisconnected;
+    const isParentDisabled = isParentDisabling || isDisconnected;
+
+    // Check if user has typed anything
+    const hasContent = userPrompt.trim().length > 0;
+
+    // "Send Button" is disabled if parent is disabling or if there's no content
+    const isSendDisabled = isParentDisabled || !hasContent;
+
+    const handleSend = () => {
+        if (!isSendDisabled) {
+            onSend();
+        }
+    };
 
     return (
-        <div className="max-w-xl w-full mt-auto">
+        <div className="max-w-2xl w-full">
             {error && (
                 <p
                     className="bg-red-100 border border-red-500 rounded-xl p-4 text-red-500 text-sm font-semibold mb-2"
@@ -57,75 +69,60 @@ export function ChatInput({
                         }
                         className="flex-1 focus:outline-none resize-none field-sizing-content max-h-80"
                         rows={2}
-                        disabled={isDisabled}
+                        disabled={isParentDisabled}
                         value={userPrompt}
                         onChange={e => setUserPrompt(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
-                                onSend();
+                                if (!isSendDisabled) {
+                                    handleSend();
+                                }
                             }
                         }}
                         aria-label="User prompt input"
                     />
                     <div className="flex justify-end">
-                        {/* <div>
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="hover:cursor-pointer"
-                                >
-                                    <Paperclip className="h-4 w-4" />
-                                    Add files
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="text-center">
-                                Feature coming soon!
-                            </PopoverContent>
-                        </Popover>
-                        <Button
-                            variant="ghost"
-                            className="hover:cursor-pointer"
-                        >
-                            <Mic className="h-4 w-4" />
-                            Use microphone
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="hover:cursor-pointer"
-                            asChild
-                        >
-                            <Link to="/chat/video" search>
-                                <Video className="h-4 w-4" />
-                                Use camera
-                            </Link>
-                        </Button>
-                    </div> */}
-                        <div className="flex items-center gap-2">
-                            <SecureButton
-                                currentTime={secureButton.currentTime}
-                                challenge={secureButton.challenge}
-                                quote={secureButton.quote}
-                                verification={secureButton.verification}
-                            />
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            size="icon"
-                                            className="hover:cursor-pointer"
-                                            onClick={onSend}
-                                            disabled={isDisabled}
-                                        >
-                                            <ArrowUp className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Send message</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                        <div className="flex items-center gap-2 relative">
+                            {/* "Secure Button" with transition that slides left when send button appears */}
+                            <div className={`transition-transform duration-300 ease-in-out ${
+                                hasContent ? 'translate-x-0' : 'translate-x-11'
+                            }`}
+                            >
+                                <SecureButton
+                                    currentTime={secureButton.currentTime}
+                                    challenge={secureButton.challenge}
+                                    quote={secureButton.quote}
+                                    verification={secureButton.verification}
+                                />
+                            </div>
+
+                            {/* "Send Button" with slide-in animation */}
+                            <div className={`transition-all duration-300 ease-out ${
+                                hasContent
+                                    ? 'opacity-100 translate-x-0 pointer-events-auto'
+                                    : 'opacity-0 -translate-x-8 pointer-events-none'
+                            }`}
+                            >
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                size="icon"
+                                                className="hover:cursor-pointer"
+                                                onClick={handleSend}
+                                                disabled={isSendDisabled}
+                                                tabIndex={hasContent ? 0 : -1}
+                                            >
+                                                <ArrowUp className="h-4 w-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Send message</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                         </div>
                     </div>
                 </div>
