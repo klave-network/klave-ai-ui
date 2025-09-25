@@ -1,9 +1,11 @@
 import { ArrowUp } from 'lucide-react';
-import React from 'react';
+import React, { useRef } from 'react';
 
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
+import { ModelSelector } from '@/components/model-selector';
 import { SecureButton } from '@/components/secure-button';
+import { ToolSelector } from '@/components/tool-selector';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -17,6 +19,7 @@ type ChatInputProps = {
     setUserPrompt: React.Dispatch<React.SetStateAction<string>>;
     error: string | null;
     onSend: () => void;
+    agentMode?: boolean;
     isDisabled?: boolean;
     secureButton: {
         currentTime: number;
@@ -31,9 +34,12 @@ export function ChatInput({
     setUserPrompt,
     error,
     onSend,
+    agentMode = false,
     isDisabled: isParentDisabling,
     secureButton
 }: ChatInputProps) {
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
     const isDisconnected = !secureButton.quote || !secureButton.verification;
     const isParentDisabled = isParentDisabling || isDisconnected;
 
@@ -49,6 +55,19 @@ export function ChatInput({
         }
     };
 
+    const handleContainerClick = (e: React.MouseEvent) => {
+        // Don't focus textarea if clicking on buttons or other interactive elements
+        const target = e.target as HTMLElement;
+        const isInteractiveElement = target.closest('button')
+            || target.closest('select')
+            || target.closest('[role="button"]')
+            || target.closest('[data-radix-collection-item]'); // For dropdown items
+
+        if (!isInteractiveElement && textareaRef.current && !isParentDisabled) {
+            textareaRef.current.focus();
+        }
+    };
+
     return (
         <div className="max-w-2xl w-full">
             {error && (
@@ -60,8 +79,12 @@ export function ChatInput({
                 </p>
             )}
             <div className="rounded-xl p-[1px] bg-gradient-to-r from-kor via-kbl to-kcy shadow-centered shadow-gray/50">
-                <div className="flex flex-col gap-4 rounded-[calc(0.9rem-1px)] bg-white border p-4">
+                <div
+                    className="flex flex-col gap-8 rounded-[calc(0.9rem-1px)] bg-white border p-4"
+                    onClick={handleContainerClick}
+                >
                     <textarea
+                        ref={textareaRef}
                         placeholder={
                             isDisconnected
                                 ? 'It looks like you might be disconnected :('
@@ -82,7 +105,11 @@ export function ChatInput({
                         }}
                         aria-label="User prompt input"
                     />
-                    <div className="flex justify-end">
+                    <div className="flex justify-between">
+                        <div className="flex items-center gap-2">
+                            <ModelSelector />
+                            {agentMode && <ToolSelector />}
+                        </div>
                         <div className="flex items-center gap-2 relative">
                             {/* "Secure Button" with transition that slides left when send button appears */}
                             <div className={`transition-transform duration-300 ease-in-out ${

@@ -53,6 +53,7 @@ type KlaveAIState = {
     userData: Record<string, UserData>;
     vlModels: Model[];
     llModels: Model[];
+    mcpModels: Model[];
     ragDataSets: Rag[];
     mcpServers: McpServer[];
 };
@@ -92,6 +93,7 @@ const initialState: KlaveAIState = {
     userData: {},
     vlModels: [],
     llModels: [],
+    mcpModels: [],
     ragDataSets: [],
     mcpServers: []
 };
@@ -344,6 +346,14 @@ export const storeActions = {
                 }
             };
         });
+    },
+
+    // Update global MCP models
+    addMcpModels: (mcpModels: Model[]) => {
+        store.setState(state => ({
+            ...state,
+            mcpModels
+        }));
     },
 
     // add RAG data sets fetched from the backend

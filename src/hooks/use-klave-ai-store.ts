@@ -73,6 +73,15 @@ export function useVlModel(modelName: string) {
         state.vlModels?.find(model => model.name === modelName));
 }
 
+export function useMcpModels() {
+    return useStore(store, state => state.mcpModels);
+}
+
+export function useMcpModel(modelName: string) {
+    return useStore(store, state =>
+        state.mcpModels?.find(model => model.name === modelName));
+}
+
 export function useRagDataSets() {
     return useStore(store, state => state.ragDataSets);
 }

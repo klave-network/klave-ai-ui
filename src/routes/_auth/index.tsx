@@ -14,7 +14,8 @@ export const Route = createFileRoute('/_auth/')({
         const ragSets = await getRagList();
         const mcpServers = await getMcpServers();
 
-        storeActions.addModels(currentUser, [...models, ...mcpModels]);
+        storeActions.addModels(currentUser, [...models]);
+        storeActions.addMcpModels(mcpModels);
         storeActions.addMcpServers(mcpServers);
         storeActions.addRagDataSets(ragSets);
     },
