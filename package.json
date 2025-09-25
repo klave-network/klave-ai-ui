@@ -66,8 +66,7 @@
         "usehooks-ts": "^3.1.1",
         "uuid": "^11.1.0",
         "vite-plugin-mkcert": "^1.17.8",
-        "zod": "^3.25.67",
-        "zustand": "^5.0.8"
+        "zod": "^3.25.67"
     },
     "devDependencies": {
         "@antfu/eslint-config": "^4.17.0",
