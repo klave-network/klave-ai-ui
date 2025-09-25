@@ -35,7 +35,6 @@ import {
     SelectValue
 } from '@/components/ui/select';
 import { SliderTooltip } from '@/components/ui/slider-tooltip';
-import { Switch } from '@/components/ui/switch';
 import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
 import { storeActions } from '@/store';
 
@@ -47,9 +46,7 @@ const formSchema = z.object({
         .max(2, 'Temperature must be between 0 and 2'),
     topp: z.number().min(0).max(1, 'Top-p must be between 0 and 1'),
     steps: z.number().min(256).max(1024),
-    slidingWindow: z.boolean(),
-    useRag: z.boolean(),
-    ragChunks: z.number().min(0).max(5, 'RAG chunks must be between 0 and 5')
+    useRag: z.boolean()
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -74,9 +71,7 @@ export function ChatSettingsModal() {
             temperature: 0.8,
             topp: 0.9,
             steps: 256,
-            slidingWindow: false,
-            useRag: false,
-            ragChunks: 3
+            useRag: false
         }
     });
 
@@ -93,9 +88,7 @@ export function ChatSettingsModal() {
             temperature: settings.temperature,
             topp: settings.topp,
             steps: settings.steps,
-            slidingWindow: settings.slidingWindow,
-            useRag: settings.useRag,
-            ragChunks: settings.ragChunks
+            useRag: settings.useRag
         });
     }, [isDialogOpen, currentChat, chatSettings, form]);
 
@@ -112,9 +105,9 @@ export function ChatSettingsModal() {
                 temperature: data.temperature,
                 topp: data.topp,
                 steps: data.steps,
-                slidingWindow: data.slidingWindow,
+                slidingWindow: false,
                 useRag: data.useRag,
-                ragChunks: data.ragChunks,
+                ragChunks: 2,
                 // Keep model keys unchanged to avoid overwriting
                 currentLlModel: chatSettings.currentLlModel,
                 currentVlModel: chatSettings.currentVlModel,
@@ -236,34 +229,6 @@ export function ChatSettingsModal() {
 
                         <FormField
                             control={form.control}
-                            name="ragChunks"
-                            render={({
-                                field: { value, onChange, ref, ...field }
-                            }) => (
-                                <FormItem>
-                                    <FormControl>
-                                        <SliderTooltip
-                                            id="ragChunks"
-                                            min={0}
-                                            max={5}
-                                            step={1}
-                                            defaultValue={[value]}
-                                            onValueChange={([val]) =>
-                                                isInChatView && onChange(val)}
-                                            labelFor="ragChunks"
-                                            labelTitle="RAG Chunks"
-                                            labelValue={value}
-                                            disabled={!isInChatView}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
                             name="steps"
                             render={({
                                 field: { value, onChange, ...field }
@@ -302,29 +267,6 @@ export function ChatSettingsModal() {
                             )}
                         />
 
-                        <FormField
-                            control={form.control}
-                            name="slidingWindow"
-                            render={({
-                                field: { value, onChange, ...field }
-                            }) => (
-                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                                    <div className="space-y-0.5">
-                                        <FormLabel>Sliding Window</FormLabel>
-                                    </div>
-                                    <FormControl>
-                                        <Switch
-                                            checked={value}
-                                            onCheckedChange={checked =>
-                                                isInChatView
-                                                && onChange(checked)}
-                                            disabled={!isInChatView}
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
                     </form>
                 </Form>
                 <DialogFooter className="flex space-x-2 pt-4">
