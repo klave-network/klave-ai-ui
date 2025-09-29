@@ -28,7 +28,7 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { useLlModels } from '@/hooks/use-klave-ai-store';
+import { useMcpModels, useMcpServers } from '@/hooks/use-klave-ai-store';
 import { ChunkingStrategy } from '@/lib/types';
 import { storeActions } from '@/store';
 
@@ -68,10 +68,13 @@ function RouteComponent() {
     const [files, setFiles] = useState<File[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [selectedModel, setSelectedModel] = useState<string>('');
+    const [selectedTool, setSelectedTool] = useState<string>('');
     const [selectedChunkingStrategy, setSelectedChunkingStrategy] = useState<ChunkingStrategyType>(ChunkingStrategy.SENTENCE);
     const [spaceName, setSpaceName] = useState<string>('');
     const [chunkSize, setChunkSize] = useState<number>(256);
-    const llModels = useLlModels();
+    const mcpModels = useMcpModels();
+    const mcpTools = useMcpServers();
+    const availableTools = mcpTools.filter(tool => tool.description.is_rag);
 
     // Reset chunk size to default when switching away from fixed chunking strategy
     useEffect(() => {
@@ -218,8 +221,9 @@ function RouteComponent() {
             // Create RAG instance
             const rag_id = await ragCreate({
                 database_id,
-                rag_name: `rag_dev_${spaceName.trim() || `rag_dev_${Date.now()}`}`,
-                model_name: selectedModel
+                rag_name: `rag_uat_${spaceName.trim() || `rag_uat_${Date.now()}`}`,
+                model_name: selectedModel,
+                tool_name: selectedTool
             });
 
             // Process each uploaded file
@@ -319,7 +323,7 @@ function RouteComponent() {
             <h3 className="text-xl font-medium">New space</h3>
 
             <div className="flex flex-col gap-2">
-                <Label htmlFor="space-name">Space name</Label>
+                <Label htmlFor="space-name">Space Name</Label>
                 <Input
                     id="space-name"
                     type="text"
@@ -331,7 +335,7 @@ function RouteComponent() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label>Select model</Label>
+                <Label>Language Model</Label>
                 <Select value={selectedModel} onValueChange={value => setSelectedModel(value)}>
                     <SelectTrigger className="w-[300px]">
                         <SelectValue placeholder="Select language model" />
@@ -339,7 +343,7 @@ function RouteComponent() {
                     <SelectContent>
                         <SelectGroup>
                             <SelectLabel>Available language models</SelectLabel>
-                            {llModels.map(model => (
+                            {mcpModels.map(model => (
                                 <SelectItem key={model.name} value={model.name}>
                                     {model.name}
                                 </SelectItem>
@@ -350,7 +354,26 @@ function RouteComponent() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label>Select chunking strategy</Label>
+                <Label>MCP Tool</Label>
+                <Select value={selectedTool} onValueChange={value => setSelectedTool(value)}>
+                    <SelectTrigger className="w-[300px]">
+                        <SelectValue placeholder="Select MCP tool" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Available MCP tools</SelectLabel>
+                            {availableTools.map(tool => (
+                                <SelectItem key={tool.name} value={tool.name}>
+                                    {tool.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+                <Label>Chunking Strategy</Label>
                 <Select value={selectedChunkingStrategy} onValueChange={value => setSelectedChunkingStrategy(value as ChunkingStrategyType)}>
                     <SelectTrigger className="w-[300px]">
                         <SelectValue placeholder="Select chunking strategy" />
@@ -370,7 +393,7 @@ function RouteComponent() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label>Select chunk size</Label>
+                <Label>Chunk Size</Label>
                 <Select
                     value={chunkSize.toString()}
                     onValueChange={value => setChunkSize(Number(value))}
@@ -393,7 +416,7 @@ function RouteComponent() {
             </div>
 
             <div className="flex flex-col gap-2">
-                <Label>Upload files</Label>
+                <Label>Upload Files</Label>
                 <FileUpload
                     maxFiles={10}
                     maxSize={5 * 1024 * 1024}

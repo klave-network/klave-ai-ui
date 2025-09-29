@@ -93,7 +93,7 @@ function RouteComponent() {
                         temperature: 0.3, // Lower temperature for more factual responses
                         topp: 0.9,
                         steps: 512,
-                        sliding_window: true,
+                        sliding_window: false,
                         embeddings: false,
                         multimodal: false
                     },

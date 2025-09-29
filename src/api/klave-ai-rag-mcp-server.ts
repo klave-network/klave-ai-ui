@@ -126,7 +126,7 @@ export async function pgsqlList(): Promise<any> {
 }
 
 // RAG
-export async function ragCreate(args: { database_id: string; rag_name: string; model_name: string; chunk_length?: number }): Promise<any> {
+export async function ragCreate(args: { database_id: string; rag_name: string; model_name: string; tool_name: string; chunk_length?: number }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(

@@ -12,9 +12,9 @@ import { routeTree } from './routeTree.gen';
 
 // Initialize multiple SCP connections with different gateway configurations
 secretariumHandler.initializeMultiple({
-    'thranduil1:5035': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_1,
-    'thranduil1:5036': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_2,
-    'thranduil1:5037': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_3
+    'gimli1:5035': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_1,
+    'gimli1:5036': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_2,
+    'gimli1:5037': import.meta.env.VITE_APP_SECRETARIUM_GATEWAYS_3
 });
 // Create a new router instance
 const router = createRouter({

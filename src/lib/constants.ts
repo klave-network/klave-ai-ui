@@ -1,9 +1,9 @@
 export const KLAVE_AI_MCP_CLIENT_FQDN = import.meta.env.VITE_APP_KLAVE_FQDN_MCP;
-export const KLAVE_AI_MCP_CLIENT_NODE = 'thranduil1:5036';
+export const KLAVE_AI_MCP_CLIENT_NODE = 'gimli1:5036';
 export const KLAVE_AI_MULTIMODAL_FQDN = import.meta.env.VITE_APP_KLAVE_FQDN_MULTI_MODAL;
-export const KLAVE_AI_MULTIMODAL_NODE = 'thranduil1:5035';
+export const KLAVE_AI_MULTIMODAL_NODE = 'gimli1:5035';
 export const KLAVE_AI_RAG_MCP_SERVER_FQDN = import.meta.env.VITE_APP_KLAVE_FQDN_RAG;
-export const KLAVE_AI_RAG_MCP_SERVER_NODE = 'thranduil1:5037';
+export const KLAVE_AI_RAG_MCP_SERVER_NODE = 'gimli1:5037';
 export const STORE_KEY = 'klave-ai:Store';
 export const CUR_USER_KEY = 'klave-ai:CurrentUser';
 export const CUR_MODE_KEY = 'klave-ai:CurrentMode';

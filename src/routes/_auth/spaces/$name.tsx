@@ -166,6 +166,22 @@ function RouteComponent() {
                         </Button>
                     </div>
                 </div>
+                <div className="p-4 pt-0 space-y-2">
+                    <Label>Tool Name</Label>
+                    <div className="flex items-center gap-2">
+                        <Input disabled value={rag.tool_name} />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 hover:cursor-pointer"
+                            onClick={() =>
+                                copyToClipboard(rag.tool_name, 'Tool Name')}
+                        >
+                            <CopyIcon className="h-3.5 w-3.5" />
+                            <span className="sr-only">Copy tool name</span>
+                        </Button>
+                    </div>
+                </div>
                 <div className="grid grid-cols-2 gap-2 border-t">
                     <div className="p-4 space-y-2">
                         <Label>Database ID</Label>

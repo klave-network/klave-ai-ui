@@ -53,7 +53,7 @@ function RouteComponent() {
                                     {server.name}
                                     <br />
                                     <span className="text-xs text-gray-500">
-                                        {server.description}
+                                        {server.description.brief}
                                     </span>
                                 </span>
                             </Link>

@@ -1,4 +1,5 @@
 import { useLocation, useParams } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 import {
     Select,
@@ -9,7 +10,7 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { useCurrentUser, useCurrentUserChatSettings, useLlModels, useUserChat, useVlModels } from '@/hooks/use-klave-ai-store';
+import { useCurrentUser, useCurrentUserChatSettings, useLlModels, useMcpModels, useUserChat, useVlModels } from '@/hooks/use-klave-ai-store';
 import {
     storeActions
 } from '@/store';
@@ -20,13 +21,15 @@ export function ModelSelector() {
     const currentUser = useCurrentUser() ?? '';
 
     const isVideoChat = location.pathname.includes('/lense');
+    const isAgentChat = location.pathname.includes('/agent');
     const isChatView
-        = location.pathname === '/chat' || location.pathname === '/chat/lense';
+        = location.pathname === '/chat' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
 
     const llModels = useLlModels();
     const vlModels = useVlModels();
+    const mcpModels = useMcpModels();
 
-    const models = isVideoChat ? vlModels : llModels;
+    const models = isVideoChat ? vlModels : isAgentChat ? mcpModels : llModels;
 
     const currentChat = useUserChat(currentUser, params?.id ?? '');
     const globalChatSettings = useCurrentUserChatSettings();
@@ -38,6 +41,18 @@ export function ModelSelector() {
     if (chatExists && currentChat) {
         baseSettings = currentChat.chatSettings ?? baseSettings;
     }
+
+    // *********TEST THIS*********
+    // Reset currentLlModel when switching between regular chat and agent chat modes
+    useEffect(() => {
+        // Only reset if we're in a chat view and not in an existing chat (where model should be preserved)
+        if (isChatView && !chatExists) {
+            storeActions.updateChatSettings(currentUser, {
+                ...baseSettings,
+                currentLlModel: ''
+            });
+        }
+    }, [isAgentChat, currentUser, isChatView, chatExists]);
 
     const selectedModel = isVideoChat
         ? (baseSettings.currentVlModel ?? models[0]?.name ?? '')
@@ -73,10 +88,10 @@ export function ModelSelector() {
     return (
         <Select value={selectedModel} onValueChange={handleChange}>
             <SelectTrigger
-                className="w-[180px]"
+                className="w-auto max-w-[200px]"
                 disabled={!isChatView || isDisabled}
             >
-                <SelectValue placeholder="Select language model" />
+                <SelectValue placeholder="Select model" />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>

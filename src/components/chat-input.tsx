@@ -113,7 +113,7 @@ export function ChatInput({
                         <div className="flex items-center gap-2 relative">
                             {/* "Secure Button" with transition that slides left when send button appears */}
                             <div className={`transition-transform duration-300 ease-in-out ${
-                                hasContent ? 'translate-x-0' : 'translate-x-11'
+                                (hasContent && !isParentDisabled) ? 'translate-x-0' : 'translate-x-11'
                             }`}
                             >
                                 <SecureButton
@@ -126,7 +126,7 @@ export function ChatInput({
 
                             {/* "Send Button" with slide-in animation */}
                             <div className={`transition-all duration-300 ease-out ${
-                                hasContent
+                                (hasContent && !isParentDisabled)
                                     ? 'opacity-100 translate-x-0 pointer-events-auto'
                                     : 'opacity-0 -translate-x-8 pointer-events-none'
                             }`}

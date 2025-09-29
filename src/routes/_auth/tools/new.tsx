@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { createMcpServer, getMcpServers } from '@/api/klave-ai-mcp-client';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Form,
     FormControl,
@@ -23,7 +24,8 @@ export const Route = createFileRoute('/_auth/tools/new')({
 
 const formSchema = z.object({
     name: z.string().min(1, 'Server name is required'),
-    description: z.string().min(1, 'Description is required'),
+    brief: z.string().min(1, 'Description is required'),
+    is_rag: z.boolean(),
     url: z.string().url('Invalid URL'),
     apiKey: z.string().optional()
 });
@@ -37,7 +39,8 @@ function RouteComponent() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
-            description: '',
+            brief: '',
+            is_rag: false,
             url: '',
             apiKey: ''
         }
@@ -47,7 +50,10 @@ function RouteComponent() {
         try {
             const result = await createMcpServer({
                 name: data.name,
-                description: data.description,
+                description: {
+                    brief: data.brief,
+                    is_rag: data.is_rag
+                },
                 url: data.url,
                 auth_type: data.apiKey ? 'ApiKey' : 'None',
                 auth_config: {
@@ -109,7 +115,7 @@ function RouteComponent() {
 
                     <FormField
                         control={form.control}
-                        name="description"
+                        name="brief"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Server Description</FormLabel>
@@ -153,6 +159,23 @@ function RouteComponent() {
                                         {...field}
                                     />
                                 </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="is_rag"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-center gap-2">
+                                <FormControl>
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormLabel>Uses RAG</FormLabel>
                                 <FormMessage />
                             </FormItem>
                         )}

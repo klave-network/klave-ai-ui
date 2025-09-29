@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { CopyIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useMcpServer } from '@/hooks/use-klave-ai-store';
@@ -58,6 +59,30 @@ function RouteComponent() {
                             <span className="sr-only">Copy MCP Server URL</span>
                         </Button>
                     </div>
+                </div>
+
+                <div className="p-4 space-y-2">
+                    <Label>MCP Server Description</Label>
+                    <div className="flex items-center gap-2">
+                        <Input disabled value={mcpServer.description.brief} />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-6 hover:cursor-pointer"
+                            onClick={() =>
+                                copyToClipboard(mcpServer.description.brief, 'MCP Server Description')}
+                        >
+                            <CopyIcon className="h-3.5 w-3.5" />
+                            <span className="sr-only">Copy MCP Server Description</span>
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="p-4 flex gap-2">
+                    <div className="flex items-center gap-2">
+                        <Checkbox disabled checked={mcpServer.description.is_rag} />
+                    </div>
+                    <Label>RAG Mode</Label>
                 </div>
             </div>
         </div>

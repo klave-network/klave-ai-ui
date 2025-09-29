@@ -61,7 +61,10 @@ export type McpServer = {
             version: string;
         };
     };
-    description: string;
+    description: {
+        brief: string;
+        is_rag: boolean;
+    };
     created_at: string;
     last_connected: string;
     is_active: boolean;
@@ -230,6 +233,7 @@ export type Rag = {
     model_name: string;
     rag_id: string;
     table_name: string;
+    tool_name: string;
 };
 
 export type Document = {
