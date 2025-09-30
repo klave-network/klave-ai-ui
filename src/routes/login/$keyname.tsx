@@ -8,6 +8,7 @@ import {
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { createUser, getUser } from '@/api/klave-drive';
 import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useKeyPair, useKeyPairs } from '@/hooks/use-klave-ai-store';
 import {
+    KLAVE_AI_DRIVE_NODE,
     KLAVE_AI_MCP_CLIENT_NODE,
     KLAVE_AI_MULTIMODAL_NODE,
     KLAVE_AI_RAG_MCP_SERVER_NODE,
@@ -80,9 +82,18 @@ function RouteComponent() {
                 await secretariumHandler.connect(KLAVE_AI_MULTIMODAL_NODE);
                 await secretariumHandler.connect(KLAVE_AI_MCP_CLIENT_NODE);
                 await secretariumHandler.connect(KLAVE_AI_RAG_MCP_SERVER_NODE);
+                await secretariumHandler.connect(KLAVE_AI_DRIVE_NODE);
 
                 toast.success(`Connected with ${key.name}.`, { id: toastId });
 
+                // @TODO: Fix user authentication with Klave Drive
+                const result = await getUser();
+                if (!result.success) {
+                    await createUser({ driveId: '', role: 'user' });
+                }
+
+                // Set Klave Drive ID in store
+                storeActions.addKlaveDriveId(result.result?.roles?.[0]?.driveId ?? null);
                 // Set current user in store
                 storeActions.setCurrentUser(key.name);
 

@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 
 import type { KeyPair } from '@/lib/types';
 
+import { getUser } from '@/api/klave-drive';
 import { KeyDropzone } from '@/components/key-dropzone';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -64,6 +65,8 @@ function RouteComponent() {
             });
 
             await promise;
+
+            await getUser();
 
             // Set current user in store
             storeActions.setCurrentUser(key.name);

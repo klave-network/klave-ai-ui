@@ -275,7 +275,7 @@ export async function getFileUploadToken(getFileUploadTokenInput: GetFileUploadT
         );
 }
 
-export async function listDrives(): Promise<ListDrivesResult> {
+export async function getDrives(): Promise<ListDrivesResult> {
     return waitForConnection()
         .then(() => secretariumHandler.request(KLAVE_AI_DRIVE_FQDN, 'listDrives', {}, `listDrives-${Math.random()}`, KLAVE_AI_DRIVE_NODE))
         .then(

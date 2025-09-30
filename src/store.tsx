@@ -1,6 +1,6 @@
 import { Store } from '@tanstack/react-store';
 
-import type { KeyPair, McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
+import type { DriveFile, KeyPair, McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
 
 import { STORE_KEY } from '@/lib/constants';
 
@@ -49,6 +49,8 @@ type UserData = {
 
 type KlaveAIState = {
     currentUser: string | null;
+    klaveDriveId: string | null;
+    driveFiles: DriveFile[];
     keyPairs: KeyPair[];
     userData: Record<string, UserData>;
     vlModels: Model[];
@@ -89,6 +91,8 @@ function getDefaultUserData(): UserData {
 
 const initialState: KlaveAIState = {
     currentUser: null,
+    klaveDriveId: null,
+    driveFiles: [],
     keyPairs: [],
     userData: {},
     vlModels: [],
@@ -115,6 +119,20 @@ if (savedState) {
 
 // Actions
 export const storeActions = {
+    addDriveFile: (driveFiles: DriveFile[]) => {
+        store.setState(state => ({
+            ...state,
+            driveFiles
+        }));
+    },
+
+    addKlaveDriveId: (klaveDriveId: string) => {
+        store.setState(state => ({
+            ...state,
+            klaveDriveId
+        }));
+    },
+
     addKeyPair: (keyPair: KeyPair) => {
         store.setState((state) => {
             // Check if key pair already exists
@@ -153,7 +171,8 @@ export const storeActions = {
     logout: () => {
         store.setState(state => ({
             ...state,
-            currentUser: null
+            currentUser: null,
+            klaveDriveId: null
         }));
     },
     createChat: (

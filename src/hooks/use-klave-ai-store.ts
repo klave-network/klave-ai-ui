@@ -11,6 +11,10 @@ export function useKeyPair(keyname: string) {
         state.keyPairs.find(kp => kp.name === keyname));
 }
 
+export function useKlaveDriveId() {
+    return useStore(store, state => state.klaveDriveId);
+}
+
 export function useCurrentUser() {
     return useStore(store, state => state.currentUser);
 }

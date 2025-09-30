@@ -37,6 +37,7 @@ import { Route as AuthModelsNameRouteImport } from './routes/_auth/models/$name'
 import { Route as AuthChatLenseRouteImport } from './routes/_auth/chat/lense'
 import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
 import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
+import { Route as AuthSpacesDriveIndexRouteImport } from './routes/_auth/spaces/drive/index'
 import { Route as AuthChatAgentIndexRouteImport } from './routes/_auth/chat/agent/index'
 import { Route as AuthChatAgentIdRouteImport } from './routes/_auth/chat/agent/$id'
 
@@ -179,6 +180,11 @@ const AuthChatIdRoute = AuthChatIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthChatRouteRoute,
 } as any)
+const AuthSpacesDriveIndexRoute = AuthSpacesDriveIndexRouteImport.update({
+  id: '/drive/',
+  path: '/drive/',
+  getParentRoute: () => AuthSpacesRouteRoute,
+} as any)
 const AuthChatAgentIndexRoute = AuthChatAgentIndexRouteImport.update({
   id: '/agent/',
   path: '/agent/',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/tools/': typeof AuthToolsIndexRoute
   '/chat/agent/$id': typeof AuthChatAgentIdRoute
   '/chat/agent': typeof AuthChatAgentIndexRoute
+  '/spaces/drive': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRoutesByTo {
   '/files': typeof FilesRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   '/tools': typeof AuthToolsIndexRoute
   '/chat/agent/$id': typeof AuthChatAgentIdRoute
   '/chat/agent': typeof AuthChatAgentIndexRoute
+  '/spaces/drive': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -279,6 +287,7 @@ export interface FileRoutesById {
   '/_auth/tools/': typeof AuthToolsIndexRoute
   '/_auth/chat/agent/$id': typeof AuthChatAgentIdRoute
   '/_auth/chat/agent/': typeof AuthChatAgentIndexRoute
+  '/_auth/spaces/drive/': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -312,6 +321,7 @@ export interface FileRouteTypes {
     | '/tools/'
     | '/chat/agent/$id'
     | '/chat/agent'
+    | '/spaces/drive'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/files'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/tools'
     | '/chat/agent/$id'
     | '/chat/agent'
+    | '/spaces/drive'
   id:
     | '__root__'
     | '/login'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/_auth/tools/'
     | '/_auth/chat/agent/$id'
     | '/_auth/chat/agent/'
+    | '/_auth/spaces/drive/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -577,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthChatIdRouteImport
       parentRoute: typeof AuthChatRouteRoute
     }
+    '/_auth/spaces/drive/': {
+      id: '/_auth/spaces/drive/'
+      path: '/drive'
+      fullPath: '/spaces/drive'
+      preLoaderRoute: typeof AuthSpacesDriveIndexRouteImport
+      parentRoute: typeof AuthSpacesRouteRoute
+    }
     '/_auth/chat/agent/': {
       id: '/_auth/chat/agent/'
       path: '/agent'
@@ -648,12 +667,14 @@ interface AuthSpacesRouteRouteChildren {
   AuthSpacesNameRoute: typeof AuthSpacesNameRoute
   AuthSpacesNewRoute: typeof AuthSpacesNewRoute
   AuthSpacesIndexRoute: typeof AuthSpacesIndexRoute
+  AuthSpacesDriveIndexRoute: typeof AuthSpacesDriveIndexRoute
 }
 
 const AuthSpacesRouteRouteChildren: AuthSpacesRouteRouteChildren = {
   AuthSpacesNameRoute: AuthSpacesNameRoute,
   AuthSpacesNewRoute: AuthSpacesNewRoute,
   AuthSpacesIndexRoute: AuthSpacesIndexRoute,
+  AuthSpacesDriveIndexRoute: AuthSpacesDriveIndexRoute,
 }
 
 const AuthSpacesRouteRouteWithChildren = AuthSpacesRouteRoute._addFileChildren(
