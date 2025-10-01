@@ -1,16 +1,20 @@
 import type { FastifyInstance } from 'fastify';
 
 import { Utils } from '@secretarium/connector';
-import { Buffer } from 'node:buffer';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pipeline } from 'node:stream';
+import { fileURLToPath } from 'node:url';
 import util from 'node:util';
 import prettyBytes from 'pretty-bytes';
 import { v4 as uuid } from 'uuid';
 
 import KeyHolder from './utils/key-holder';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const pump = util.promisify(pipeline);
 
@@ -56,7 +60,8 @@ export async function app(fastify: FastifyInstance) {
         const public_key = Utils.toBase64(new Uint8Array(public_key_buf), false);
         console.info('Drive public key: ', public_key);
         console.info('Signature: ', Utils.toBase64(signature, false));
-        const isValid = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, KeyHolder.driveKey, signature, Buffer.from(tokenContentB64));
+        const isValid = await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, KeyHolder.driveKey, signature, tokenContent);
+        console.log('Signature verified:', isValid);
 
         if (!isValid)
             return res.status(400).send({ error: 'The signature could not be verified' });
@@ -108,7 +113,7 @@ export async function app(fastify: FastifyInstance) {
                 return res.status(500).send({ error: 'The signing key is missing' });
             }
 
-            const proofSign = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, KeyHolder.signKey, Buffer.from(tokenContentB64));
+            const proofSign = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, KeyHolder.signKey, tokenContent);
             const resultToken = new Uint8Array(40 + 64);
             resultToken.set(tokenContent, 0);
             resultToken.set(new Uint8Array(proofSign), 40);
