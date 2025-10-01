@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log('ENV', process.env);
+
 const keyFolder = process.env.VITE_APP_KEY_FOLDER ?? 'keys';
 const idKeyName = process.env.IKEY ?? 'i.key.pem';
 const signKeyName = process.env.SKEY ?? 's.key.pem';
