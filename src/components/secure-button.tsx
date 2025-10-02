@@ -286,7 +286,6 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                     className="hover:cursor-pointer hover:bg-green-200 bg-green-300 border border-green-500"
                 >
                     <Lock className="h-4 w-4" />
-                    Secured
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="flex flex-col w-96 border-green-500">
