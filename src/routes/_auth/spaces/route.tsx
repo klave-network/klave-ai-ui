@@ -1,7 +1,8 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { Cloud, File, Plus } from 'lucide-react';
+import { Cloud, File } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useKlaveDriveId, useRagDataSets } from '@/hooks/use-klave-ai-store';
 import { truncateId } from '@/lib/utils';
 
@@ -15,17 +16,14 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between h-28 px-4 border-b">
-                <h2 className="font-owners font-medium tracking-wide text-xl">
-                    Spaces
-                </h2>
-                <Button className="mx-4 hover:cursor-pointer" asChild>
-                    <Link to="/spaces/new">
-                        <Plus />
-                        Create space
-                    </Link>
-                </Button>
-            </div>
+            <header className="px-4 border-b flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                <SidebarTrigger />
+                <Separator
+                    orientation="vertical"
+                    className="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <p className="font-owners font-medium tracking-wide text-lg">Spaces</p>
+            </header>
             <div className="flex h-full">
                 <div className="flex flex-col divide-y w-[250px] border-r shrink-0">
                     <div className="flex flex-col p-4 gap-2">

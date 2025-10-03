@@ -2,6 +2,8 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { Hammer, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useMcpServers } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/tools')({
@@ -13,17 +15,20 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between h-28 px-4 border-b">
-                <p className="font-owners font-medium tracking-wide text-xl">
-                    Tools
-                </p>
-                <Button className="mx-4 hover:cursor-pointer" asChild>
+            <header className="px-4 border-b flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                <SidebarTrigger />
+                <Separator
+                    orientation="vertical"
+                    className="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <p className="font-owners font-medium tracking-wide text-lg">Tools</p>
+                <Button className="ml-auto hover:cursor-pointer" asChild>
                     <Link to="/tools/new">
                         <Plus />
                         Add tool
                     </Link>
                 </Button>
-            </div>
+            </header>
             <div className="flex h-full">
                 <div className="flex flex-col w-[250px] border-r shrink-0">
                     <div className="h-12 p-4 text-sm border-b">

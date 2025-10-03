@@ -1,6 +1,8 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
 import { Puzzle } from 'lucide-react';
 
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useLlModels, useVlModels } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/models')({
@@ -17,14 +19,16 @@ function RouteComponent() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex items-center h-28 px-4 border-b">
-                <p className="font-owners font-medium tracking-wide text-xl">Models</p>
-            </div>
+            <header className="px-4 border-b flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                <SidebarTrigger />
+                <Separator
+                    orientation="vertical"
+                    className="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <p className="font-owners font-medium tracking-wide text-lg">Models</p>
+            </header>
             <div className="flex h-full">
                 <div className="flex flex-col w-[250px] border-r shrink-0">
-                    <div className="h-12 p-4 text-sm border-b">
-                        Available models loaded
-                    </div>
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto p-3">
                         {models.length === 0 && (
                             <p className="text-gray-500 text-sm italic">

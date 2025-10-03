@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 
 import { ChatSettingsModal } from '@/components/chat-settings-modal';
 import { LenseSettingsModal } from '@/components/lense-settings-modal';
-import { ModelSelector } from '@/components/model-selector';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export const Route = createFileRoute('/_auth/chat')({
     component: RouteComponent
@@ -19,12 +19,11 @@ function RouteComponent() {
     return (
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                <div className="w-full flex items-center gap-2 px-4">
-                    {location.pathname === '/chat/lense' && <ModelSelector />}
+                <div className="w-full flex items-center justify-between gap-2 px-4">
+                    <SidebarTrigger />
+                    {/* {location.pathname === '/chat/lense' && <ModelSelector />} */}
                     {/* {location.pathname === '/chat/lense' ? null : hasMatchingRagModel && <SpaceSelector />} */}
-                    <div className="ml-auto">
-                        {location.pathname === '/chat/lense' ? <LenseSettingsModal /> : <ChatSettingsModal />}
-                    </div>
+                    {location.pathname === '/chat/lense' ? <LenseSettingsModal /> : <ChatSettingsModal />}
                 </div>
             </header>
             <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
