@@ -132,7 +132,7 @@ export async function ragCreate(args: { database_id: string; rag_name: string; m
             secretariumHandler.request(
                 KLAVE_AI_RAG_MCP_SERVER_FQDN,
                 'rag_create',
-                { ...args, chunk_length: args.chunk_length ?? 255 },
+                { ...args, chunk_length: args.chunk_length ?? 256 },
                 `rag_create-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
                 KLAVE_AI_RAG_MCP_SERVER_NODE
             )
@@ -154,11 +154,12 @@ export async function ragCreate(args: { database_id: string; rag_name: string; m
 export async function ragAddDocument(args: {
     rag_id: string;
     document: any;
-    nb_tokens_per_chunk: number;
-    embd_window_size: number;
+    nb_chars_per_chunk: number;
+    overlap_ratio: number;
     chunking_strategy: ChunkingStrategyType;
     ocr_id: string;
     perform_ocr: boolean;
+    batch_size: number;
 }): Promise<any> {
     return waitForConnection()
         .then(() =>
@@ -224,7 +225,6 @@ export async function ragDocumentList(args: { rag_id: string }): Promise<Documen
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        console.log('ragDocumentList result:', result);
                         resolve(result);
                     });
                     tx.onError((error) => {
