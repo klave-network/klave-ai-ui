@@ -125,7 +125,7 @@ function RouteComponent() {
         try {
             if (chat?.chatSettings.ragSpace) {
                 const result = await inferenceAddRagPrompt({
-                    context_name: `stories_context_${chatId}`,
+                    context_name: `context_${chatId}`,
                     user_prompt: promptToSend,
                     rag_id: chat?.chatSettings.ragSpace,
                     n_rag_chunks: chat?.chatSettings.ragChunks,
@@ -138,7 +138,7 @@ function RouteComponent() {
             }
             else {
                 await inferenceAddPrompt({
-                    context_name: `stories_context_${chatId}`,
+                    context_name: `context_${chatId}`,
                     user_prompt: promptToSend
                 });
             }
@@ -205,7 +205,7 @@ function RouteComponent() {
 
             // Send the tool result back to the LLM context
             const promptResult = await sendLlmContextPrompt({
-                context_name: `stories_context_${chatId}`,
+                context_name: `context_${chatId}`,
                 user_prompt: `Tool result: ${JSON.stringify(toolResult)}`
             });
 
@@ -261,7 +261,7 @@ function RouteComponent() {
                                     ? (
                                             <StreamedResponse
                                                 key={`stream-${id}`}
-                                                context_name={`stories_context_${chatId}`}
+                                                context_name={`context_${chatId}`}
                                                 onComplete={fullResponse =>
                                                     handleStreamComplete(
                                                         id,
@@ -350,6 +350,7 @@ function RouteComponent() {
                 onSend={handleSend}
                 isDisabled={streamingMessageId !== '' || processingToolCall}
                 secureButton={{ currentTime, challenge, quote, verification }}
+                agentMode={chatSettings.agentMode}
             />
         </div>
     );
