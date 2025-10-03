@@ -13,3 +13,9 @@ uploads/*
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Server sensitive/generated directories
+server/uploads/
+server/keys/
+server/utils/keys/
+server/.env
