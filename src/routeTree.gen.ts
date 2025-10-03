@@ -39,8 +39,6 @@ import { Route as AuthChatLenseRouteImport } from './routes/_auth/chat/lense'
 import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
 import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
 import { Route as AuthSpacesDriveIndexRouteImport } from './routes/_auth/spaces/drive/index'
-import { Route as AuthChatAgentIndexRouteImport } from './routes/_auth/chat/agent/index'
-import { Route as AuthChatAgentIdRouteImport } from './routes/_auth/chat/agent/$id'
 
 const PingRoute = PingRouteImport.update({
   id: '/ping',
@@ -191,16 +189,6 @@ const AuthSpacesDriveIndexRoute = AuthSpacesDriveIndexRouteImport.update({
   path: '/drive/',
   getParentRoute: () => AuthSpacesRouteRoute,
 } as any)
-const AuthChatAgentIndexRoute = AuthChatAgentIndexRouteImport.update({
-  id: '/agent/',
-  path: '/agent/',
-  getParentRoute: () => AuthChatRouteRoute,
-} as any)
-const AuthChatAgentIdRoute = AuthChatAgentIdRouteImport.update({
-  id: '/agent/$id',
-  path: '/agent/$id',
-  getParentRoute: () => AuthChatRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof LoginRouteRouteWithChildren
@@ -231,8 +219,6 @@ export interface FileRoutesByFullPath {
   '/models/': typeof AuthModelsIndexRoute
   '/spaces/': typeof AuthSpacesIndexRoute
   '/tools/': typeof AuthToolsIndexRoute
-  '/chat/agent/$id': typeof AuthChatAgentIdRoute
-  '/chat/agent': typeof AuthChatAgentIndexRoute
   '/spaces/drive': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRoutesByTo {
@@ -259,8 +245,6 @@ export interface FileRoutesByTo {
   '/models': typeof AuthModelsIndexRoute
   '/spaces': typeof AuthSpacesIndexRoute
   '/tools': typeof AuthToolsIndexRoute
-  '/chat/agent/$id': typeof AuthChatAgentIdRoute
-  '/chat/agent': typeof AuthChatAgentIndexRoute
   '/spaces/drive': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRoutesById {
@@ -294,8 +278,6 @@ export interface FileRoutesById {
   '/_auth/models/': typeof AuthModelsIndexRoute
   '/_auth/spaces/': typeof AuthSpacesIndexRoute
   '/_auth/tools/': typeof AuthToolsIndexRoute
-  '/_auth/chat/agent/$id': typeof AuthChatAgentIdRoute
-  '/_auth/chat/agent/': typeof AuthChatAgentIndexRoute
   '/_auth/spaces/drive/': typeof AuthSpacesDriveIndexRoute
 }
 export interface FileRouteTypes {
@@ -329,8 +311,6 @@ export interface FileRouteTypes {
     | '/models/'
     | '/spaces/'
     | '/tools/'
-    | '/chat/agent/$id'
-    | '/chat/agent'
     | '/spaces/drive'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -357,8 +337,6 @@ export interface FileRouteTypes {
     | '/models'
     | '/spaces'
     | '/tools'
-    | '/chat/agent/$id'
-    | '/chat/agent'
     | '/spaces/drive'
   id:
     | '__root__'
@@ -391,8 +369,6 @@ export interface FileRouteTypes {
     | '/_auth/models/'
     | '/_auth/spaces/'
     | '/_auth/tools/'
-    | '/_auth/chat/agent/$id'
-    | '/_auth/chat/agent/'
     | '/_auth/spaces/drive/'
   fileRoutesById: FileRoutesById
 }
@@ -615,20 +591,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSpacesDriveIndexRouteImport
       parentRoute: typeof AuthSpacesRouteRoute
     }
-    '/_auth/chat/agent/': {
-      id: '/_auth/chat/agent/'
-      path: '/agent'
-      fullPath: '/chat/agent'
-      preLoaderRoute: typeof AuthChatAgentIndexRouteImport
-      parentRoute: typeof AuthChatRouteRoute
-    }
-    '/_auth/chat/agent/$id': {
-      id: '/_auth/chat/agent/$id'
-      path: '/agent/$id'
-      fullPath: '/chat/agent/$id'
-      preLoaderRoute: typeof AuthChatAgentIdRouteImport
-      parentRoute: typeof AuthChatRouteRoute
-    }
   }
 }
 
@@ -650,16 +612,12 @@ interface AuthChatRouteRouteChildren {
   AuthChatIdRoute: typeof AuthChatIdRoute
   AuthChatAttestRoute: typeof AuthChatAttestRoute
   AuthChatLenseRoute: typeof AuthChatLenseRoute
-  AuthChatAgentIdRoute: typeof AuthChatAgentIdRoute
-  AuthChatAgentIndexRoute: typeof AuthChatAgentIndexRoute
 }
 
 const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
   AuthChatIdRoute: AuthChatIdRoute,
   AuthChatAttestRoute: AuthChatAttestRoute,
   AuthChatLenseRoute: AuthChatLenseRoute,
-  AuthChatAgentIdRoute: AuthChatAgentIdRoute,
-  AuthChatAgentIndexRoute: AuthChatAgentIndexRoute,
 }
 
 const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(

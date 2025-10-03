@@ -5,12 +5,24 @@ import { useCallback, useState } from 'react';
 import type { Reference } from '@/lib/types';
 
 import { getQuote, verifyQuote } from '@/api/klave';
-import { createLlmContext, getModels as getMcpModels, getMcpServers, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client';
-import { getModels as getMultimodalModels, graphInitExecutionContext, inferenceAddPrompt, inferenceAddRagPrompt } from '@/api/klave-ai-multimodal';
+import {
+    createLlmContext,
+    getModels as getMcpModels,
+    getMcpServers,
+    sendLlmContextPrompt
+} from '@/api/klave-ai-mcp-client';
+import {
+    getModels as getMultimodalModels,
+    graphInitExecutionContext,
+    inferenceAddPrompt,
+    inferenceAddRagPrompt
+} from '@/api/klave-ai-multimodal';
 import { getRagList } from '@/api/klave-ai-rag-mcp-server';
 import { ChatInput } from '@/components/chat-input';
 import { ChatSettingsModal } from '@/components/chat-settings-modal';
 import { LoadingDots } from '@/components/loading-dots';
+import { ModelSelector } from '@/components/model-selector';
+import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useCurrentUser, useCurrentUserChatSettings, useLlModels } from '@/hooks/use-klave-ai-store';
 import { generateSimpleId } from '@/lib/utils';
@@ -58,8 +70,7 @@ export const Route = createFileRoute('/_auth/')({
 });
 
 function RouteComponent() {
-    const { currentTime, challenge, quote, verification }
-        = Route.useLoaderData();
+    const { currentTime, challenge, quote, verification } = Route.useLoaderData();
 
     const [userPrompt, setUserPrompt] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -83,11 +94,11 @@ function RouteComponent() {
         setError(null);
 
         const contextId = generateSimpleId();
-        const contextName = `stories_context_${contextId}`;
+        const contextName = `context_${contextId}`;
         let references: Reference[] = [];
 
         try {
-            if (currentModel.includes('Mistral-Small')) {
+            if (chatSettings.agentMode) {
                 // Step 1: Create LLM Context with MCP Integration
                 await createLlmContext({
                     context: {
@@ -124,9 +135,7 @@ function RouteComponent() {
 
                 // Prepare settings matching your store's ChatSettings type
                 const settings = {
-                    systemPrompt:
-                        chatSettings?.systemPrompt
-                        ?? 'You are a helpful assistant.',
+                    systemPrompt: chatSettings?.systemPrompt ?? 'You are a helpful assistant.',
                     temperature: 0.3,
                     topp: 0.9,
                     steps: 512,
@@ -147,9 +156,7 @@ function RouteComponent() {
                 await graphInitExecutionContext({
                     model_name: currentModel,
                     context_name: contextName,
-                    system_prompt:
-                        chatSettings?.systemPrompt
-                        ?? 'You are a helpful assistant.',
+                    system_prompt: chatSettings?.systemPrompt ?? 'You are a helpful assistant.',
                     temperature: chatSettings?.temperature ?? 0.8,
                     topp: chatSettings?.topp ?? 0.9,
                     steps: chatSettings?.steps ?? 256,
@@ -169,9 +176,7 @@ function RouteComponent() {
                     });
 
                     const seen = new Set<string>();
-                    references = result.references.filter(
-                        ref => !seen.has(ref.filename) && seen.add(ref.filename)
-                    );
+                    references = result.references.filter(ref => !seen.has(ref.filename) && seen.add(ref.filename));
                 }
                 else {
                     await inferenceAddPrompt({
@@ -189,9 +194,7 @@ function RouteComponent() {
 
                 // Prepare settings matching your store's ChatSettings type
                 const settings = {
-                    systemPrompt:
-                        chatSettings?.systemPrompt
-                        ?? 'You are a helpful assistant.',
+                    systemPrompt: chatSettings?.systemPrompt ?? 'You are a helpful assistant.',
                     temperature: chatSettings?.temperature ?? 0.8,
                     topp: chatSettings?.topp ?? 0.9,
                     steps: chatSettings?.steps ?? 256,
@@ -212,28 +215,24 @@ function RouteComponent() {
             console.error('Error: ', err);
             setError('Failed to create context');
         }
-    }, [
-        userPrompt,
-        currentModel,
-        chatSettings,
-        currentUser,
-        navigate
-    ]);
+    }, [userPrompt, currentModel, chatSettings, currentUser, navigate]);
 
     return (
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                 <div className="w-full flex items-center justify-between gap-2 px-4">
-                    <SidebarTrigger />
+                    <div className="flex items-center gap-2">
+                        <SidebarTrigger />
+                        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+                        <ModelSelector />
+                    </div>
                     <ChatSettingsModal />
                 </div>
             </header>
 
             <div className="flex flex-col items-center h-full">
-                {/* Welcome screen */}
                 <div className="flex flex-col gap-6 items-center justify-center h-full w-full">
                     <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">What's on your mind?</h2>
-                    {/* Chat input */}
                     <ChatInput
                         userPrompt={userPrompt}
                         setUserPrompt={setUserPrompt}
@@ -241,6 +240,7 @@ function RouteComponent() {
                         onSend={handleCreateContext}
                         isDisabled={false}
                         secureButton={{ currentTime, challenge, quote, verification }}
+                        agentMode={chatSettings.agentMode}
                     />
                 </div>
             </div>

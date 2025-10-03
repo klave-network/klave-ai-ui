@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Blocks, Hammer, Puzzle } from 'lucide-react';
+import { Blocks, Bot, Hammer } from 'lucide-react';
 import * as React from 'react';
 
 import {
@@ -42,7 +42,7 @@ export function NavExplore({
                                     className: 'bg-sidebar-accent flex'
                                 }}
                             >
-                                <Puzzle />
+                                <Bot />
                                 <span>Models</span>
                             </Link>
                         </SidebarMenuButton>

@@ -61,7 +61,7 @@ export function ChatSettingsModal() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Only enable settings editing in chat view
-    const isInChatView = location.pathname === '/chat';
+    const isInChatView = location.pathname === '/';
 
     // Initialize react-hook-form with validation schema and default values
     const form = useForm<FormValues>({
@@ -128,7 +128,7 @@ export function ChatSettingsModal() {
             <DialogTrigger asChild>
                 <Button
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     className="hover:cursor-pointer"
                 >
                     <Settings2 className="text-gray-500" />

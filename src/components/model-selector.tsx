@@ -1,6 +1,6 @@
-import { useLocation, useParams } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
 
+import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -10,29 +10,36 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { useCurrentUser, useCurrentUserChatSettings, useLlModels, useMcpModels, useUserChat, useVlModels } from '@/hooks/use-klave-ai-store';
 import {
-    storeActions
-} from '@/store';
+    useCurrentUser,
+    useCurrentUserChatSettings,
+    useLlModels,
+    useMcpModels,
+    useUserChat,
+    useVlModels
+} from '@/hooks/use-klave-ai-store';
+import { storeActions } from '@/store';
 
 export function ModelSelector() {
     const location = useLocation();
+    const navigate = useNavigate();
     const params = useParams({ strict: false });
     const currentUser = useCurrentUser() ?? '';
 
     const isVideoChat = location.pathname.includes('/lense');
     const isAgentChat = location.pathname.includes('/agent');
     const isChatView
-        = location.pathname === '/chat' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
+        = location.pathname === '/' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
 
     const llModels = useLlModels();
     const vlModels = useVlModels();
     const mcpModels = useMcpModels();
+    const globalChatSettings = useCurrentUserChatSettings();
 
-    const models = isVideoChat ? vlModels : isAgentChat ? mcpModels : llModels;
+    const isAgent = isAgentChat || Boolean(globalChatSettings?.agentMode);
+    const models = isVideoChat ? vlModels : isAgent ? mcpModels : llModels;
 
     const currentChat = useUserChat(currentUser, params?.id ?? '');
-    const globalChatSettings = useCurrentUserChatSettings();
 
     const chatExists = Boolean(currentChat);
 
@@ -42,63 +49,76 @@ export function ModelSelector() {
         baseSettings = currentChat.chatSettings ?? baseSettings;
     }
 
-    // *********TEST THIS*********
-    // Reset currentLlModel when switching between regular chat and agent chat modes
-    useEffect(() => {
-        // Only reset if we're in a chat view and not in an existing chat (where model should be preserved)
-        if (isChatView && !chatExists) {
-            storeActions.updateChatSettings(currentUser, {
-                ...baseSettings,
-                currentLlModel: ''
-            });
-        }
-    }, [isAgentChat, currentUser, isChatView, chatExists]);
-
     const selectedModel = isVideoChat
-        ? (baseSettings.currentVlModel ?? models[0]?.name ?? '')
-        : (baseSettings.currentLlModel ?? models[0]?.name ?? '');
+        ? baseSettings.currentVlModel ?? models[0]?.name ?? ''
+        : isAgent
+            ? baseSettings.currentMcpModel ?? models[0]?.name ?? ''
+            : baseSettings.currentLlModel ?? models[0]?.name ?? '';
 
     const isDisabled = chatExists;
 
     if (models.length === 0) {
-        return (
-            <div className="text-gray-500 text-sm italic">
-                No models available. Please add a model first.
-            </div>
-        );
+        return <div className="text-gray-500 text-sm italic">No models available. Please add a model first.</div>;
     }
 
     const handleChange = (modelName: string) => {
         if (isDisabled)
             return;
 
+        const isMcpSelected = mcpModels.some(model => model.name === modelName);
+        const isLlSelected = llModels.some(model => model.name === modelName);
+        const isVlSelected = vlModels.some(model => model.name === modelName);
         storeActions.updateChatSettings(currentUser, {
             ...baseSettings,
             ragSpace: '',
             currentMcpServer: '',
             currentLlModel: isVideoChat
-                ? (baseSettings.currentLlModel ?? '')
-                : modelName,
-            currentVlModel: isVideoChat
-                ? modelName
-                : (baseSettings.currentVlModel ?? '')
+                ? baseSettings.currentLlModel ?? ''
+                : isLlSelected
+                    ? modelName
+                    : baseSettings.currentLlModel ?? '',
+            currentVlModel: isVideoChat ? modelName : isVlSelected ? modelName : baseSettings.currentVlModel ?? '',
+            currentMcpModel: isVideoChat
+                ? baseSettings.currentMcpModel ?? ''
+                : isMcpSelected
+                    ? modelName
+                    : baseSettings.currentMcpModel ?? '',
+            agentMode: isVideoChat ? baseSettings.agentMode : isMcpSelected
         });
+
+        if (isVlSelected && !isVideoChat) {
+            navigate({ to: '/chat/lense', search: true });
+        }
+        else if (isVideoChat && (isLlSelected || isMcpSelected)) {
+            navigate({ to: '/', search: true });
+        }
     };
 
     return (
         <Select value={selectedModel} onValueChange={handleChange}>
-            <SelectTrigger
-                className="w-auto max-w-[200px]"
-                disabled={!isChatView || isDisabled}
-            >
+            {/* Remove default styles and push to the left to have the same spacing */}
+            <SelectTrigger className="w-auto border-none shadow-none -ml-2" disabled={!isChatView || isDisabled}>
                 <SelectValue placeholder="Select model" />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    <SelectLabel>Available language models</SelectLabel>
-                    {models.map(model => (
-                        <SelectItem key={model.name} value={model.name}>
+                    <SelectLabel>Available models</SelectLabel>
+                    {llModels.map(model => (
+                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
                             {model.name}
+                            <Badge className="bg-kbl">LLM Ask</Badge>
+                        </SelectItem>
+                    ))}
+                    {mcpModels.map(model => (
+                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
+                            {model.name}
+                            <Badge className="bg-kcy text-black">LLM Agent</Badge>
+                        </SelectItem>
+                    ))}
+                    {vlModels.map(model => (
+                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
+                            {model.name}
+                            <Badge className="bg-kor">VLM</Badge>
                         </SelectItem>
                     ))}
                 </SelectGroup>

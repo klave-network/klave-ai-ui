@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
-import { ModelSelector } from '@/components/model-selector';
+import { AgentModeToggle } from '@/components/agent-mode-toggle';
 import { SecureButton } from '@/components/secure-button';
 import { ToolSelector } from '@/components/tool-selector';
 import { Button } from '@/components/ui/button';
@@ -107,7 +107,7 @@ export function ChatInput({
                     />
                     <div className="flex justify-between">
                         <div className="flex items-center gap-2">
-                            <ModelSelector />
+                            <AgentModeToggle />
                             {agentMode && <ToolSelector />}
                         </div>
                         <div className="flex items-center gap-2 relative">

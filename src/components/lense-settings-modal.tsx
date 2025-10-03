@@ -91,7 +91,7 @@ export function LenseSettingsModal() {
             <DialogTrigger asChild>
                 <Button
                     size="icon"
-                    variant="outline"
+                    variant="ghost"
                     className="hover:cursor-pointer"
                 >
                     <Settings2 className="text-gray-500" />

@@ -30,12 +30,6 @@ const routes = {
             className: 'bg-gradient-to-br from-kbl via-kbl to-kcy/90 text-white'
         },
         {
-            title: 'Agent mode',
-            url: '/chat/agent',
-            icon: Bot,
-            className: 'bg-gradient-to-br from-kcy via-kbl to-kbl/90 text-white'
-        },
-        {
             title: 'Lense',
             url: '/chat/lense',
             icon: Video,

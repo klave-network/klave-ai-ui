@@ -28,10 +28,12 @@ type ChatSettings = {
     useRag: boolean;
     currentLlModel: string;
     currentVlModel: string;
+    currentMcpModel?: string;
     currentMcpServer: string;
     ragSpace: string;
     ragChunks: number;
     sessionId?: string;
+    agentMode?: boolean;
 };
 
 export type ChatHistory = {
@@ -69,9 +71,11 @@ export const defaultChatSettings: ChatSettings = {
     useRag: false,
     currentLlModel: '',
     currentVlModel: '',
+    currentMcpModel: '',
     currentMcpServer: '',
     ragSpace: '',
-    ragChunks: 2
+    ragChunks: 2,
+    agentMode: false
 };
 
 export const defaultLenseSettings = {
@@ -175,12 +179,7 @@ export const storeActions = {
             klaveDriveId: null
         }));
     },
-    createChat: (
-        userKeyname: string,
-        chatId: string,
-        message: ChatMessage,
-        settings: ChatSettings
-    ) => {
+    createChat: (userKeyname: string, chatId: string, message: ChatMessage, settings: ChatSettings) => {
         store.setState((state) => {
             const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
@@ -207,10 +206,7 @@ export const storeActions = {
         });
     },
 
-    updateLenseSettings: (
-        userKeyname: string,
-        settings: Partial<LenseSettings>
-    ) => {
+    updateLenseSettings: (userKeyname: string, settings: Partial<LenseSettings>) => {
         store.setState((state) => {
             const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
@@ -230,10 +226,7 @@ export const storeActions = {
         });
     },
 
-    updateChatSettings: (
-        userKeyname: string,
-        settings: Partial<ChatSettings>
-    ) => {
+    updateChatSettings: (userKeyname: string, settings: Partial<ChatSettings>) => {
         store.setState((state) => {
             const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
@@ -257,9 +250,7 @@ export const storeActions = {
         store.setState((state) => {
             const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
-            const updatedChats = userData.chats.filter(
-                chat => chat.id !== chatId
-            );
+            const updatedChats = userData.chats.filter(chat => chat.id !== chatId);
 
             return {
                 ...state,
@@ -312,9 +303,7 @@ export const storeActions = {
             const userData = state.userData[userKeyname] ?? getDefaultUserData();
 
             const updatedChats = userData.chats.map(chat =>
-                chat.id === chatId
-                    ? { ...chat, messages: [...chat.messages, message] }
-                    : chat
+                chat.id === chatId ? { ...chat, messages: [...chat.messages, message] } : chat
             );
 
             return {
@@ -333,12 +322,8 @@ export const storeActions = {
     // add models fetched from the backend
     // and set initial chat settings
     addModels: (userKeyname: string, models: Model[]) => {
-        const llModels = models.filter(
-            m => m.metadata.description.task === 'text-generation'
-        );
-        const vlModels = models.filter(
-            m => m.metadata.description.task === 'image-to-text'
-        );
+        const llModels = models.filter(m => m.metadata.description.task === 'text-generation');
+        const vlModels = models.filter(m => m.metadata.description.task === 'image-to-text');
 
         const firstLlm = llModels[0];
         const firstVlm = vlModels[0];
