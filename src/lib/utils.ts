@@ -74,3 +74,59 @@ export function formatTimestamp(timestampNanosStr: string): string {
         return 'Invalid date format';
     }
 }
+
+export function urlToId(url: string): string {
+    // Remove any trailing slashes and extract the last part of the URL
+    const cleanUrl = url.replace(/\/$/, '');
+    const parts = cleanUrl.split('/');
+    return parts[parts.length - 1] || url;
+}
+
+export function idToUrl(id: string): string {
+    return id;
+}
+
+export function getFileExtension(filename: string): string {
+    return `.${filename.split('.').pop()?.toLowerCase()}` || '';
+}
+
+export const FILE_TYPE_MAP: Record<string, string> = {
+    '.pdf': 'application/pdf',
+    '.txt': 'text/plain',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    '.doc': 'application/msword',
+    '.ppt': 'application/vnd.ms-powerpoint',
+    '.rtf': 'application/rtf',
+    '.odt': 'application/vnd.oasis.opendocument.text',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.tiff': 'image/tiff',
+    '.bmp': 'image/bmp',
+    '.csv': 'text/csv',
+    '.md': 'text/markdown'
+};
+
+export const TEXT_EXTENSIONS = ['.txt', '.rtf', '.md', '.csv'];
+export const OCR_EXTENSIONS = ['.pdf', '.docx', '.pptx', '.doc', '.ppt', '.odt', '.png', '.jpg', '.jpeg', '.tiff', '.bmp'];
+
+export function getContentType(filename: string): string {
+    const extension = getFileExtension(filename);
+    return FILE_TYPE_MAP[extension] || 'application/octet-stream';
+}
+
+export function shouldUseOcr(filename: string): boolean {
+    const extension = getFileExtension(filename);
+    return OCR_EXTENSIONS.includes(extension);
+}
+
+export function isTextFile(filename: string): boolean {
+    const extension = getFileExtension(filename);
+    return TEXT_EXTENSIONS.includes(extension);
+}
+
+export function extractFileDate(): string {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+}
