@@ -19,6 +19,20 @@ export function NavExplore({
             <SidebarGroupLabel>Explore</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
+                    {/* <SidebarMenuItem key="lense">
+                        <SidebarMenuButton asChild>
+                            <Link
+                                search
+                                to="/chat/lense"
+                                activeProps={{
+                                    className: 'bg-sidebar-accent flex'
+                                }}
+                            >
+                                <Video />
+                                <span>Lense</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem> */}
                     <SidebarMenuItem key="models">
                         <SidebarMenuButton asChild>
                             <Link
@@ -47,6 +61,20 @@ export function NavExplore({
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
+                    {/* <SidebarMenuItem key="mcp-servers">
+                        <SidebarMenuButton asChild>
+                            <Link
+                                search
+                                to="/mcp-servers"
+                                activeProps={{
+                                    className: 'bg-sidebar-accent flex'
+                                }}
+                            >
+                                <MCPIcon />
+                                <span>MCP Servers</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem> */}
                     <SidebarMenuItem key="tools">
                         <SidebarMenuButton asChild>
                             <Link
