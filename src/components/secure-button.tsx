@@ -47,7 +47,7 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
                 disabled={true}
                 className="hover:cursor-pointer hover:bg-gray-200 bg-gray-300 border border-gray-500"
             >
-                <Unplug className="h-4 w-4" />
+                <Unplug className="size-4" />
                 Disconnected
             </Button>
         );
@@ -283,9 +283,10 @@ export const SecureButton: React.FC<SecureButtonProps> = ({
             <PopoverTrigger asChild>
                 <Button
                     variant="ghost"
+                    size="icon"
                     className="hover:cursor-pointer hover:bg-green-200 bg-green-300 border border-green-500"
                 >
-                    <Lock className="h-4 w-4" />
+                    <Lock />
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="flex flex-col w-96 border-green-500">
