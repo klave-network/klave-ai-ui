@@ -176,18 +176,14 @@ export type ChunkResult = {
     complete: boolean;
 };
 
+export type McpPiece = {
+    type: 'ReasoningContent' | 'Content' | 'ToolCalls';
+    content: string;
+};
+
 export type McpChunkResult = {
-    piece: number[];
+    pieces?: McpPiece[];
     complete: boolean;
-    has_tool_call: boolean;
-    tool_call: {
-        function_name: string;
-        arguments: {
-            agentPrompt: string;
-            nChunks: number;
-        };
-    };
-    message_before_tool: string;
 };
 
 export type BackendVersion = {
