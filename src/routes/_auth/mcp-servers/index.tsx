@@ -5,5 +5,16 @@ export const Route = createFileRoute('/_auth/mcp-servers/')({
 });
 
 function RouteComponent() {
-    return <div>Hello "/_auth/mcp-servers/"!</div>;
+    return (
+        <div className="flex flex-col items-center h-full w-full">
+            <div className="flex flex-col gap-6 items-center justify-center h-full pb-32">
+                <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">
+                    Welcome to Klave AI
+                </h2>
+                <p className="text-center max-w-xl text-gray-500">
+                    Select a MCP server
+                </p>
+            </div>
+        </div>
+    );
 }

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Blocks, Bot, Hammer } from 'lucide-react';
 import * as React from 'react';
 
+import { MCPIcon } from '@/components/mcp-icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -61,7 +62,7 @@ export function NavExplore({
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    {/* <SidebarMenuItem key="mcp-servers">
+                    <SidebarMenuItem key="mcp-servers">
                         <SidebarMenuButton asChild>
                             <Link
                                 search
@@ -74,7 +75,7 @@ export function NavExplore({
                                 <span>MCP Servers</span>
                             </Link>
                         </SidebarMenuButton>
-                    </SidebarMenuItem> */}
+                    </SidebarMenuItem>
                     <SidebarMenuItem key="tools">
                         <SidebarMenuButton asChild>
                             <Link
