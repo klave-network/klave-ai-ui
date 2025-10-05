@@ -21,7 +21,7 @@ function RouteComponent() {
                     orientation="vertical"
                     className="mr-2 data-[orientation=vertical]:h-4"
                 />
-                <p className="font-owners font-medium tracking-wide text-lg">Tools</p>
+                <p className="font-owners font-medium tracking-wide text-lg">MCP Servers</p>
                 <Button className="ml-auto hover:cursor-pointer" asChild>
                     <Link to="/tools/new">
                         <Plus />
