@@ -15,8 +15,8 @@ export function NavHeader() {
                         to="/"
                         className="hidden group-data-[collapsible=icon]:flex h-10 items-center gap-2 w-full justify-center"
                     >
-                        <div className="size-6 flex items-center justify-center transition-all group-hover/logo:invisible">
-                            <img src={klaveIcon} alt="klave logo" className="size-4" />
+                        <div className="size-6 flex items-center justify-center">
+                            <img src={klaveIcon} alt="klave logo" className="size-6" />
                         </div>
                     </Link>
                     {/* Expanded: horizontal logo */}
