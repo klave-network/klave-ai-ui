@@ -186,11 +186,12 @@ function RouteComponent() {
                     controller_public_key: 'controller_public_key_example'
                 },
                 // Additional parameters for chunking and OCR
-                nb_tokens_per_chunk: chunkSize,
-                embd_window_size: 128,
+                nb_tokens_per_chunk: 2048,
+                overlap_ratio: 0.1,
                 chunking_strategy: selectedChunkingStrategy,
                 ocr_id: ocr[0].ocr_id ?? '',
-                perform_ocr: useOcr
+                perform_ocr: useOcr,
+                batch_size: 100
             });
 
             toast.success(`Document added: ${file.name}`, {
@@ -222,7 +223,7 @@ function RouteComponent() {
             const rag_id = await ragCreate({
                 database_id,
                 rag_name: `rag_uat_${spaceName.trim() || `rag_uat_${Date.now()}`}`,
-                model_name: selectedModel,
+                model_name: 'Qwen3-Embedding-8B',
                 tool_name: selectedTool
             });
 
