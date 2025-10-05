@@ -5,6 +5,12 @@ export type KeyPair = EncryptedKeyPair & {
     name: string;
 };
 
+export type ToolResult = {
+    toolName: string;
+    result: any;
+    timestamp: number;
+};
+
 export type Capabilities = {
     logging: {
         level: string;
