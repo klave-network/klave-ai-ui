@@ -78,9 +78,9 @@ export function ChatInput({
                     {error}
                 </p>
             )}
-            <div className="rounded-xl p-[1px] bg-gradient-to-r from-kor via-kbl to-kcy shadow-centered shadow-gray/50">
+            <div className="rounded-xl p-[1.5px] bg-gradient-to-r from-klave-cyan to-klave-blue shadow-centered shadow-gray/50">
                 <div
-                    className="flex flex-col gap-8 rounded-[calc(0.9rem-1px)] bg-white border p-4"
+                    className="flex flex-col gap-8 rounded-[calc(1rem-1.5px)] bg-white border p-4"
                     onClick={handleContainerClick}
                 >
                     <textarea

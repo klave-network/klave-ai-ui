@@ -35,7 +35,7 @@ function RouteComponent() {
                             to="/spaces/drive"
                             className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
                         >
-                            <div className="p-1 h-8 w-8 rounded-md text-white bg-kbl flex justify-center items-center">
+                            <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
                                 <Cloud className="h-4" />
                             </div>
                             <span className="capitalize line-clamp-3">
@@ -64,7 +64,7 @@ function RouteComponent() {
                                             }}
                                             className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
                                         >
-                                            <div className="p-1 h-8 w-8 rounded-md text-white bg-kbl flex justify-center items-center">
+                                            <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
                                                 <File className="h-4" />
                                             </div>
                                             <span className="capitalize line-clamp-3">

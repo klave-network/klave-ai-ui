@@ -27,13 +27,13 @@ const routes = {
             title: 'New chat',
             url: '/',
             icon: MessageCirclePlus,
-            className: 'bg-gradient-to-br from-kbl via-kbl to-kcy/90 text-white'
+            className: 'bg-gradient-to-br from-klave-blue via-klave-blue to-klave-cyan/90 text-white'
         },
         {
             title: 'Lense',
             url: '/chat/lense',
             icon: Video,
-            className: 'bg-gradient-to-br from-kbl via-kbl to-kcy/90 text-white'
+            className: 'bg-gradient-to-br from-klave-blue via-klave-blue to-klave-cyan/90 text-white'
         }
     ],
     navExplore: [

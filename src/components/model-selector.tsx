@@ -106,19 +106,19 @@ export function ModelSelector() {
                     {llModels.map(model => (
                         <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
                             {model.name}
-                            <Badge className="bg-kbl">LLM Ask</Badge>
+                            <Badge className="bg-klave-blue">LLM Ask</Badge>
                         </SelectItem>
                     ))}
                     {mcpModels.map(model => (
                         <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
                             {model.name}
-                            <Badge className="bg-kcy text-black">LLM Agent</Badge>
+                            <Badge className="bg-klave-cyan text-black">LLM Agent</Badge>
                         </SelectItem>
                     ))}
                     {vlModels.map(model => (
                         <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
                             {model.name}
-                            <Badge className="bg-kor">VLM</Badge>
+                            <Badge className="bg-klave-orange">VLM</Badge>
                         </SelectItem>
                     ))}
                 </SelectGroup>

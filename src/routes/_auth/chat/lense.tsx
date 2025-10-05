@@ -117,7 +117,7 @@ function RouteComponent() {
 
     return (
         <div className="">
-            <div className="max-w-xl mx-auto p-2 bg-gradient-to-br from-kcy to-kbl/90 rounded-md">
+            <div className="max-w-xl mx-auto p-2 bg-gradient-to-br from-klave-cyan to-klave-blue/90 rounded-md">
                 <Camera
                     ref={cameraRef}
                     errorMessages={{
