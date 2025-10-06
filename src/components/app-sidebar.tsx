@@ -1,4 +1,4 @@
-import { Bot, Hammer, Layers, LifeBuoy, MessageCircle, MessageCirclePlus, Settings, Video } from 'lucide-react';
+import { Bot, Layers, LifeBuoy, MessageCircle, MessageCirclePlus, Settings, Video } from 'lucide-react';
 import * as React from 'react';
 
 import { NavChats } from '@/components/nav/chats';
@@ -56,11 +56,6 @@ const routes = {
             title: 'MCP Servers',
             url: '/mcp-servers',
             icon: MCPIcon
-        },
-        {
-            title: 'Tools',
-            url: '/tools',
-            icon: Hammer
         }
     ],
     navSecondary: [

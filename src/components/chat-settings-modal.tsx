@@ -45,8 +45,7 @@ const formSchema = z.object({
         .min(0)
         .max(2, 'Temperature must be between 0 and 2'),
     topp: z.number().min(0).max(1, 'Top-p must be between 0 and 1'),
-    steps: z.number().min(256).max(1024),
-    useRag: z.boolean()
+    steps: z.number().min(256).max(1024)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -70,8 +69,7 @@ export function ChatSettingsModal() {
             systemPrompt: '',
             temperature: 0.8,
             topp: 0.9,
-            steps: 256,
-            useRag: false
+            steps: 256
         }
     });
 
@@ -87,8 +85,7 @@ export function ChatSettingsModal() {
             systemPrompt: settings.systemPrompt,
             temperature: settings.temperature,
             topp: settings.topp,
-            steps: settings.steps,
-            useRag: settings.useRag
+            steps: settings.steps
         });
     }, [isDialogOpen, currentChat, chatSettings, form]);
 
@@ -106,12 +103,9 @@ export function ChatSettingsModal() {
                 topp: data.topp,
                 steps: data.steps,
                 slidingWindow: false,
-                useRag: data.useRag,
-                ragChunks: 2,
                 // Keep model keys unchanged to avoid overwriting
                 currentLlModel: chatSettings.currentLlModel,
-                currentVlModel: chatSettings.currentVlModel,
-                ragSpace: chatSettings.ragSpace
+                currentVlModel: chatSettings.currentVlModel
             });
 
             toast.success('Settings updated successfully');

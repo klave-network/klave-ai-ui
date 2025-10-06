@@ -33,7 +33,6 @@ export function AgentModeToggle() {
             currentMcpModel: checked ? firstMcpModel : chatSettings.currentMcpModel ?? '',
             currentLlModel: checked ? chatSettings.currentLlModel ?? firstLlModel : firstLlModel,
             // reset contextual selections that might conflict when switching modes
-            ragSpace: '',
             currentMcpServer: ''
         });
     };

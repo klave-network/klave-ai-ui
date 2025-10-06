@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Blocks, Bot, Hammer } from 'lucide-react';
+import { Blocks, Bot } from 'lucide-react';
 import * as React from 'react';
 
 import { MCPIcon } from '@/components/mcp-icon';
@@ -73,20 +73,6 @@ export function NavExplore({
                             >
                                 <MCPIcon />
                                 <span>MCP Servers</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem key="tools">
-                        <SidebarMenuButton asChild>
-                            <Link
-                                search
-                                to="/tools"
-                                activeProps={{
-                                    className: 'bg-sidebar-accent flex'
-                                }}
-                            >
-                                <Hammer />
-                                <span>Tools</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

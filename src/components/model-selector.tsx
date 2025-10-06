@@ -70,7 +70,6 @@ export function ModelSelector() {
         const isVlSelected = vlModels.some(model => model.name === modelName);
         storeActions.updateChatSettings(currentUser, {
             ...baseSettings,
-            ragSpace: '',
             currentMcpServer: '',
             currentLlModel: isVideoChat
                 ? baseSettings.currentLlModel ?? ''
