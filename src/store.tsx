@@ -1,6 +1,6 @@
 import { Store } from '@tanstack/react-store';
 
-import type { DriveFile, KeyPair, McpServer, McpSession, Model, Rag, Reference } from '@/lib/types';
+import type { DriveFile, KeyPair, McpServer, McpSession, Model, Rag, Tool, ToolResult } from '@/lib/types';
 
 import { STORE_KEY } from '@/lib/constants';
 
@@ -8,9 +8,10 @@ type ChatMessage = {
     id: string;
     role: 'user' | 'ai';
     content: string;
-    references?: Reference[];
     timestamp?: number;
     toolCalled?: string;
+    toolResults?: ToolResult[];
+    reasoningContent?: string;
 };
 
 type LenseSettings = {
@@ -25,15 +26,13 @@ type ChatSettings = {
     topp: number;
     steps: number;
     slidingWindow: boolean;
-    useRag: boolean;
     currentLlModel: string;
     currentVlModel: string;
     currentMcpModel?: string;
     currentMcpServer: string;
-    ragSpace: string;
-    ragChunks: number;
     sessionId?: string;
     agentMode?: boolean;
+    selectedTools?: string[]; // Array of selected tool names
 };
 
 export type ChatHistory = {
@@ -68,14 +67,12 @@ export const defaultChatSettings: ChatSettings = {
     topp: 0.9,
     steps: 256,
     slidingWindow: false,
-    useRag: false,
     currentLlModel: '',
     currentVlModel: '',
     currentMcpModel: '',
     currentMcpServer: '',
-    ragSpace: '',
-    ragChunks: 2,
-    agentMode: false
+    agentMode: false,
+    selectedTools: []
 };
 
 export const defaultLenseSettings = {
@@ -113,12 +110,49 @@ store.subscribe(() => {
     localStorage.setItem(STORE_KEY, JSON.stringify(store.state));
 });
 
+// Helper to safely get or create a user's data
+function ensureUserDataExists(state: KlaveAIState, userKeyname: string): UserData {
+    return state.userData[userKeyname] ?? getDefaultUserData();
+}
+
+// Helper to update nested userData for a specific user in a immutable way
+function updateUserData(
+    state: KlaveAIState,
+    userKeyname: string,
+    updater: (current: UserData) => UserData
+): KlaveAIState {
+    const currentUserData = ensureUserDataExists(state, userKeyname);
+    return {
+        ...state,
+        userData: {
+            ...state.userData,
+            [userKeyname]: updater(currentUserData)
+        }
+    };
+}
+
 // Load initial state from localStorage
 const savedState = localStorage.getItem(STORE_KEY);
 if (savedState) {
-    store.setState(() => ({
-        ...(JSON.parse(savedState) as KlaveAIState)
-    }));
+    try {
+        const parsed = JSON.parse(savedState) as Partial<KlaveAIState> | null;
+        if (parsed && typeof parsed === 'object') {
+            // Shallow merge to keep any newly added defaults
+            store.setState(() => ({
+                ...initialState,
+                ...parsed
+            }));
+        }
+    }
+    catch (err) {
+        console.warn('Failed to parse persisted store state. Clearing persisted value.', err);
+        try {
+            localStorage.removeItem(STORE_KEY);
+        }
+        catch {
+            // ignore
+        }
+    }
 }
 
 // Actions
@@ -162,13 +196,8 @@ export const storeActions = {
 
     setCurrentUser: (userKeyname: string) => {
         store.setState(state => ({
-            ...state,
-            currentUser: userKeyname,
-            // Ensure user data exists when they become current user
-            userData: {
-                ...state.userData,
-                [userKeyname]: state.userData[userKeyname] ?? getDefaultUserData()
-            }
+            ...updateUserData(state, userKeyname, current => current),
+            currentUser: userKeyname
         }));
     },
 
@@ -181,9 +210,8 @@ export const storeActions = {
     },
     createChat: (userKeyname: string, chatId: string, message: ChatMessage, settings: ChatSettings) => {
         store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            if (userData.chats.some(chat => chat.id === chatId)) {
+            const current = ensureUserDataExists(state, userKeyname);
+            if (current.chats.some(chat => chat.id === chatId)) {
                 return state; // Avoid duplicates
             }
 
@@ -193,130 +221,104 @@ export const storeActions = {
                 chatSettings: settings
             };
 
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chats: [...userData.chats, newChat]
-                    }
-                }
-            };
+            return updateUserData(state, userKeyname, u => ({
+                ...u,
+                chats: [...u.chats, newChat]
+            }));
         });
     },
 
     updateLenseSettings: (userKeyname: string, settings: Partial<LenseSettings>) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        lenseSettings: {
-                            ...userData.lenseSettings,
-                            ...settings
-                        }
-                    }
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                lenseSettings: {
+                    ...u.lenseSettings,
+                    ...settings
                 }
-            };
-        });
+            }))
+        );
     },
 
     updateChatSettings: (userKeyname: string, settings: Partial<ChatSettings>) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chatSettings: {
-                            ...userData.chatSettings,
-                            ...settings
-                        }
-                    }
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                chatSettings: {
+                    ...u.chatSettings,
+                    ...settings
                 }
-            };
-        });
+            }))
+        );
     },
 
     deleteChat: (userKeyname: string, chatId: string) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            const updatedChats = userData.chats.filter(chat => chat.id !== chatId);
-
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chats: updatedChats
-                    }
-                }
-            };
-        });
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                chats: u.chats.filter(chat => chat.id !== chatId)
+            }))
+        );
     },
 
     updateMessage: (
         userKeyname: string,
         chatId: string,
         messageId: string,
-        updatedContent: Partial<Pick<ChatMessage, 'content' | 'timestamp'>>
+        updatedContent: Partial<Pick<ChatMessage, 'content' | 'timestamp' | 'toolResults' | 'reasoningContent'>>
     ) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                chats: u.chats.map((chat) => {
+                    if (chat.id !== chatId)
+                        return chat;
 
-            const updatedChats = userData.chats.map((chat) => {
-                if (chat.id !== chatId)
-                    return chat;
+                    return {
+                        ...chat,
+                        messages: chat.messages.map(msg =>
+                            msg.id === messageId ? { ...msg, ...updatedContent } : msg
+                        )
+                    };
+                })
+            }))
+        );
+    },
 
-                const updatedMessages = chat.messages.map(msg =>
-                    msg.id === messageId ? { ...msg, ...updatedContent } : msg
-                );
+    addToolResult: (userKeyname: string, chatId: string, messageId: string, toolResult: ToolResult) => {
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                chats: u.chats.map((chat) => {
+                    if (chat.id !== chatId)
+                        return chat;
 
-                return { ...chat, messages: updatedMessages };
-            });
+                    return {
+                        ...chat,
+                        messages: chat.messages.map((msg) => {
+                            if (msg.id !== messageId)
+                                return msg;
 
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chats: updatedChats
-                    }
-                }
-            };
-        });
+                            return {
+                                ...msg,
+                                toolResults: [...(msg.toolResults || []), toolResult]
+                            };
+                        })
+                    };
+                })
+            }))
+        );
     },
 
     addMessage: (userKeyname: string, chatId: string, message: ChatMessage) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            const updatedChats = userData.chats.map(chat =>
-                chat.id === chatId ? { ...chat, messages: [...chat.messages, message] } : chat
-            );
-
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chats: updatedChats
-                    }
-                }
-            };
-        });
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                chats: u.chats.map(chat =>
+                    chat.id === chatId ? { ...chat, messages: [...chat.messages, message] } : chat
+                )
+            }))
+        );
     },
 
     // add models fetched from the backend
@@ -329,25 +331,18 @@ export const storeActions = {
         const firstVlm = vlModels[0];
 
         store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
-
-            return {
-                ...state,
-                // Update global models
-                llModels,
-                vlModels,
-                // Update user chat settings with first available models
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        chatSettings: {
-                            ...userData.chatSettings,
-                            currentLlModel: firstLlm?.name ?? '',
-                            currentVlModel: firstVlm?.name ?? ''
-                        }
-                    }
+            const next = updateUserData(state, userKeyname, u => ({
+                ...u,
+                chatSettings: {
+                    ...u.chatSettings,
+                    currentLlModel: firstLlm?.name ?? '',
+                    currentVlModel: firstVlm?.name ?? ''
                 }
+            }));
+            return {
+                ...next,
+                llModels,
+                vlModels
             };
         });
     },
@@ -378,19 +373,21 @@ export const storeActions = {
 
     // add MCP sessions created on the frontend
     addMcpSessions: (userKeyname: string, mcpSessions: McpSession[]) => {
-        store.setState((state) => {
-            const userData = state.userData[userKeyname] ?? getDefaultUserData();
+        store.setState(state =>
+            updateUserData(state, userKeyname, u => ({
+                ...u,
+                mcpSessions
+            }))
+        );
+    },
 
-            return {
-                ...state,
-                userData: {
-                    ...state.userData,
-                    [userKeyname]: {
-                        ...userData,
-                        mcpSessions
-                    }
-                }
-            };
-        });
+    // Update tools for a specific MCP server
+    updateMcpServerTools: (serverId: string, tools: Tool[]) => {
+        store.setState(state => ({
+            ...state,
+            mcpServers: state.mcpServers.map(server =>
+                server.id === serverId ? { ...server, tools } : server
+            )
+        }));
     }
 };

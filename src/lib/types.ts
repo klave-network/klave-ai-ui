@@ -11,6 +11,12 @@ export type ToolResult = {
     timestamp: number;
 };
 
+export type Tool = {
+    name: string;
+    description?: string;
+    inputSchema?: any;
+};
+
 export type Capabilities = {
     logging: {
         level: string;
@@ -74,13 +80,15 @@ export type McpServer = {
     created_at: string;
     last_connected: string;
     is_active: boolean;
-    tools: string[];
+    tools: Tool[];
 };
 
 export type McpServerInput = Omit<
     McpServer,
-  'id' | 'clientInfo' | 'created_at' | 'last_connected' | 'is_active' | 'tools'
->;
+  'id' | 'clientInfo' | 'created_at' | 'last_connected' | 'is_active'
+> & {
+    tools?: Tool[];
+};
 
 export type Model = {
     name: string;
@@ -103,16 +111,6 @@ export type Model = {
     };
     status: number;
     file_size: number;
-};
-
-export type AddRagPromptResult = {
-    references: Reference[];
-    user_prompt: string;
-};
-
-export type Reference = {
-    filename: string;
-    content: string;
 };
 
 export type Tokenizer = {
