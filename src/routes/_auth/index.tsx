@@ -2,20 +2,20 @@ import { Utils } from '@secretarium/connector';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useCallback, useState } from 'react';
 
-import type { Reference } from '@/lib/types';
-
 import { getQuote, verifyQuote } from '@/api/klave';
 import {
     createLlmContext,
     getModels as getMcpModels,
+    getMcpServerCapabilities,
     getMcpServers,
+    getMcpTools,
+    initMcpSession,
     sendLlmContextPrompt
 } from '@/api/klave-ai-mcp-client';
 import {
     getModels as getMultimodalModels,
     graphInitExecutionContext,
-    inferenceAddPrompt,
-    inferenceAddRagPrompt
+    inferenceAddPrompt
 } from '@/api/klave-ai-multimodal';
 import { getRagList } from '@/api/klave-ai-rag-mcp-server';
 import { ChatInput } from '@/components/chat-input';
@@ -24,7 +24,7 @@ import { LoadingDots } from '@/components/loading-dots';
 import { ModelSelector } from '@/components/model-selector';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useCurrentUser, useCurrentUserChatSettings, useLlModels } from '@/hooks/use-klave-ai-store';
+import { useCurrentUser, useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
 import { generateSimpleId } from '@/lib/utils';
 import { store, storeActions } from '@/store';
 
@@ -41,6 +41,39 @@ export const Route = createFileRoute('/_auth/')({
         storeActions.addMcpModels(mcpModels);
         storeActions.addMcpServers(mcpServers);
         storeActions.addRagDataSets(ragSets);
+
+        // Initialize MCP sessions for all servers and fetch their tools
+        const mcpSessions = [];
+        for (const server of mcpServers) {
+            try {
+                // Get capabilities for this server
+                const capsResponse = await getMcpServerCapabilities({ server_id: server.id });
+
+                // Initialize session
+                const session = await initMcpSession({
+                    server_id: server.id,
+                    capabilities: capsResponse.capabilities
+                });
+
+                mcpSessions.push(session);
+
+                // Fetch tools for this session
+                const toolsResponse = await getMcpTools({ session_id: session.session_id });
+
+                // Update the server with its tools
+                if (toolsResponse && toolsResponse.tools) {
+                    storeActions.updateMcpServerTools(server.id, toolsResponse.tools);
+                }
+            }
+            catch (error) {
+                console.error(`Failed to initialize MCP server ${server.name}:`, error);
+            }
+        }
+
+        // Store all sessions for the current user
+        if (currentUser && mcpSessions.length > 0) {
+            storeActions.addMcpSessions(currentUser, mcpSessions);
+        }
 
         const challenge = Array.from(Utils.getRandomBytes(64));
         const currentTime = new Date().getTime();
@@ -77,13 +110,11 @@ function RouteComponent() {
     const navigate = useNavigate();
     const currentUser = useCurrentUser();
 
-    // Use LL models
-    const llModels = useLlModels();
     // Use chat settings from store
     const chatSettings = useCurrentUserChatSettings();
 
     // Determine current model from chatSettings or fallback to first LL model
-    const currentModel = chatSettings?.currentLlModel || llModels[0]?.name || '';
+    const currentModel = chatSettings.agentMode ? chatSettings.currentMcpModel : chatSettings.currentLlModel;
 
     const handleCreateContext = useCallback(async () => {
         if (!userPrompt.trim()) {
@@ -95,17 +126,44 @@ function RouteComponent() {
 
         const contextId = generateSimpleId();
         const contextName = `context_${contextId}`;
-        let references: Reference[] = [];
 
         try {
             if (chatSettings.agentMode) {
                 // Step 1: Create LLM Context with MCP Integration
+                // Get session IDs for selected tools
+                const selectedToolNames = chatSettings.selectedTools ?? [];
+                const sessionIds: string[] = [];
+
+                if (selectedToolNames.length > 0) {
+                    // Get sessions for selected tools
+                    const currentUserSessions = store.state.userData[currentUser ?? '']?.mcpSessions ?? [];
+                    const mcpServers = store.state.mcpServers;
+
+                    for (const toolName of selectedToolNames) {
+                        // Find which server has this tool
+                        const serverWithTool = mcpServers.find(server =>
+                            server.tools.some(tool => tool.name === toolName)
+                        );
+
+                        if (serverWithTool) {
+                            // Find the session for this server
+                            const session = currentUserSessions.find(
+                                s => s.server_id === serverWithTool.id
+                            );
+
+                            if (session && !sessionIds.includes(session.session_id)) {
+                                sessionIds.push(session.session_id);
+                            }
+                        }
+                    }
+                }
+
                 await createLlmContext({
                     context: {
-                        model_name: currentModel,
+                        model_name: currentModel ?? '',
                         context_name: contextName,
                         mode: 'chat',
-                        system_prompt: `You are a helpful assistant with deep expertise in Secretarium’s protocols, identity systems, and secure computing concepts. You have access to a knowledge base of Secretarium documents and a set of specialized tools via the MCP server, including:
+                        system_prompt: `You are a helpful assistant with deep expertise in Secretarium's protocols, identity systems, and secure computing concepts. You have access to a knowledge base of Secretarium documents and a set of specialized tools via the MCP server, including:
                         - Document search and retrieval
                         - Identity protocol analysis
                         - Ceremony process review
@@ -118,19 +176,20 @@ function RouteComponent() {
                         embeddings: false,
                         multimodal: false
                     },
-                    session_ids: [chatSettings.sessionId ?? '']
+                    session_ids: sessionIds,
+                    token_id: ''
                 });
                 // Step 2: Send prompt to LLM Context
                 await sendLlmContextPrompt({
                     context_name: contextName,
-                    user_prompt: userPrompt
+                    user_prompt: userPrompt,
+                    token_id: ''
                 });
 
                 const message = {
                     id: generateSimpleId(),
                     content: userPrompt,
-                    role: 'user' as const,
-                    references
+                    role: 'user' as const
                 };
 
                 // Prepare settings matching your store's ChatSettings type
@@ -140,13 +199,13 @@ function RouteComponent() {
                     topp: 0.9,
                     steps: 512,
                     slidingWindow: chatSettings?.slidingWindow ?? false,
-                    useRag: chatSettings?.useRag ?? false,
-                    currentLlModel: currentModel,
+                    currentLlModel: currentModel ?? '',
                     currentVlModel: chatSettings?.currentVlModel ?? '',
+                    currentMcpModel: chatSettings?.currentMcpModel ?? '',
                     currentMcpServer: chatSettings?.currentMcpServer ?? '',
-                    ragSpace: chatSettings?.ragSpace ?? '',
-                    ragChunks: chatSettings?.ragChunks ?? 2,
-                    sessionId: chatSettings.sessionId
+                    sessionId: chatSettings.sessionId,
+                    agentMode: chatSettings?.agentMode ?? false,
+                    selectedTools: chatSettings?.selectedTools ?? []
                 };
 
                 storeActions.createChat(currentUser ?? '', contextId, message, settings);
@@ -154,7 +213,7 @@ function RouteComponent() {
             }
             else {
                 await graphInitExecutionContext({
-                    model_name: currentModel,
+                    model_name: currentModel ?? '',
                     context_name: contextName,
                     system_prompt: chatSettings?.systemPrompt ?? 'You are a helpful assistant.',
                     temperature: chatSettings?.temperature ?? 0.8,
@@ -166,30 +225,15 @@ function RouteComponent() {
                     multimodal: false
                 });
 
-                if (chatSettings?.ragSpace) {
-                    const result = await inferenceAddRagPrompt({
-                        context_name: contextName,
-                        user_prompt: userPrompt,
-                        rag_id: chatSettings.ragSpace,
-                        n_rag_chunks: chatSettings.ragChunks ?? 2,
-                        n_max_augmentations: 2
-                    });
-
-                    const seen = new Set<string>();
-                    references = result.references.filter(ref => !seen.has(ref.filename) && seen.add(ref.filename));
-                }
-                else {
-                    await inferenceAddPrompt({
-                        context_name: contextName,
-                        user_prompt: userPrompt
-                    });
-                }
+                await inferenceAddPrompt({
+                    context_name: contextName,
+                    user_prompt: userPrompt
+                });
 
                 const message = {
                     id: generateSimpleId(),
                     content: userPrompt,
-                    role: 'user' as const,
-                    references
+                    role: 'user' as const
                 };
 
                 // Prepare settings matching your store's ChatSettings type
@@ -199,12 +243,12 @@ function RouteComponent() {
                     topp: chatSettings?.topp ?? 0.9,
                     steps: chatSettings?.steps ?? 256,
                     slidingWindow: chatSettings?.slidingWindow ?? false,
-                    useRag: chatSettings?.useRag ?? false,
-                    currentLlModel: currentModel,
+                    currentLlModel: currentModel ?? '',
                     currentVlModel: chatSettings?.currentVlModel ?? '',
+                    currentMcpModel: chatSettings?.currentMcpModel ?? '',
                     currentMcpServer: chatSettings?.currentMcpServer ?? '',
-                    ragSpace: chatSettings?.ragSpace ?? '',
-                    ragChunks: chatSettings?.ragChunks ?? 2
+                    agentMode: chatSettings?.agentMode ?? false,
+                    selectedTools: chatSettings?.selectedTools ?? []
                 };
 
                 storeActions.createChat(currentUser ?? '', contextId, message, settings);
