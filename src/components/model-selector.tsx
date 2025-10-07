@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
+import { Bot } from 'lucide-react';
 
 import {
     Select,
@@ -17,6 +18,7 @@ import {
     useUserChat,
     useVlModels
 } from '@/hooks/use-klave-ai-store';
+import { getModelLogo } from '@/lib/utils';
 import { storeActions } from '@/store';
 
 export function ModelSelector() {
@@ -92,32 +94,127 @@ export function ModelSelector() {
         }
     };
 
+    // Find the current selected model to display in trigger
+    const allModels = [...llModels, ...mcpModels, ...vlModels];
+    const currentModel = allModels.find(m => m.name === selectedModel);
+    const currentLogoPath = currentModel ? getModelLogo(currentModel.name) : null;
+
     return (
         <Select value={selectedModel} onValueChange={handleChange}>
             {/* Remove default styles and push to the left to have the same spacing */}
             <SelectTrigger className="w-auto border-none shadow-none -ml-2" disabled={!isChatView || isDisabled}>
-                <SelectValue placeholder="Select model" />
+                {currentModel
+                    ? (
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 flex items-center justify-center shrink-0">
+                                    {currentLogoPath
+                                        ? (
+                                                <img
+                                                    src={currentLogoPath}
+                                                    alt={`${currentModel.name} logo`}
+                                                    className="h-4 w-4 object-contain"
+                                                />
+                                            )
+                                        : (
+                                                <Bot className="h-4 w-4" />
+                                            )}
+                                </div>
+                                <span className="font-medium">{currentModel.name}</span>
+                            </div>
+                        )
+                    : (
+                            <SelectValue placeholder="Select model" />
+                        )}
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
                     <SelectLabel>Available LLMs (Ask Mode)</SelectLabel>
-                    {llModels.map(model => (
-                        <SelectItem key={model.name} value={model.name}>
-                            {model.name}
-                        </SelectItem>
-                    ))}
+                    {llModels.map((model) => {
+                        const logoPath = getModelLogo(model.name);
+                        return (
+                            <SelectItem key={model.name} value={model.name}>
+                                <div className="flex items-start gap-2 max-w-sm">
+                                    <div className="h-5 w-5 flex items-center justify-center shrink-0">
+                                        {logoPath
+                                            ? (
+                                                    <img
+                                                        src={logoPath}
+                                                        alt={`${model.name} logo`}
+                                                        className="h-4 w-4 object-contain"
+                                                    />
+                                                )
+                                            : (
+                                                    <Bot className="h-4 w-4" />
+                                                )}
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className="font-medium break-words">{model.name}</span>
+                                        <span className="text-xs text-muted-foreground break-words whitespace-normal">
+                                            {model.metadata.description.brief}
+                                        </span>
+                                    </div>
+                                </div>
+                            </SelectItem>
+                        );
+                    })}
                     <SelectLabel>Available LLMs (Agent Mode)</SelectLabel>
-                    {mcpModels.map(model => (
-                        <SelectItem key={model.name} value={model.name}>
-                            {model.name}
-                        </SelectItem>
-                    ))}
+                    {mcpModels.map((model) => {
+                        const logoPath = getModelLogo(model.name);
+                        return (
+                            <SelectItem key={model.name} value={model.name}>
+                                <div className="flex items-start gap-2 max-w-sm">
+                                    <div className="h-5 w-5 flex items-center justify-center shrink-0">
+                                        {logoPath
+                                            ? (
+                                                    <img
+                                                        src={logoPath}
+                                                        alt={`${model.name} logo`}
+                                                        className="h-4 w-4 object-contain"
+                                                    />
+                                                )
+                                            : (
+                                                    <Bot className="h-4 w-4" />
+                                                )}
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className="font-medium break-words">{model.name}</span>
+                                        <span className="text-xs text-muted-foreground break-words whitespace-normal">
+                                            {model.metadata.description.brief}
+                                        </span>
+                                    </div>
+                                </div>
+                            </SelectItem>
+                        );
+                    })}
                     <SelectLabel>Available VLMs</SelectLabel>
-                    {vlModels.map(model => (
-                        <SelectItem key={model.name} value={model.name}>
-                            {model.name}
-                        </SelectItem>
-                    ))}
+                    {vlModels.map((model) => {
+                        const logoPath = getModelLogo(model.name);
+                        return (
+                            <SelectItem key={model.name} value={model.name}>
+                                <div className="flex items-start gap-2 max-w-sm">
+                                    <div className="h-5 w-5 flex items-center justify-center shrink-0">
+                                        {logoPath
+                                            ? (
+                                                    <img
+                                                        src={logoPath}
+                                                        alt={`${model.name} logo`}
+                                                        className="h-4 w-4 object-contain"
+                                                    />
+                                                )
+                                            : (
+                                                    <Bot className="h-4 w-4" />
+                                                )}
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                        <span className="font-medium break-words">{model.name}</span>
+                                        <span className="text-xs text-muted-foreground break-words whitespace-normal">
+                                            {model.metadata.description.brief}
+                                        </span>
+                                    </div>
+                                </div>
+                            </SelectItem>
+                        );
+                    })}
                 </SelectGroup>
             </SelectContent>
         </Select>

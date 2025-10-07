@@ -130,3 +130,63 @@ export function extractFileDate(): string {
     const d = new Date();
     return d.toISOString().split('T')[0];
 }
+
+export function getModelLogo(modelName: string): string | null {
+    const lowerName = modelName.toLowerCase();
+
+    // OpenAI models
+    if (lowerName.includes('gpt') || lowerName.includes('openai')) {
+        return '/src/assets/openai_light.svg';
+    }
+
+    // DeepSeek models
+    if (lowerName.includes('deepseek')) {
+        return '/src/assets/deepseek.svg';
+    }
+
+    // Meta models (Llama)
+    if (lowerName.includes('llama') || lowerName.includes('meta')) {
+        return '/src/assets/meta.svg';
+    }
+
+    // Microsoft models (Phi)
+    if (lowerName.includes('phi') || lowerName.includes('microsoft')) {
+        return '/src/assets/microsoft.svg';
+    }
+
+    // Mistral models
+    if (lowerName.includes('mistral') || lowerName.includes('mixtral')) {
+        return '/src/assets/mistral.svg';
+    }
+
+    // Qwen models
+    if (lowerName.includes('qwen')) {
+        return '/src/assets/qwen_light.svg';
+    }
+
+    // HuggingFace models
+    if (lowerName.includes('smolvlm')) {
+        return '/src/assets/hugging_face.svg';
+    }
+
+    return null;
+}
+
+export function getModelProvider(modelName: string): string {
+    const lowerName = modelName.toLowerCase();
+
+    if (lowerName.includes('gpt') || lowerName.includes('openai'))
+        return 'OpenAI';
+    if (lowerName.includes('deepseek'))
+        return 'DeepSeek';
+    if (lowerName.includes('llama') || lowerName.includes('meta'))
+        return 'Meta';
+    if (lowerName.includes('phi') || lowerName.includes('microsoft'))
+        return 'Microsoft';
+    if (lowerName.includes('mistral') || lowerName.includes('mixtral'))
+        return 'Mistral';
+    if (lowerName.includes('qwen'))
+        return 'Qwen';
+
+    return 'Unknown';
+}
