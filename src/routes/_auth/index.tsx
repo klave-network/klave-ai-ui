@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import {
+    getAttestations,
     getModels as getMcpModels,
     getMcpServerCapabilities,
     getMcpServers,
@@ -23,7 +24,8 @@ export const Route = createFileRoute('/_auth/')({
         const mcpModels = await getMcpModels();
         const ragSets = await getRagList();
         const mcpServers = await getMcpServers();
-
+        const attestations = await getAttestations();
+        console.log('Attestations:', attestations);
         storeActions.addModels(currentUser, [...models]);
         storeActions.addMcpModels(mcpModels);
         storeActions.addMcpServers(mcpServers);
@@ -82,7 +84,7 @@ function RouteComponent() {
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                 <div className="w-full flex items-center justify-between gap-2 px-4">
-                    <SidebarTrigger />
+                    <SidebarTrigger side="left" />
                 </div>
             </header>
 

@@ -34,7 +34,7 @@ function RouteComponent() {
             <header className={`sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 bg-background transition-all ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 ${isScrolled ? 'shadow-md' : ''}`}>
                 <div className="w-full flex items-center justify-between gap-2 px-4">
                     <div className="flex items-center gap-2">
-                        <SidebarTrigger />
+                        <SidebarTrigger side="left" />
                         <Separator
                             orientation="vertical"
                             className="mr-2 data-[orientation=vertical]:h-4"

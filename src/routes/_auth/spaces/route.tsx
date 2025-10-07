@@ -17,12 +17,14 @@ function RouteComponent() {
     return (
         <div className="flex flex-col h-full">
             <header className="px-4 border-b flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                <SidebarTrigger />
-                <Separator
-                    orientation="vertical"
-                    className="mr-2 data-[orientation=vertical]:h-4"
-                />
-                <p className="font-owners font-medium tracking-wide text-lg">Spaces</p>
+                <div className="flex items-center gap-2 flex-1">
+                    <SidebarTrigger side="left" />
+                    <Separator
+                        orientation="vertical"
+                        className="mr-2 data-[orientation=vertical]:h-4"
+                    />
+                    <p className="font-owners font-medium tracking-wide text-lg">Spaces</p>
+                </div>
             </header>
             <div className="flex h-full">
                 <div className="flex flex-col divide-y w-[300px] border-r shrink-0">

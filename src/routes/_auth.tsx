@@ -3,10 +3,12 @@ import { zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
 
 import { AppSidebar } from '@/components/app-sidebar';
+import { AppSidebarRight } from '@/components/app-sidebar-right';
 import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SecurityProvider } from '@/contexts/security-context';
 import { KLAVE_AI_MULTIMODAL_NODE } from '@/lib/constants';
 import secretariumHandler from '@/lib/secretarium-handler';
 import { store } from '@/store';
@@ -76,13 +78,16 @@ export const Route = createFileRoute('/_auth')({
 
 function RouteComponent() {
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-                <div className="flex flex-1 flex-col">
-                    <Outlet />
-                </div>
-            </SidebarInset>
-        </SidebarProvider>
+        <SecurityProvider>
+            <SidebarProvider>
+                <AppSidebar />
+                <SidebarInset>
+                    <div className="flex flex-1 flex-col">
+                        <Outlet />
+                    </div>
+                </SidebarInset>
+                <AppSidebarRight collapsible="offcanvas" />
+            </SidebarProvider>
+        </SecurityProvider>
     );
 }

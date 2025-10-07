@@ -1,22 +1,37 @@
 import { createContext, use } from 'react';
 
 export type SidebarContextProps = {
-    state: 'expanded' | 'collapsed';
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    openMobile: boolean;
-    setOpenMobile: (open: boolean) => void;
+    left: {
+        state: 'expanded' | 'collapsed';
+        open: boolean;
+        setOpen: (open: boolean) => void;
+        openMobile: boolean;
+        setOpenMobile: (open: boolean) => void;
+        toggleSidebar: () => void;
+    };
+    right: {
+        state: 'expanded' | 'collapsed';
+        open: boolean;
+        setOpen: (open: boolean) => void;
+        openMobile: boolean;
+        setOpenMobile: (open: boolean) => void;
+        toggleSidebar: () => void;
+    };
     isMobile: boolean;
-    toggleSidebar: () => void;
 };
 
 export const SidebarContext = createContext<SidebarContextProps | null>(null);
 
-export function useSidebar() {
+export function useSidebar(side: 'left' | 'right' = 'left') {
     const context = use(SidebarContext);
     if (!context) {
         throw new Error('useSidebar must be used within a SidebarProvider.');
     }
 
-    return context;
+    const sidebarState = side === 'left' ? context.left : context.right;
+
+    return {
+        ...sidebarState,
+        isMobile: context.isMobile
+    };
 }

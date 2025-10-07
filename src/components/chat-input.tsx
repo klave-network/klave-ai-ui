@@ -1,5 +1,5 @@
 import { ArrowUp } from 'lucide-react';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
@@ -13,6 +13,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from '@/components/ui/tooltip';
+import { useSecurityData } from '@/contexts/security-context';
 
 type ChatInputProps = {
     userPrompt: string;
@@ -39,6 +40,12 @@ export function ChatInput({
     secureButton
 }: ChatInputProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const { setSecurityData } = useSecurityData();
+
+    // Update security data in context whenever it changes
+    useEffect(() => {
+        setSecurityData(secureButton);
+    }, [secureButton, setSecurityData]);
 
     const isDisconnected = !secureButton.quote || !secureButton.verification;
     const isParentDisabled = isParentDisabling || isDisconnected;
@@ -116,12 +123,7 @@ export function ChatInput({
                                 (hasContent && !isParentDisabled) ? 'translate-x-0' : 'translate-x-11'
                             }`}
                             >
-                                <SecureButton
-                                    currentTime={secureButton.currentTime}
-                                    challenge={secureButton.challenge}
-                                    quote={secureButton.quote}
-                                    verification={secureButton.verification}
-                                />
+                                <SecureButton />
                             </div>
 
                             {/* "Send Button" with slide-in animation */}
