@@ -12,7 +12,7 @@ function RouteComponent() {
                     Welcome to Klave AI
                 </h2>
                 <p className="text-center max-w-xl text-gray-500">
-                    Select a tool
+                    Select a MCP server
                 </p>
             </div>
         </div>

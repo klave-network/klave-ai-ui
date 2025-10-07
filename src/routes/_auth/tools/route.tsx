@@ -1,7 +1,7 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { Hammer, Plus } from 'lucide-react';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-import { Button } from '@/components/ui/button';
+import { NewMcpServerDialog } from '@/components/modals/new-mcp-server-dialog';
+import { ToolCard } from '@/components/sidebar-cards/tool-card';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useMcpServers } from '@/hooks/use-klave-ai-store';
@@ -22,46 +22,23 @@ function RouteComponent() {
                     className="mr-2 data-[orientation=vertical]:h-4"
                 />
                 <p className="font-owners font-medium tracking-wide text-lg">Tools</p>
-                <Button className="ml-auto hover:cursor-pointer" asChild>
-                    <Link to="/tools/new">
-                        <Plus />
-                        Add tool
-                    </Link>
-                </Button>
+                <NewMcpServerDialog />
             </header>
             <div className="flex h-full">
-                <div className="flex flex-col w-[250px] border-r shrink-0">
-                    <div className="h-12 p-4 text-sm border-b">
-                        Available tools loaded
-                    </div>
+                <div className="flex flex-col w-[300px] border-r shrink-0">
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto p-3">
                         {mcpServers.length === 0 && (
                             <p className="text-gray-500 text-sm italic">
-                                No servers available.
+                                No tools available.
                             </p>
                         )}
                         {mcpServers.map(server => (
-                            <Link
-                                search
-                                to="/tools/$id"
-                                params={{ id: server.id }}
+                            <ToolCard
                                 key={server.id}
-                                activeProps={{
-                                    className: 'bg-sidebar-accent'
-                                }}
-                                className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
-                            >
-                                <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
-                                    <Hammer className="size-4" />
-                                </div>
-                                <span className="capitalize line-clamp-3">
-                                    {server.name}
-                                    <br />
-                                    <span className="text-xs text-gray-500">
-                                        {server.description.brief}
-                                    </span>
-                                </span>
-                            </Link>
+                                id={server.id}
+                                name={server.name}
+                                description={server.description.brief}
+                            />
                         ))}
                     </div>
                 </div>
