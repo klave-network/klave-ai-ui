@@ -5,25 +5,12 @@ import { useMemo } from 'react';
 
 import type { AttestationComponent } from '@/lib/types';
 
-// ============================================================================
-// LAYOUT CONFIGURATION
-// ============================================================================
-// Adjust these values to control the tree layout spacing
-
 const HORIZONTAL_SPACING = 300; // Space between nodes horizontally (left to right)
 const VERTICAL_SPACING = 150; // Space between nodes vertically (top to bottom)
-
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
 
 type AttestationFlowProps = {
     data: AttestationComponent;
 };
-
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 
 export function AttestationFlow({ data }: AttestationFlowProps) {
     // Calculate nodes and edges whenever data changes
@@ -32,9 +19,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
         const edges: Edge[] = [];
         let nodeId = 0; // Counter for generating unique node IDs
 
-        // ====================================================================
         // CREATE ROOT NODE: "THIS CHAT"
-        // ====================================================================
         const rootNodeId = 'root-this-chat';
         nodes.push({
             id: rootNodeId,
@@ -64,11 +49,8 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
             }
         } as Node);
 
-        // ====================================================================
         // RECURSIVE TREE BUILDING FUNCTION
-        // ====================================================================
         // This function walks through the component tree and creates nodes/edges
-
         const buildTree = (
             component: AttestationComponent, // Current component to process
             x: number, // X position for this node
@@ -77,9 +59,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
         ): void => {
             const currentNodeId = `node-${nodeId++}`;
 
-            // ================================================================
             // CREATE NODE
-            // ================================================================
             // Each node represents a component in the attestation hierarchy
 
             nodes.push({
@@ -93,9 +73,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 sourcePosition: Position.Bottom, // Edges exit from bottom
                 targetPosition: Position.Top, // Edges enter from top
 
-                // ============================================================
                 // NODE STYLING
-                // ============================================================
                 // Customize appearance here
 
                 style: {
@@ -116,9 +94,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 }
             });
 
-            // ================================================================
             // CREATE EDGE (CONNECTION FROM PARENT)
-            // ================================================================
             // Connect this node to its parent (skip for root node)
 
             if (parentId) {
@@ -130,18 +106,14 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 });
             }
 
-            // ================================================================
             // PROCESS CHILDREN
-            // ================================================================
             // Recursively create child nodes
             // MODIFY THIS SECTION TO CHANGE LAYOUT STRATEGY
 
             if (component.childComponent && component.childComponent.length > 0) {
                 const childCount = component.childComponent.length;
 
-                // ============================================================
                 // LAYOUT STRATEGY: HORIZONTAL
-                // ============================================================
                 // Children are placed horizontally below the parent
                 // Centered around the parent's X position
 
@@ -187,19 +159,13 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
             }
         };
 
-        // ====================================================================
         // START BUILDING FROM ROOT
-        // ====================================================================
         // Build the tree starting below "This Chat" root node
 
         buildTree(data, 0, VERTICAL_SPACING, rootNodeId);
 
         return { nodes, edges };
     }, [data]);
-
-    // ========================================================================
-    // RENDER REACT FLOW
-    // ========================================================================
 
     return (
         <div className="h-full w-full bg-muted rounded-md">
@@ -208,9 +174,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 edges={edges}
                 fitView // Auto-fit the view to show all nodes
 
-                // ============================================================
                 // INTERACTIVITY CONFIGURATION
-                // ============================================================
                 // Panning enabled for scrolling through large trees
 
                 nodesDraggable={false}
@@ -224,30 +188,13 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 panOnScroll={true} // Enable pan with scroll (when holding shift)
                 panOnDrag={true} // Enable panning by dragging
                 preventScrolling={true} // Prevent page scroll when interacting
-
-                // ============================================================
-                // ZOOM CONFIGURATION
-                // ============================================================
-
                 minZoom={0.1}
                 maxZoom={1.5}
-
-                // ============================================================
-                // FIT VIEW OPTIONS
-                // ============================================================
-                // Controls how the view fits the diagram
-
                 fitViewOptions={{
                     padding: 0.15, // 15% padding around edges
                     minZoom: 0.2, // Allow zooming out to see full tree
                     maxZoom: 1.2 // Allow slight zoom in for details
                 }}
-
-                // ============================================================
-                // EDGE STYLING
-                // ============================================================
-                // Default styling for all edges (connections between nodes)
-
                 defaultEdgeOptions={{
                     type: 'smoothstep',
                     animated: false,
@@ -257,7 +204,6 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                         strokeDasharray: '8,4' // Dashed line pattern
                     }
                 }}
-
                 proOptions={{ hideAttribution: true }}
             />
         </div>
