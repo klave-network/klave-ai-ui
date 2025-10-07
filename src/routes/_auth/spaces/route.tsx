@@ -1,10 +1,10 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { Cloud, File } from 'lucide-react';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
+import { DriveCard } from '@/components/sidebar-cards/drive-card';
+import { SpaceCard } from '@/components/sidebar-cards/space-card';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useKlaveDriveId, useRagDataSets } from '@/hooks/use-klave-ai-store';
-import { truncateId } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/spaces')({
     component: RouteComponent
@@ -25,56 +25,26 @@ function RouteComponent() {
                 <p className="font-owners font-medium tracking-wide text-lg">Spaces</p>
             </header>
             <div className="flex h-full">
-                <div className="flex flex-col divide-y w-[250px] border-r shrink-0">
-                    <div className="flex flex-col p-4 gap-2">
+                <div className="flex flex-col divide-y w-[300px] border-r shrink-0">
+                    <div className="flex flex-col p-3 gap-3">
                         <h3 className="text-sm text-gray-500 font-owners font-medium tracking-wide">
                             My Drive
                         </h3>
-                        <Link
-                            search
-                            to="/spaces/drive"
-                            className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
-                        >
-                            <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
-                                <Cloud className="h-4" />
-                            </div>
-                            <span className="capitalize line-clamp-3">
-                                Drive ID
-                                <br />
-                                <span className="text-xs text-gray-500">
-                                    {truncateId(klaveDriveId ?? '')}
-                                </span>
-                            </span>
-                        </Link>
+                        <DriveCard driveId={klaveDriveId ?? ''} />
                     </div>
-                    <div className="flex flex-col p-4 gap-2">
+                    <div className="flex flex-col p-3 gap-3">
                         <h3 className="text-sm text-gray-500 font-owners font-medium tracking-wide">
                             My Spaces
                         </h3>
                         {rags.length > 0
                             ? (
                                     rags.map(rag => (
-                                        <Link
-                                            search
-                                            to="/spaces/$name"
-                                            params={{ name: rag.rag_id }}
+                                        <SpaceCard
                                             key={rag.rag_id}
-                                            activeProps={{
-                                                className: 'bg-sidebar-accent'
-                                            }}
-                                            className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
-                                        >
-                                            <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
-                                                <File className="h-4" />
-                                            </div>
-                                            <span className="capitalize line-clamp-3">
-                                                {rag.table_name}
-                                                <br />
-                                                <span className="text-xs text-gray-500">
-                                                    {rag.model_name}
-                                                </span>
-                                            </span>
-                                        </Link>
+                                            ragId={rag.rag_id}
+                                            tableName={rag.table_name}
+                                            modelName={rag.model_name}
+                                        />
                                     ))
                                 )
                             : (

@@ -1,9 +1,9 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router';
-import { Puzzle } from 'lucide-react';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
 
+import { ModelCard } from '@/components/sidebar-cards/model-card';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useLlModels, useVlModels } from '@/hooks/use-klave-ai-store';
+import { useLlModels, useMcpModels, useVlModels } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/models')({
     component: RouteComponent
@@ -13,9 +13,10 @@ function RouteComponent() {
     // Fetch LL and VL models separately
     const llModels = useLlModels();
     const vlModels = useVlModels();
+    const mcpModels = useMcpModels();
 
     // Combine both model lists
-    const models = [...llModels, ...vlModels];
+    const models = [...llModels, ...vlModels, ...mcpModels];
 
     return (
         <div className="flex flex-col h-full">
@@ -28,7 +29,7 @@ function RouteComponent() {
                 <p className="font-owners font-medium tracking-wide text-lg">Models</p>
             </header>
             <div className="flex h-full">
-                <div className="flex flex-col w-[250px] border-r shrink-0">
+                <div className="flex flex-col w-[300px] border-r shrink-0">
                     <div className="flex flex-col gap-3 flex-1 overflow-y-auto p-3">
                         {models.length === 0 && (
                             <p className="text-gray-500 text-sm italic">
@@ -36,27 +37,11 @@ function RouteComponent() {
                             </p>
                         )}
                         {models.map(model => (
-                            <Link
-                                search
-                                to="/models/$name"
-                                params={{ name: model.name }}
+                            <ModelCard
                                 key={model.name}
-                                activeProps={{
-                                    className: 'bg-sidebar-accent'
-                                }}
-                                className="border rounded-xl p-3 bg-sidebar text-sm flex gap-2 items-center hover:bg-sidebar-accent/80"
-                            >
-                                <div className="p-1 h-8 w-8 rounded-md text-white bg-klave-blue flex justify-center items-center">
-                                    <Puzzle className="h-4" />
-                                </div>
-                                <span className="capitalize line-clamp-3">
-                                    {model.name}
-                                    <br />
-                                    <span className="text-xs text-gray-500">
-                                        {model.metadata.description.brief}
-                                    </span>
-                                </span>
-                            </Link>
+                                name={model.name}
+                                description={model.metadata.description.brief}
+                            />
                         ))}
                     </div>
                 </div>

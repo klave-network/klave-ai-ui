@@ -1,6 +1,5 @@
 import { useLocation, useNavigate, useParams } from '@tanstack/react-router';
 
-import { Badge } from '@/components/ui/badge';
 import {
     Select,
     SelectContent,
@@ -29,7 +28,7 @@ export function ModelSelector() {
     const isVideoChat = location.pathname.includes('/lense');
     const isAgentChat = location.pathname.includes('/agent');
     const isChatView
-        = location.pathname === '/' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
+        = location.pathname === '/chat' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
 
     const llModels = useLlModels();
     const vlModels = useVlModels();
@@ -89,7 +88,7 @@ export function ModelSelector() {
             navigate({ to: '/chat/lense', search: true });
         }
         else if (isVideoChat && (isLlSelected || isMcpSelected)) {
-            navigate({ to: '/', search: true });
+            navigate({ to: '/chat', search: true });
         }
     };
 
@@ -101,23 +100,22 @@ export function ModelSelector() {
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    <SelectLabel>Available models</SelectLabel>
+                    <SelectLabel>Available LLMs (Ask Mode)</SelectLabel>
                     {llModels.map(model => (
-                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
+                        <SelectItem key={model.name} value={model.name}>
                             {model.name}
-                            <Badge className="bg-klave-blue">LLM Ask</Badge>
                         </SelectItem>
                     ))}
+                    <SelectLabel>Available LLMs (Agent Mode)</SelectLabel>
                     {mcpModels.map(model => (
-                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
+                        <SelectItem key={model.name} value={model.name}>
                             {model.name}
-                            <Badge className="bg-klave-cyan text-black">LLM Agent</Badge>
                         </SelectItem>
                     ))}
+                    <SelectLabel>Available VLMs</SelectLabel>
                     {vlModels.map(model => (
-                        <SelectItem key={model.name} value={model.name} className="flex items-center gap-2">
+                        <SelectItem key={model.name} value={model.name}>
                             {model.name}
-                            <Badge className="bg-klave-orange">VLM</Badge>
                         </SelectItem>
                     ))}
                 </SelectGroup>

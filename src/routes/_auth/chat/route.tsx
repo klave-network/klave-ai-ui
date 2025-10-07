@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { ChatSettingsModal } from '@/components/chat-settings-modal';
 import { LenseSettingsModal } from '@/components/lense-settings-modal';
 import { ModelSelector } from '@/components/model-selector';
+import { SpaceSelector } from '@/components/space-selector';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/chat')({
     component: RouteComponent
@@ -14,11 +16,9 @@ export const Route = createFileRoute('/_auth/chat')({
 function RouteComponent() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
-    // const chatSettings = useCurrentUserChatSettings();
-    // const rags = useRagDataSets();
+    const chatSettings = useCurrentUserChatSettings();
 
-    // const currentLlModel = chatSettings.currentLlModel;
-    // const hasMatchingRagModel = rags?.some(rag => rag.model_name === currentLlModel);
+    const isAgentMode = chatSettings?.agentMode ?? false;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -40,6 +40,15 @@ function RouteComponent() {
                             className="mr-2 data-[orientation=vertical]:h-4"
                         />
                         <ModelSelector />
+                        {isAgentMode && (
+                            <>
+                                <Separator
+                                    orientation="vertical"
+                                    className="mr-2 data-[orientation=vertical]:h-4"
+                                />
+                                <SpaceSelector />
+                            </>
+                        )}
                     </div>
                     {/* {location.pathname === '/chat/lense' && <ModelSelector />} */}
                     {/* {location.pathname === '/chat/lense' ? null : hasMatchingRagModel && <SpaceSelector />} */}

@@ -1,5 +1,5 @@
 import { useParams } from '@tanstack/react-router';
-import { ChevronDown, Hammer } from 'lucide-react';
+import { Blocks, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
 import { useCurrentUser, useCurrentUserChatSettings, useMcpServers, useUserChat } from '@/hooks/use-klave-ai-store';
 import { storeActions } from '@/store';
 
-export function ToolSelector() {
+export function SpaceSelector() {
     const params = useParams({ strict: false });
     const currentUser = useCurrentUser() ?? '';
     const chatSettings = useCurrentUserChatSettings();
@@ -27,9 +27,9 @@ export function ToolSelector() {
     // Get current selections from chat settings
     const selectedTools = currentChat?.chatSettings?.selectedTools ?? chatSettings?.selectedTools ?? [];
 
-    // Get all available tools from non-RAG servers only (is_rag: false or undefined)
-    const nonRagServers = mcpServers.filter(server => server.description?.is_rag !== true);
-    const allTools = nonRagServers.flatMap(server =>
+    // Get all available tools from RAG servers only (is_rag: true)
+    const ragServers = mcpServers.filter(server => server.description?.is_rag === true);
+    const allSpaceTools = ragServers.flatMap(server =>
         (server.tools || []).map(tool => ({
             ...tool,
             serverId: server.id,
@@ -37,7 +37,7 @@ export function ToolSelector() {
         }))
     );
 
-    const handleToolToggle = (toolName: string) => {
+    const handleSpaceToggle = (toolName: string) => {
         if (isDisabled)
             return;
 
@@ -48,12 +48,12 @@ export function ToolSelector() {
             if (currentSelections.includes(toolName)) {
                 // Remove tool
                 newSelections = currentSelections.filter(t => t !== toolName);
-                toast.success(`Tool "${toolName}" deselected`);
+                toast.success(`Space "${toolName}" deselected`);
             }
             else {
                 // Add tool
                 newSelections = [...currentSelections, toolName];
-                toast.success(`Tool "${toolName}" selected`);
+                toast.success(`Space "${toolName}" selected`);
             }
 
             storeActions.updateChatSettings(currentUser, {
@@ -62,16 +62,18 @@ export function ToolSelector() {
             });
         }
         catch (error) {
-            toast.error('Failed to update tool selection');
-            console.error('Error updating tool selection:', error);
+            toast.error('Failed to update space selection');
+            console.error('Error updating space selection:', error);
         }
     };
 
-    if (allTools.length === 0) {
+    if (allSpaceTools.length === 0) {
         return null;
     }
 
-    const selectedCount = selectedTools.length;
+    // Count only selected spaces (tools from RAG servers)
+    const selectedSpaceNames = allSpaceTools.map(tool => tool.name);
+    const selectedCount = selectedTools.filter(tool => selectedSpaceNames.includes(tool)).length;
 
     return (
         <DropdownMenu>
@@ -79,20 +81,20 @@ export function ToolSelector() {
                 <Button
                     variant="outline"
                     disabled={isDisabled}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 border-none shadow-none"
                 >
-                    <Hammer className="h-4 w-4" />
+                    <Blocks className="h-4 w-4" />
                     <span>
-                        {selectedCount > 0 ? `Tools (${selectedCount})` : 'Select Tools'}
+                        {selectedCount > 0 ? `Spaces (${selectedCount})` : 'Select Spaces'}
                     </span>
                     <ChevronDown className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-80 max-h-96 overflow-y-auto">
-                <DropdownMenuLabel>Available Tools</DropdownMenuLabel>
+                <DropdownMenuLabel>Available Spaces</DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
-                {nonRagServers.map((server) => {
+                {ragServers.map((server) => {
                     if (!server.tools || server.tools.length === 0)
                         return null;
 
@@ -105,7 +107,7 @@ export function ToolSelector() {
                                 <DropdownMenuCheckboxItem
                                     key={`${server.id}-${tool.name}`}
                                     checked={selectedTools.includes(tool.name)}
-                                    onCheckedChange={() => handleToolToggle(tool.name)}
+                                    onCheckedChange={() => handleSpaceToggle(tool.name)}
                                     className="pl-6"
                                 >
                                     <div className="flex flex-col gap-1">
@@ -121,12 +123,6 @@ export function ToolSelector() {
                         </div>
                     );
                 })}
-
-                {allTools.length === 0 && (
-                    <div className="px-2 py-1.5 text-sm text-gray-500">
-                        No tools available
-                    </div>
-                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

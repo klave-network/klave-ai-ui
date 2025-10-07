@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { formatDistance } from 'date-fns';
 import { CopyIcon } from 'lucide-react';
 import prettyBytes from 'pretty-bytes';
 import { useEffect, useRef, useState } from 'react';
@@ -9,7 +8,7 @@ import { CachePolicies, useFetch } from 'use-http';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useLlModel, useVlModel } from '@/hooks/use-klave-ai-store';
+import { useLlModel, useMcpModel, useVlModel } from '@/hooks/use-klave-ai-store';
 import { copyToClipboard } from '@/lib/utils';
 
 export const Route = createFileRoute('/_auth/models/$name')({
@@ -37,9 +36,10 @@ function RouteComponent() {
     // Try to find model in LL models first, then VL models
     const llModel = useLlModel(name);
     const vlModel = useVlModel(name);
+    const mcpModel = useMcpModel(name);
 
     // Prefer LL model if exists, otherwise VL model
-    const model = llModel ?? vlModel ?? null;
+    const model = llModel ?? vlModel ?? mcpModel ?? null;
 
     const [modelDetailUrl, setModelDetailUrl] = useState<string | null>(null);
     const modelDetailQueriedRef = useRef(false);
@@ -115,21 +115,7 @@ function RouteComponent() {
     };
 
     // Extract remote details safely
-    const dLicense
-        = enhancedModelDetails.remote?.tags
-            ?.find(tag => tag.includes('license:'))
-            ?.split(':')[1]
-            .toUpperCase() ?? '-';
-    const dLikes = enhancedModelDetails.remote?.likes ?? '-';
-    const dDownloads = enhancedModelDetails.remote?.downloads ?? '-';
-    const dCreatedAt = enhancedModelDetails.remote?.createdAt
-        ? new Date(enhancedModelDetails.remote.createdAt)
-        : undefined;
-    const dCreatedAgo = dCreatedAt
-        ? formatDistance(dCreatedAt, new Date())
-        : '-';
     const dSize = prettyBytes(enhancedModelDetails.file_size ?? 0);
-    const dTokenizer = enhancedModelDetails.tokenizer_name ?? '-';
 
     if (!model)
         return <div className="p-4">Loading model...</div>;
@@ -165,63 +151,14 @@ function RouteComponent() {
                         )}
                 />
 
-                <div className="grid grid-cols-3 gap-2 border-t">
-                    {/* License */}
-                    <ModelDetailField
-                        label="License"
-                        value={dLicense}
-                        onCopy={() =>
-                            copyToClipboard(dLicense, 'Model License')}
-                        isSmall
-                    />
-
-                    {/* Size */}
-                    <ModelDetailField
-                        label="Size"
-                        value={dSize}
-                        onCopy={() => copyToClipboard(dSize, 'Model Size')}
-                        isSmall
-                    />
-
-                    {/* Likes */}
-                    <ModelDetailField
-                        label="Stats"
-                        value={`${dLikes}`}
-                        onCopy={() =>
-                            copyToClipboard(`${dLikes}`, 'Model Stats')}
-                        isSmall
-                    />
-                </div>
-
-                {/* Downloads */}
+                {/* Size */}
                 <ModelDetailField
-                    label="Downloads"
-                    value={`${dDownloads}`}
-                    onCopy={() =>
-                        copyToClipboard(`${dDownloads}`, 'Model Downloads')}
+                    label="Size"
+                    value={dSize}
+                    onCopy={() => copyToClipboard(dSize, 'Model Size')}
                     isSmall
                 />
 
-                {/* Tokenizer */}
-                <ModelDetailField
-                    label="Tokenizer"
-                    value={dTokenizer}
-                    onCopy={() =>
-                        copyToClipboard(dTokenizer, 'Model Tokenizer')}
-                    isSmall
-                />
-
-                {/* Creation */}
-                <ModelDetailField
-                    label="Creation"
-                    value={dCreatedAgo}
-                    onCopy={() =>
-                        copyToClipboard(
-                            dCreatedAt?.toISOString() ?? '',
-                            'Model Created At'
-                        )}
-                    isSmall
-                />
             </div>
         </div>
     );

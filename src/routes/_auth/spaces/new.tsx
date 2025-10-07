@@ -186,7 +186,7 @@ function RouteComponent() {
                     controller_public_key: 'controller_public_key_example'
                 },
                 // Additional parameters for chunking and OCR
-                nb_tokens_per_chunk: 2048,
+                nb_chars_per_chunk: 2048,
                 overlap_ratio: 0.1,
                 chunking_strategy: selectedChunkingStrategy,
                 ocr_id: ocr[0].ocr_id ?? '',

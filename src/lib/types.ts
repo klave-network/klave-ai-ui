@@ -85,10 +85,8 @@ export type McpServer = {
 
 export type McpServerInput = Omit<
     McpServer,
-  'id' | 'clientInfo' | 'created_at' | 'last_connected' | 'is_active'
-> & {
-    tools?: Tool[];
-};
+  'id' | 'clientInfo' | 'created_at' | 'last_connected' | 'is_active' | 'tools'
+>;
 
 export type Model = {
     name: string;

@@ -24,18 +24,15 @@ import { Route as AuthCommunityRouteImport } from './routes/_auth/community'
 import { Route as AuthToolsRouteRouteImport } from './routes/_auth/tools/route'
 import { Route as AuthSpacesRouteRouteImport } from './routes/_auth/spaces/route'
 import { Route as AuthModelsRouteRouteImport } from './routes/_auth/models/route'
-import { Route as AuthMcpServersRouteRouteImport } from './routes/_auth/mcp-servers/route'
 import { Route as AuthChatRouteRouteImport } from './routes/_auth/chat/route'
 import { Route as AuthToolsIndexRouteImport } from './routes/_auth/tools/index'
 import { Route as AuthSpacesIndexRouteImport } from './routes/_auth/spaces/index'
 import { Route as AuthModelsIndexRouteImport } from './routes/_auth/models/index'
-import { Route as AuthMcpServersIndexRouteImport } from './routes/_auth/mcp-servers/index'
-import { Route as AuthToolsNewRouteImport } from './routes/_auth/tools/new'
+import { Route as AuthChatIndexRouteImport } from './routes/_auth/chat/index'
 import { Route as AuthToolsIdRouteImport } from './routes/_auth/tools/$id'
 import { Route as AuthSpacesNewRouteImport } from './routes/_auth/spaces/new'
 import { Route as AuthSpacesNameRouteImport } from './routes/_auth/spaces/$name'
 import { Route as AuthModelsNameRouteImport } from './routes/_auth/models/$name'
-import { Route as AuthMcpServersIdRouteImport } from './routes/_auth/mcp-servers/$id'
 import { Route as AuthChatLenseRouteImport } from './routes/_auth/chat/lense'
 import { Route as AuthChatAttestRouteImport } from './routes/_auth/chat/attest'
 import { Route as AuthChatIdRouteImport } from './routes/_auth/chat/$id'
@@ -115,11 +112,6 @@ const AuthModelsRouteRoute = AuthModelsRouteRouteImport.update({
   path: '/models',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthMcpServersRouteRoute = AuthMcpServersRouteRouteImport.update({
-  id: '/mcp-servers',
-  path: '/mcp-servers',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthChatRouteRoute = AuthChatRouteRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -140,15 +132,10 @@ const AuthModelsIndexRoute = AuthModelsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthModelsRouteRoute,
 } as any)
-const AuthMcpServersIndexRoute = AuthMcpServersIndexRouteImport.update({
+const AuthChatIndexRoute = AuthChatIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthMcpServersRouteRoute,
-} as any)
-const AuthToolsNewRoute = AuthToolsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthToolsRouteRoute,
+  getParentRoute: () => AuthChatRouteRoute,
 } as any)
 const AuthToolsIdRoute = AuthToolsIdRouteImport.update({
   id: '/$id',
@@ -169,11 +156,6 @@ const AuthModelsNameRoute = AuthModelsNameRouteImport.update({
   id: '/$name',
   path: '/$name',
   getParentRoute: () => AuthModelsRouteRoute,
-} as any)
-const AuthMcpServersIdRoute = AuthMcpServersIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthMcpServersRouteRoute,
 } as any)
 const AuthChatLenseRoute = AuthChatLenseRouteImport.update({
   id: '/lense',
@@ -201,7 +183,6 @@ export interface FileRoutesByFullPath {
   '/files': typeof FilesRoute
   '/ping': typeof PingRoute
   '/chat': typeof AuthChatRouteRouteWithChildren
-  '/mcp-servers': typeof AuthMcpServersRouteRouteWithChildren
   '/models': typeof AuthModelsRouteRouteWithChildren
   '/spaces': typeof AuthSpacesRouteRouteWithChildren
   '/tools': typeof AuthToolsRouteRouteWithChildren
@@ -216,13 +197,11 @@ export interface FileRoutesByFullPath {
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
   '/chat/lense': typeof AuthChatLenseRoute
-  '/mcp-servers/$id': typeof AuthMcpServersIdRoute
   '/models/$name': typeof AuthModelsNameRoute
   '/spaces/$name': typeof AuthSpacesNameRoute
   '/spaces/new': typeof AuthSpacesNewRoute
   '/tools/$id': typeof AuthToolsIdRoute
-  '/tools/new': typeof AuthToolsNewRoute
-  '/mcp-servers/': typeof AuthMcpServersIndexRoute
+  '/chat/': typeof AuthChatIndexRoute
   '/models/': typeof AuthModelsIndexRoute
   '/spaces/': typeof AuthSpacesIndexRoute
   '/tools/': typeof AuthToolsIndexRoute
@@ -231,7 +210,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/files': typeof FilesRoute
   '/ping': typeof PingRoute
-  '/chat': typeof AuthChatRouteRouteWithChildren
   '/community': typeof AuthCommunityRoute
   '/profile': typeof AuthProfileRoute
   '/projects': typeof AuthProjectsRoute
@@ -243,13 +221,11 @@ export interface FileRoutesByTo {
   '/chat/$id': typeof AuthChatIdRoute
   '/chat/attest': typeof AuthChatAttestRoute
   '/chat/lense': typeof AuthChatLenseRoute
-  '/mcp-servers/$id': typeof AuthMcpServersIdRoute
   '/models/$name': typeof AuthModelsNameRoute
   '/spaces/$name': typeof AuthSpacesNameRoute
   '/spaces/new': typeof AuthSpacesNewRoute
   '/tools/$id': typeof AuthToolsIdRoute
-  '/tools/new': typeof AuthToolsNewRoute
-  '/mcp-servers': typeof AuthMcpServersIndexRoute
+  '/chat': typeof AuthChatIndexRoute
   '/models': typeof AuthModelsIndexRoute
   '/spaces': typeof AuthSpacesIndexRoute
   '/tools': typeof AuthToolsIndexRoute
@@ -262,7 +238,6 @@ export interface FileRoutesById {
   '/files': typeof FilesRoute
   '/ping': typeof PingRoute
   '/_auth/chat': typeof AuthChatRouteRouteWithChildren
-  '/_auth/mcp-servers': typeof AuthMcpServersRouteRouteWithChildren
   '/_auth/models': typeof AuthModelsRouteRouteWithChildren
   '/_auth/spaces': typeof AuthSpacesRouteRouteWithChildren
   '/_auth/tools': typeof AuthToolsRouteRouteWithChildren
@@ -277,13 +252,11 @@ export interface FileRoutesById {
   '/_auth/chat/$id': typeof AuthChatIdRoute
   '/_auth/chat/attest': typeof AuthChatAttestRoute
   '/_auth/chat/lense': typeof AuthChatLenseRoute
-  '/_auth/mcp-servers/$id': typeof AuthMcpServersIdRoute
   '/_auth/models/$name': typeof AuthModelsNameRoute
   '/_auth/spaces/$name': typeof AuthSpacesNameRoute
   '/_auth/spaces/new': typeof AuthSpacesNewRoute
   '/_auth/tools/$id': typeof AuthToolsIdRoute
-  '/_auth/tools/new': typeof AuthToolsNewRoute
-  '/_auth/mcp-servers/': typeof AuthMcpServersIndexRoute
+  '/_auth/chat/': typeof AuthChatIndexRoute
   '/_auth/models/': typeof AuthModelsIndexRoute
   '/_auth/spaces/': typeof AuthSpacesIndexRoute
   '/_auth/tools/': typeof AuthToolsIndexRoute
@@ -296,7 +269,6 @@ export interface FileRouteTypes {
     | '/files'
     | '/ping'
     | '/chat'
-    | '/mcp-servers'
     | '/models'
     | '/spaces'
     | '/tools'
@@ -311,13 +283,11 @@ export interface FileRouteTypes {
     | '/chat/$id'
     | '/chat/attest'
     | '/chat/lense'
-    | '/mcp-servers/$id'
     | '/models/$name'
     | '/spaces/$name'
     | '/spaces/new'
     | '/tools/$id'
-    | '/tools/new'
-    | '/mcp-servers/'
+    | '/chat/'
     | '/models/'
     | '/spaces/'
     | '/tools/'
@@ -326,7 +296,6 @@ export interface FileRouteTypes {
   to:
     | '/files'
     | '/ping'
-    | '/chat'
     | '/community'
     | '/profile'
     | '/projects'
@@ -338,13 +307,11 @@ export interface FileRouteTypes {
     | '/chat/$id'
     | '/chat/attest'
     | '/chat/lense'
-    | '/mcp-servers/$id'
     | '/models/$name'
     | '/spaces/$name'
     | '/spaces/new'
     | '/tools/$id'
-    | '/tools/new'
-    | '/mcp-servers'
+    | '/chat'
     | '/models'
     | '/spaces'
     | '/tools'
@@ -356,7 +323,6 @@ export interface FileRouteTypes {
     | '/files'
     | '/ping'
     | '/_auth/chat'
-    | '/_auth/mcp-servers'
     | '/_auth/models'
     | '/_auth/spaces'
     | '/_auth/tools'
@@ -371,13 +337,11 @@ export interface FileRouteTypes {
     | '/_auth/chat/$id'
     | '/_auth/chat/attest'
     | '/_auth/chat/lense'
-    | '/_auth/mcp-servers/$id'
     | '/_auth/models/$name'
     | '/_auth/spaces/$name'
     | '/_auth/spaces/new'
     | '/_auth/tools/$id'
-    | '/_auth/tools/new'
-    | '/_auth/mcp-servers/'
+    | '/_auth/chat/'
     | '/_auth/models/'
     | '/_auth/spaces/'
     | '/_auth/tools/'
@@ -498,13 +462,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthModelsRouteRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/mcp-servers': {
-      id: '/_auth/mcp-servers'
-      path: '/mcp-servers'
-      fullPath: '/mcp-servers'
-      preLoaderRoute: typeof AuthMcpServersRouteRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/chat': {
       id: '/_auth/chat'
       path: '/chat'
@@ -533,19 +490,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthModelsIndexRouteImport
       parentRoute: typeof AuthModelsRouteRoute
     }
-    '/_auth/mcp-servers/': {
-      id: '/_auth/mcp-servers/'
+    '/_auth/chat/': {
+      id: '/_auth/chat/'
       path: '/'
-      fullPath: '/mcp-servers/'
-      preLoaderRoute: typeof AuthMcpServersIndexRouteImport
-      parentRoute: typeof AuthMcpServersRouteRoute
-    }
-    '/_auth/tools/new': {
-      id: '/_auth/tools/new'
-      path: '/new'
-      fullPath: '/tools/new'
-      preLoaderRoute: typeof AuthToolsNewRouteImport
-      parentRoute: typeof AuthToolsRouteRoute
+      fullPath: '/chat/'
+      preLoaderRoute: typeof AuthChatIndexRouteImport
+      parentRoute: typeof AuthChatRouteRoute
     }
     '/_auth/tools/$id': {
       id: '/_auth/tools/$id'
@@ -574,13 +524,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/models/$name'
       preLoaderRoute: typeof AuthModelsNameRouteImport
       parentRoute: typeof AuthModelsRouteRoute
-    }
-    '/_auth/mcp-servers/$id': {
-      id: '/_auth/mcp-servers/$id'
-      path: '/$id'
-      fullPath: '/mcp-servers/$id'
-      preLoaderRoute: typeof AuthMcpServersIdRouteImport
-      parentRoute: typeof AuthMcpServersRouteRoute
     }
     '/_auth/chat/lense': {
       id: '/_auth/chat/lense'
@@ -631,30 +574,19 @@ interface AuthChatRouteRouteChildren {
   AuthChatIdRoute: typeof AuthChatIdRoute
   AuthChatAttestRoute: typeof AuthChatAttestRoute
   AuthChatLenseRoute: typeof AuthChatLenseRoute
+  AuthChatIndexRoute: typeof AuthChatIndexRoute
 }
 
 const AuthChatRouteRouteChildren: AuthChatRouteRouteChildren = {
   AuthChatIdRoute: AuthChatIdRoute,
   AuthChatAttestRoute: AuthChatAttestRoute,
   AuthChatLenseRoute: AuthChatLenseRoute,
+  AuthChatIndexRoute: AuthChatIndexRoute,
 }
 
 const AuthChatRouteRouteWithChildren = AuthChatRouteRoute._addFileChildren(
   AuthChatRouteRouteChildren,
 )
-
-interface AuthMcpServersRouteRouteChildren {
-  AuthMcpServersIdRoute: typeof AuthMcpServersIdRoute
-  AuthMcpServersIndexRoute: typeof AuthMcpServersIndexRoute
-}
-
-const AuthMcpServersRouteRouteChildren: AuthMcpServersRouteRouteChildren = {
-  AuthMcpServersIdRoute: AuthMcpServersIdRoute,
-  AuthMcpServersIndexRoute: AuthMcpServersIndexRoute,
-}
-
-const AuthMcpServersRouteRouteWithChildren =
-  AuthMcpServersRouteRoute._addFileChildren(AuthMcpServersRouteRouteChildren)
 
 interface AuthModelsRouteRouteChildren {
   AuthModelsNameRoute: typeof AuthModelsNameRoute
@@ -690,13 +622,11 @@ const AuthSpacesRouteRouteWithChildren = AuthSpacesRouteRoute._addFileChildren(
 
 interface AuthToolsRouteRouteChildren {
   AuthToolsIdRoute: typeof AuthToolsIdRoute
-  AuthToolsNewRoute: typeof AuthToolsNewRoute
   AuthToolsIndexRoute: typeof AuthToolsIndexRoute
 }
 
 const AuthToolsRouteRouteChildren: AuthToolsRouteRouteChildren = {
   AuthToolsIdRoute: AuthToolsIdRoute,
-  AuthToolsNewRoute: AuthToolsNewRoute,
   AuthToolsIndexRoute: AuthToolsIndexRoute,
 }
 
@@ -706,7 +636,6 @@ const AuthToolsRouteRouteWithChildren = AuthToolsRouteRoute._addFileChildren(
 
 interface AuthRouteChildren {
   AuthChatRouteRoute: typeof AuthChatRouteRouteWithChildren
-  AuthMcpServersRouteRoute: typeof AuthMcpServersRouteRouteWithChildren
   AuthModelsRouteRoute: typeof AuthModelsRouteRouteWithChildren
   AuthSpacesRouteRoute: typeof AuthSpacesRouteRouteWithChildren
   AuthToolsRouteRoute: typeof AuthToolsRouteRouteWithChildren
@@ -720,7 +649,6 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthChatRouteRoute: AuthChatRouteRouteWithChildren,
-  AuthMcpServersRouteRoute: AuthMcpServersRouteRouteWithChildren,
   AuthModelsRouteRoute: AuthModelsRouteRouteWithChildren,
   AuthSpacesRouteRoute: AuthSpacesRouteRouteWithChildren,
   AuthToolsRouteRoute: AuthToolsRouteRouteWithChildren,
