@@ -48,7 +48,7 @@ export function NavChats({
 
     return (
         <SidebarGroup {...props}>
-            <SidebarGroupLabel>Chats</SidebarGroupLabel>
+            <SidebarGroupLabel className="font-owners tracking-wide">Chats</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {/* <SidebarMenuItem key="new-chat">

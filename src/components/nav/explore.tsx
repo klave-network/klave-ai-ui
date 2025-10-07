@@ -16,7 +16,7 @@ export function NavExplore({
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
     return (
         <SidebarGroup {...props}>
-            <SidebarGroupLabel>Explore</SidebarGroupLabel>
+            <SidebarGroupLabel className="font-owners tracking-wide">Explore</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {/* <SidebarMenuItem key="lense">
