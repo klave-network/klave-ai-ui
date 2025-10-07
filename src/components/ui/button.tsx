@@ -11,6 +11,7 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
+                gradient: 'bg-gradient-to-br from-klave-cyan to-klave-blue text-foreground shadow-xs transition-colors duration-200 ease-in hover:from-klave-cyan/60 hover:to-klave-blue/60',
                 default:
                     'bg-primary text-primary-foreground shadow-xs hover:bg-primary/90',
                 destructive:
