@@ -10,8 +10,7 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-    SidebarHeader,
-    SidebarRail
+    SidebarHeader
 } from '@/components/ui/sidebar';
 
 const routes = {
@@ -89,7 +88,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarFooter>
                     <NavFooter user={routes.user} />
                 </SidebarFooter>
-                <SidebarRail />
             </Sidebar>
         </>
     );

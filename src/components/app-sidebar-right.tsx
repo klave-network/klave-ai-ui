@@ -21,8 +21,7 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-    SidebarHeader,
-    SidebarRail
+    SidebarHeader
 } from '@/components/ui/sidebar';
 import { useSecurityData } from '@/contexts/security-context';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
@@ -49,7 +48,6 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
                         No security information available.
                     </div>
                 </SidebarContent>
-                <SidebarRail side="right" />
             </Sidebar>
         );
     }
@@ -265,7 +263,6 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
                     Security attestation verified
                 </div>
             </SidebarFooter>
-            <SidebarRail side="right" />
         </Sidebar>
     );
 }
