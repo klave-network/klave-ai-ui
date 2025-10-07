@@ -3,7 +3,7 @@ import { zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
 
 import { AppSidebar } from '@/components/app-sidebar';
-import { AppSidebarRight } from '@/components/app-sidebar-right';
+import { AttestationSidebar } from '@/components/attestation-sidebar';
 import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,7 +86,7 @@ function RouteComponent() {
                         <Outlet />
                     </div>
                 </SidebarInset>
-                <AppSidebarRight collapsible="offcanvas" />
+                <AttestationSidebar collapsible="offcanvas" />
             </SidebarProvider>
         </SecurityProvider>
     );

@@ -4,6 +4,9 @@ import ReactDOM from 'react-dom/client';
 
 import { Toaster } from '@/components/ui/sonner';
 
+// React Flow styles
+import '@xyflow/react/dist/style.css';
+
 import './styles.css';
 import secretariumHandler from './lib/secretarium-handler.ts';
 import reportWebVitals from './reportWebVitals.ts';

@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import type { QuoteResponse, VerifyResponse } from '@/lib/types';
 
 import { AgentModeToggle } from '@/components/agent-mode-toggle';
-import { SecureButton } from '@/components/secure-button';
+import { AttestationButton } from '@/components/attestation-button';
 import { ToolSelector } from '@/components/tool-selector';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,7 @@ type ChatInputProps = {
     onSend: () => void;
     agentMode?: boolean;
     isDisabled?: boolean;
-    secureButton: {
+    attestationButton: {
         currentTime: number;
         challenge: number[];
         quote?: QuoteResponse;
@@ -37,17 +37,17 @@ export function ChatInput({
     onSend,
     agentMode = false,
     isDisabled: isParentDisabling,
-    secureButton
+    attestationButton
 }: ChatInputProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { setSecurityData } = useSecurityData();
 
     // Update security data in context whenever it changes
     useEffect(() => {
-        setSecurityData(secureButton);
-    }, [secureButton, setSecurityData]);
+        setSecurityData(attestationButton);
+    }, [attestationButton, setSecurityData]);
 
-    const isDisconnected = !secureButton.quote || !secureButton.verification;
+    const isDisconnected = !attestationButton.quote || !attestationButton.verification;
     const isParentDisabled = isParentDisabling || isDisconnected;
 
     // Check if user has typed anything
@@ -118,40 +118,27 @@ export function ChatInput({
                             {agentMode && <ToolSelector />}
                         </div>
                         <div className="flex items-center gap-2 relative">
-                            {/* "Secure Button" with transition that slides left when send button appears */}
-                            <div className={`transition-transform duration-300 ease-in-out ${
-                                (hasContent && !isParentDisabled) ? 'translate-x-0' : 'translate-x-11'
-                            }`}
-                            >
-                                <SecureButton />
-                            </div>
+                            <AttestationButton />
 
-                            {/* "Send Button" with slide-in animation */}
-                            <div className={`transition-all duration-300 ease-out ${
-                                (hasContent && !isParentDisabled)
-                                    ? 'opacity-100 translate-x-0 pointer-events-auto'
-                                    : 'opacity-0 -translate-x-8 pointer-events-none'
-                            }`}
-                            >
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                size="icon"
-                                                className="hover:cursor-pointer"
-                                                onClick={handleSend}
-                                                disabled={isSendDisabled}
-                                                tabIndex={hasContent ? 0 : -1}
-                                            >
-                                                <ArrowUp className="h-4 w-4" />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Send message</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </div>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="gradient"
+                                            size="icon"
+                                            className="hover:cursor-pointer"
+                                            onClick={handleSend}
+                                            disabled={isSendDisabled}
+                                            tabIndex={hasContent ? 0 : -1}
+                                        >
+                                            <ArrowUp className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Send message</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
                     </div>
                 </div>

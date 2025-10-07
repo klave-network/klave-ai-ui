@@ -1,11 +1,11 @@
-import { Lock, Unplug } from 'lucide-react';
+import { ShieldCheck, Unplug } from 'lucide-react';
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useSecurityData } from '@/contexts/security-context';
 import { useSidebar } from '@/hooks/use-sidebar';
 
-export const SecureButton: React.FC = () => {
+export const AttestationButton: React.FC = () => {
     const { securityData } = useSecurityData();
     const { toggleSidebar } = useSidebar('right');
 
@@ -32,7 +32,7 @@ export const SecureButton: React.FC = () => {
             onClick={toggleSidebar}
             className="hover:cursor-pointer hover:bg-green-200 bg-green-300 border border-green-500"
         >
-            <Lock />
+            <ShieldCheck />
         </Button>
     );
 };

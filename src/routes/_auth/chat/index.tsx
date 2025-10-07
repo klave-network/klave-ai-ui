@@ -212,7 +212,7 @@ function RouteComponent() {
                     error={error}
                     onSend={handleCreateContext}
                     isDisabled={false}
-                    secureButton={{ currentTime, challenge, quote, verification }}
+                    attestationButton={{ currentTime, challenge, quote, verification }}
                     agentMode={chatSettings.agentMode}
                 />
             </div>

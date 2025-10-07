@@ -6,11 +6,19 @@ import {
     Landmark,
     Lock,
     Settings2,
+    ShieldCheck,
     SquareArrowOutUpRight,
-    TriangleAlert
+    TriangleAlert,
+    Workflow
 } from 'lucide-react';
 import * as React from 'react';
 
+import type { AttestationComponent } from '@/lib/types';
+
+// TODO: Replace with API call in the future
+// Example: const attestationData = await fetchAttestationData();
+import attestationData from '@/assets/attestation.json';
+import { AttestationFlow } from '@/components/attestation-flow';
 import {
     Accordion,
     AccordionContent,
@@ -21,12 +29,14 @@ import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
-    SidebarHeader
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { useSecurityData } from '@/contexts/security-context';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
-export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { securityData } = useSecurityData();
 
     const currentTime = securityData?.currentTime ?? 0;
@@ -68,27 +78,31 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
     return (
         <Sidebar side="right" {...props}>
             <SidebarHeader>
-                <div className="flex flex-col gap-1 px-4 py-3">
-                    <div className="flex items-center gap-2">
-                        <Lock className="h-5 w-5" />
-                        <span className="font-semibold">Security</span>
-                    </div>
-                    {/* <p className="text-xs text-muted-foreground">
-                        View security details about your connection and hardware attestation.
-                    </p> */}
-                </div>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <div className="flex items-center gap-2 px-2">
+                            <ShieldCheck className="size-6" />
+                            <span className="text-lg font-medium font-owners tracking-wide">
+                                Verification Center
+                            </span>
+                        </div>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarHeader>
 
             <SidebarContent className="px-4">
-                <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="connection">
-                        <AccordionTrigger className="hover:no-underline">
+                <p className="text-xs text-muted-foreground pb-2">
+                    View security details about your connection and hardware attestation.
+                </p>
+                <Accordion type="multiple" className="w-full space-y-4">
+                    <AccordionItem value="connection" className="border rounded-md p-2">
+                        <AccordionTrigger>
                             <div className="flex gap-2 items-center">
                                 <Lock className="size-4" />
                                 <span>Connection is secure</span>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent>
+                        <AccordionContent className="text-muted-foreground">
                             <div className="flex flex-col gap-4">
                                 <div className="flex gap-2">
                                     <BadgeCheck className="size-4 shrink-0 mt-1" />
@@ -136,14 +150,14 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
                         </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="attestation">
-                        <AccordionTrigger className="hover:no-underline">
+                    <AccordionItem value="attestation" className="border rounded-md p-2">
+                        <AccordionTrigger>
                             <div className="flex gap-2 items-center">
                                 <Cpu className="size-4" />
                                 <span>Secure hardware attestation</span>
                             </div>
                         </AccordionTrigger>
-                        <AccordionContent>
+                        <AccordionContent className="text-muted-foreground">
                             <div className="flex flex-col gap-4">
                                 <div className="flex gap-2">
                                     <BadgeCheck className="size-4 shrink-0 mt-1" />
@@ -170,31 +184,31 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
                                 </div>
                                 <div className="flex gap-2">
                                     <Lock className="size-4 shrink-0 mt-1" />
-                                    <div className="flex flex-col text-sm overflow-auto whitespace-pre-wrap break-words">
+                                    <div className="flex flex-col gap-2 text-sm overflow-auto whitespace-pre-wrap break-words">
                                         <span className="font-medium">
                                             Image measurements are correct
                                         </span>
                                         <span>
                                             MR Enclave is
-                                            <pre className="text-xs p-1 overflow-auto whitespace-pre-wrap break-words border border-border rounded text-gray-400">
+                                            <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
                                                 {mrEnclaveHash}
                                             </pre>
                                         </span>
                                         <span>
                                             MR Signer is
-                                            <pre className="text-xs p-1 overflow-auto whitespace-pre-wrap break-words border border-border rounded text-gray-400">
+                                            <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
                                                 {mrSignedHash}
                                             </pre>
                                         </span>
                                         <span>
                                             App Digest is
-                                            <pre className="text-xs p-1 overflow-auto whitespace-pre-wrap break-words border border-border rounded text-gray-400">
+                                            <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
                                                 {contractIntegrityHash}
                                             </pre>
                                         </span>
                                         <span>
                                             Challenge
-                                            <pre className="text-xs p-1 overflow-auto whitespace-pre-wrap break-words border border-border rounded text-gray-400">
+                                            <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
                                                 {JSON.stringify(challenge)}
                                             </pre>
                                         </span>
@@ -255,11 +269,25 @@ export function AppSidebarRight({ ...props }: React.ComponentProps<typeof Sideba
                             </div>
                         </AccordionContent>
                     </AccordionItem>
+
+                    <AccordionItem value="verification-flow-diagram" className="border rounded-md p-2">
+                        <AccordionTrigger>
+                            <div className="flex gap-2 items-center">
+                                <Workflow className="size-4" />
+                                <span>Verification Flow Diagram</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground w-full h-[500px]">
+                            {/* Pass attestation data from API or JSON file */}
+                            <AttestationFlow data={attestationData as AttestationComponent} />
+                        </AccordionContent>
+                    </AccordionItem>
                 </Accordion>
             </SidebarContent>
 
-            <SidebarFooter className="px-4 py-2">
-                <div className="text-xs text-muted-foreground">
+            <SidebarFooter className="px-4 py-2 bg-green-100 border-t">
+                <div className="text-xs flex items-center gap-2 text-green-600">
+                    <BadgeCheck className="size-3" />
                     Security attestation verified
                 </div>
             </SidebarFooter>

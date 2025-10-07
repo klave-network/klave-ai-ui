@@ -383,3 +383,98 @@ export type SetIdentitiesInput = {
 export type ExportStorageServerPrivateKeyInput = {
     format: string;
 };
+
+// Attestation Types
+
+// SGX Quote Header (V3)
+export type SgxQuoteHeaderV3 = {
+    version: number;
+    att_key_type: number;
+    att_key_data_0: number;
+    qe_svn: number;
+    pce_svn: number;
+    vendor_id: string;
+    user_data: string;
+};
+
+// TDX Quote Header (V4)
+export type TdxQuoteHeaderV4 = {
+    version: number;
+    att_key_type: number;
+    tee_type: number;
+    reserved: number;
+    vendor_id: string;
+    user_data: string;
+};
+
+// SGX Report Body Attributes
+export type SgxAttributes = {
+    flags: number;
+    xfrm: number;
+};
+
+// SGX Report Body
+export type SgxReportBody = {
+    cpu_svn: string;
+    misc_select: number;
+    reserved1: string;
+    isv_ext_prod_id: string;
+    attributes: SgxAttributes;
+    mr_enclave: string;
+    reserved2: string;
+    mr_signer: string;
+    reserved3: string;
+    config_id: string;
+    isv_prod_id: number;
+    isv_svn: number;
+    config_svn: number;
+    reserved4: string;
+    isv_family_id: string;
+    report_data: string;
+};
+
+// TDX Report Body
+export type TdxReportBody = {
+    tee_tcb_svn: string;
+    mr_seam: string;
+    mr_signer_seam: string;
+    seam_attributes: [number, number];
+    td_attributes: [number, number];
+    xfam: [number, number];
+    mr_td: string;
+    mr_config_id: string;
+    mr_owner: string;
+    mr_owner_config: string;
+    rt_mr: [string, string, string, string];
+    report_data: string;
+};
+
+// SGX Quote (V3)
+export type SgxQuoteV3 = {
+    version: 'V3';
+    header: SgxQuoteHeaderV3;
+    report_body: SgxReportBody;
+    signature_data: string;
+};
+
+// TDX Quote (V4)
+export type TdxQuoteV4 = {
+    version: 'V4';
+    header: TdxQuoteHeaderV4;
+    report_body: TdxReportBody;
+    signature_data: string;
+};
+
+// Union type for all quote versions
+export type Quote = SgxQuoteV3 | TdxQuoteV4;
+
+// Attestation Component (recursive structure)
+export type AttestationComponent = {
+    componentName: string;
+    description: string;
+    quote: Quote | null;
+    childComponent: AttestationComponent[];
+};
+
+// Root Attestation Structure
+export type Attestation = AttestationComponent;

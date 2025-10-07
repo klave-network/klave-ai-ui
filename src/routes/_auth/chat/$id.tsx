@@ -431,7 +431,7 @@ function RouteComponent() {
                         error={error}
                         onSend={handleSend}
                         isDisabled={streamingMessageId !== '' || processingToolCall}
-                        secureButton={{ currentTime, challenge, quote, verification }}
+                        attestationButton={{ currentTime, challenge, quote, verification }}
                         agentMode={chatSettings.agentMode}
                     />
                 </div>

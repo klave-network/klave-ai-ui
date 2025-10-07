@@ -50,8 +50,6 @@ function RouteComponent() {
                             </>
                         )}
                     </div>
-                    {/* {location.pathname === '/chat/lense' && <ModelSelector />} */}
-                    {/* {location.pathname === '/chat/lense' ? null : hasMatchingRagModel && <SpaceSelector />} */}
                     {location.pathname === '/chat/lense' ? <LenseSettingsModal /> : <ChatSettingsModal />}
                 </div>
             </header>
