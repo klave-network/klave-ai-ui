@@ -1,5 +1,6 @@
 import { useParams } from '@tanstack/react-router';
 import { ChevronDown, Hammer } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -111,9 +112,9 @@ export function ToolSelector() {
                                     <div className="flex flex-col gap-1">
                                         <span className="font-medium">{tool.name}</span>
                                         {tool.description && (
-                                            <span className="text-xs text-muted-foreground">
-                                                {tool.description}
-                                            </span>
+                                            <div className="text-xs text-muted-foreground line-clamp-3 [&>p]:inline [&_a]:text-klave-blue [&_a]:hover:underline">
+                                                <ReactMarkdown>{tool.description}</ReactMarkdown>
+                                            </div>
                                         )}
                                     </div>
                                 </DropdownMenuCheckboxItem>

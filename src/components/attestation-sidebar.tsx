@@ -1,8 +1,10 @@
 import { Utils } from '@secretarium/connector';
 import {
     BadgeCheck,
+    BrainCircuit,
     Cpu,
     FileDigit,
+    Info,
     Landmark,
     Lock,
     Settings2,
@@ -39,6 +41,17 @@ import { useSecurityData } from '@/contexts/security-context';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
+// Helper function to collect all components recursively
+function collectAllComponents(component: AttestationComponent): AttestationComponent[] {
+    const components = [component];
+    if (component.childComponent && component.childComponent.length > 0) {
+        component.childComponent.forEach((child) => {
+            components.push(...collectAllComponents(child));
+        });
+    }
+    return components;
+}
+
 export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { toggleSidebar } = useSidebar('right');
     const { securityData } = useSecurityData();
@@ -48,13 +61,18 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
     const quote = securityData?.quote;
     const verification = securityData?.verification;
 
+    const allComponents = React.useMemo(
+        () => collectAllComponents(attestationData as AttestationComponent),
+        []
+    );
+    console.log('quote', quote);
     if (!quote || !verification) {
         return (
             <Sidebar side="right" {...props}>
                 <SidebarHeader>
                     <div className="flex items-center gap-2 px-4 py-3">
                         <Settings2 className="h-5 w-5" />
-                        <span className="font-semibold">Security</span>
+                        <span>Security</span>
                     </div>
                 </SidebarHeader>
                 <SidebarContent>
@@ -114,7 +132,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                         <AccordionContent className="text-muted-foreground">
                             <div className="flex flex-col gap-4">
                                 <div className="flex gap-2">
-                                    <BadgeCheck className="size-4 shrink-0 mt-1" />
+                                    <BadgeCheck className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
                                         <span className="font-medium">
                                             Your connection is secure
@@ -136,7 +154,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <BadgeCheck className="size-4 shrink-0 mt-1" />
+                                    <BadgeCheck className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
                                         <span>
                                             {
@@ -169,9 +187,9 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                         <AccordionContent className="text-muted-foreground">
                             <div className="flex flex-col gap-4">
                                 <div className="flex gap-2">
-                                    <BadgeCheck className="size-4 shrink-0 mt-1" />
+                                    <BadgeCheck className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
-                                        <span className="font-medium">
+                                        <span>
                                             Hardware is up to date
                                         </span>
                                         <span>
@@ -192,7 +210,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Lock className="size-4 shrink-0 mt-1" />
+                                    <Lock className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col gap-2 text-sm overflow-auto whitespace-pre-wrap break-words">
                                         <span className="font-medium">
                                             Image measurements are correct
@@ -224,7 +242,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <FileDigit className="size-4 shrink-0 mt-1" />
+                                    <FileDigit className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
                                         <span className="font-medium">
                                             Attestation
@@ -243,7 +261,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <TriangleAlert className="size-4 shrink-0 mt-1" />
+                                    <TriangleAlert className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
                                         <span className="font-medium">
                                             Applicable Security Advisories
@@ -267,7 +285,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Landmark className="size-4 shrink-0 mt-1" />
+                                    <Landmark className="size-4 shrink-0 mt-0.5" />
                                     <div className="flex flex-col text-sm">
                                         <span className="font-medium">
                                             Relying Party
@@ -291,6 +309,114 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                             <AttestationFlow data={attestationData as AttestationComponent} />
                         </AccordionContent>
                     </AccordionItem>
+
+                    <p className="text-xs text-muted-foreground">
+                        Hardware attestation information for each component.
+                    </p>
+
+                    {/* Component Details */}
+                    {allComponents.map(component => (
+                        <AccordionItem
+                            key={component.componentName}
+                            value={component.componentName}
+                            className="border rounded-md p-2"
+                        >
+                            <AccordionTrigger>
+                                <div className="flex gap-2 items-center">
+                                    <BrainCircuit className="size-4" />
+                                    <span>{component.componentName}</span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="text-muted-foreground">
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex gap-2">
+                                        <Info className="size-4 shrink-0 mt-0.5" />
+                                        <span>{component.description}</span>
+                                    </div>
+                                    {component.quote && (
+                                        <>
+                                            <div className="flex gap-2">
+                                                <BadgeCheck className="size-4 shrink-0 mt-1" />
+                                                <div className="flex flex-col text-sm">
+                                                    <span className="font-medium">
+                                                        Hardware is up to date
+                                                    </span>
+                                                    <span>
+                                                        This component has a hardware attestation quote (Version:
+                                                        {' '}
+                                                        {component.quote.version}
+                                                        ).
+                                                        {' '}
+                                                        <a
+                                                            href="https://docs.klave.com/learn/confidential-computing/attestation"
+                                                            className="text-blue-400 hover:underline inline-flex align-middle items-center"
+                                                            target="_blank"
+                                                            rel="noreferrer noopener"
+                                                        >
+                                                            Learn more.
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Lock className="size-4 shrink-0 mt-1" />
+                                                <div className="flex flex-col gap-2 text-sm overflow-auto whitespace-pre-wrap break-words">
+                                                    <span className="font-medium">
+                                                        Image measurements are correct
+                                                    </span>
+                                                    {component.quote.version === 'V3' && 'mr_enclave' in component.quote.report_body && (
+                                                        <>
+                                                            <span>
+                                                                MR Enclave is
+                                                                <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
+                                                                    {component.quote.report_body.mr_enclave}
+                                                                </pre>
+                                                            </span>
+                                                            <span>
+                                                                MR Signer is
+                                                                <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
+                                                                    {component.quote.report_body.mr_signer}
+                                                                </pre>
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                    {component.quote.version === 'V4' && 'mr_seam' in component.quote.report_body && (
+                                                        <>
+                                                            <span>
+                                                                MR SEAM is
+                                                                <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
+                                                                    {component.quote.report_body.mr_seam}
+                                                                </pre>
+                                                            </span>
+                                                            <span>
+                                                                MR TD is
+                                                                <pre className="text-xs p-2 overflow-auto whitespace-pre-wrap break-words border border-border rounded bg-muted">
+                                                                    {component.quote.report_body.mr_td}
+                                                                </pre>
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {!component.quote && (
+                                        <div className="flex gap-2">
+                                            <TriangleAlert className="size-4 shrink-0 mt-1" />
+                                            <div className="flex flex-col text-sm">
+                                                <span className="font-medium">
+                                                    No Hardware Attestation
+                                                </span>
+                                                <span className="text-muted-foreground">
+                                                    This component does not have a hardware attestation quote. It may be an external service.
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
                 </Accordion>
             </SidebarContent>
 

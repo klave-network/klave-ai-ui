@@ -33,7 +33,8 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
             position: { x: 0, y: 0 },
             data: {
                 label: 'This Chat',
-                description: 'Current chat session'
+                description: 'Current chat session',
+                hasQuote: false
             },
             sourcePosition: Position.Bottom,
             targetPosition: Position.Top
@@ -57,7 +58,8 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                 position: { x, y },
                 data: {
                     label: component.componentName,
-                    description: component.description
+                    description: component.description,
+                    hasQuote: component.quote
                 },
                 type: 'custom', // Use custom AttestationNode component
                 sourcePosition: Position.Bottom, // Edges exit from bottom
