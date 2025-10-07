@@ -9,7 +9,8 @@ import {
     ShieldCheck,
     SquareArrowOutUpRight,
     TriangleAlert,
-    Workflow
+    Workflow,
+    X
 } from 'lucide-react';
 import * as React from 'react';
 
@@ -25,6 +26,7 @@ import {
     AccordionItem,
     AccordionTrigger
 } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 import {
     Sidebar,
     SidebarContent,
@@ -34,9 +36,11 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { useSecurityData } from '@/contexts/security-context';
+import { useSidebar } from '@/hooks/use-sidebar';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
 export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    const { toggleSidebar } = useSidebar('right');
     const { securityData } = useSecurityData();
 
     const currentTime = securityData?.currentTime ?? 0;
@@ -80,11 +84,16 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <div className="flex items-center gap-2 px-2">
-                            <ShieldCheck className="size-6" />
-                            <span className="text-lg font-medium font-owners tracking-wide">
-                                Verification Center
-                            </span>
+                        <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center gap-2">
+                                <ShieldCheck className="size-6" />
+                                <span className="text-lg font-medium font-owners tracking-wide">
+                                    Verification Center
+                                </span>
+                            </div>
+                            <Button size="icon" variant="ghost" onClick={toggleSidebar}>
+                                <X className="size-6" />
+                            </Button>
                         </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
