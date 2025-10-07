@@ -1,8 +1,7 @@
 import { Link } from '@tanstack/react-router';
-import { Blocks, Bot } from 'lucide-react';
+import { Blocks, Bot, Hammer } from 'lucide-react';
 import * as React from 'react';
 
-import { MCPIcon } from '@/components/mcp-icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -21,7 +20,7 @@ export function NavExplore({
             <SidebarGroupContent>
                 <SidebarMenu>
                     {/* <SidebarMenuItem key="lense">
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton asChild tooltip="Lense">
                             <Link
                                 search
                                 to="/chat/lense"
@@ -35,7 +34,7 @@ export function NavExplore({
                         </SidebarMenuButton>
                     </SidebarMenuItem> */}
                     <SidebarMenuItem key="models">
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton asChild tooltip="Models">
                             <Link
                                 search
                                 to="/models"
@@ -49,7 +48,7 @@ export function NavExplore({
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem key="spaces">
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton asChild tooltip="Spaces">
                             <Link
                                 search
                                 to="/spaces"
@@ -62,17 +61,17 @@ export function NavExplore({
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <SidebarMenuItem key="mcp-servers">
-                        <SidebarMenuButton asChild>
+                    <SidebarMenuItem key="tools">
+                        <SidebarMenuButton asChild tooltip="Tools">
                             <Link
                                 search
-                                to="/mcp-servers"
+                                to="/tools"
                                 activeProps={{
                                     className: 'bg-sidebar-accent flex'
                                 }}
                             >
-                                <MCPIcon />
-                                <span>MCP Servers</span>
+                                <Hammer />
+                                <span>Tools</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

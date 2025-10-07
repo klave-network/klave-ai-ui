@@ -1,4 +1,4 @@
-import { Bot, Layers, LifeBuoy, MessageCircle, MessageCirclePlus, Settings, Video } from 'lucide-react';
+import { Bot, Hammer, Layers, LifeBuoy, MessageCircle, MessageCirclePlus, Settings, Video } from 'lucide-react';
 import * as React from 'react';
 
 import { NavChats } from '@/components/nav/chats';
@@ -14,8 +14,6 @@ import {
     SidebarRail
 } from '@/components/ui/sidebar';
 
-import { MCPIcon } from './mcp-icon';
-
 const routes = {
     user: {
         name: 'damitzi',
@@ -25,7 +23,7 @@ const routes = {
     navMain: [
         {
             title: 'New chat',
-            url: '/',
+            url: '/chat',
             icon: MessageCirclePlus,
             className: 'bg-gradient-to-br from-klave-blue via-klave-blue to-klave-cyan/90 text-white'
         },
@@ -53,9 +51,9 @@ const routes = {
             icon: Layers
         },
         {
-            title: 'MCP Servers',
-            url: '/mcp-servers',
-            icon: MCPIcon
+            title: 'Tools',
+            url: '/tools',
+            icon: Hammer
         }
     ],
     navSecondary: [
