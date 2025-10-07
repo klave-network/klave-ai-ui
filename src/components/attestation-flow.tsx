@@ -5,11 +5,17 @@ import { useMemo } from 'react';
 
 import type { AttestationComponent } from '@/lib/types';
 
+import { AttestationNode } from '@/components/attestation-node';
+
 const HORIZONTAL_SPACING = 300; // Space between nodes horizontally (left to right)
 const VERTICAL_SPACING = 150; // Space between nodes vertically (top to bottom)
 
 type AttestationFlowProps = {
     data: AttestationComponent;
+};
+
+const nodeTypes = {
+    custom: AttestationNode
 };
 
 export function AttestationFlow({ data }: AttestationFlowProps) {
@@ -23,30 +29,14 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
         const rootNodeId = 'root-this-chat';
         nodes.push({
             id: rootNodeId,
+            type: 'custom',
             position: { x: 0, y: 0 },
             data: {
                 label: 'This Chat',
                 description: 'Current chat session'
             },
-            type: 'default',
             sourcePosition: Position.Bottom,
-            targetPosition: Position.Top,
-            style: {
-                background: 'hsl(var(--card))',
-                border: '2px solid hsl(var(--primary) / 0.5)',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                minWidth: '220px',
-                maxWidth: '220px',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'hsl(var(--card-foreground))',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                textAlign: 'center',
-                whiteSpace: 'normal',
-                wordWrap: 'break-word',
-                lineHeight: '1.4'
-            }
+            targetPosition: Position.Top
         } as Node);
 
         // RECURSIVE TREE BUILDING FUNCTION
@@ -69,29 +59,10 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
                     label: component.componentName,
                     description: component.description
                 },
-                type: 'default', // Use ReactFlow's default node type
+                type: 'custom', // Use custom AttestationNode component
                 sourcePosition: Position.Bottom, // Edges exit from bottom
-                targetPosition: Position.Top, // Edges enter from top
+                targetPosition: Position.Top // Edges enter from top
 
-                // NODE STYLING
-                // Customize appearance here
-
-                style: {
-                    background: 'hsl(var(--card))',
-                    border: '2px solid hsl(var(--primary) / 0.3)',
-                    borderRadius: '12px',
-                    padding: '16px 20px',
-                    minWidth: '220px',
-                    maxWidth: '220px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: 'hsl(var(--card-foreground))',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    textAlign: 'center',
-                    whiteSpace: 'normal',
-                    wordWrap: 'break-word',
-                    lineHeight: '1.4'
-                }
             });
 
             // CREATE EDGE (CONNECTION FROM PARENT)
@@ -172,6 +143,7 @@ export function AttestationFlow({ data }: AttestationFlowProps) {
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
+                nodeTypes={nodeTypes}
                 fitView // Auto-fit the view to show all nodes
 
                 // INTERACTIVITY CONFIGURATION
