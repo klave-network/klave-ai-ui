@@ -21,7 +21,7 @@ const routes = {
     },
     navMain: [
         {
-            title: 'New chat',
+            title: 'New Chat',
             url: '/chat',
             icon: MessageCirclePlus,
             className: 'bg-gradient-to-br from-klave-blue via-klave-blue to-klave-cyan/90 text-white'
