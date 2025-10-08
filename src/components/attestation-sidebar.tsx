@@ -65,7 +65,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
         () => collectAllComponents(attestationData as AttestationComponent),
         []
     );
-    console.log('quote', quote);
+
     if (!quote || !verification) {
         return (
             <Sidebar side="right" {...props}>
