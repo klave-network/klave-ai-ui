@@ -97,6 +97,7 @@ function RouteComponent() {
                         {mcpServer.description.is_rag ? <Layers className="size-4" /> : <Hammer className="size-4" />}
                         <h3 className="font-semibold text-lg">
                             Available
+                            {' '}
                             {mcpServer.description.is_rag ? 'Spaces' : 'Tools'}
                         </h3>
                         <span className="text-sm text-muted-foreground">
