@@ -32,7 +32,8 @@ type ChatSettings = {
     currentMcpServer: string;
     sessionId?: string;
     agentMode?: boolean;
-    selectedTools?: string[]; // Array of selected tool names
+    selectedTools?: string[]; // Array of selected tool names (non-RAG tools)
+    selectedSpaces?: string[]; // Array of selected space names (RAG tools)
 };
 
 export type ChatHistory = {
@@ -72,7 +73,8 @@ export const defaultChatSettings: ChatSettings = {
     currentMcpModel: '',
     currentMcpServer: '',
     agentMode: false,
-    selectedTools: []
+    selectedTools: [],
+    selectedSpaces: []
 };
 
 export const defaultLenseSettings = {

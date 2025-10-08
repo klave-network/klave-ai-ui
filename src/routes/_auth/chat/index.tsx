@@ -72,15 +72,17 @@ function RouteComponent() {
             if (chatSettings.agentMode) {
                 // Step 1: Create LLM Context with MCP Integration
                 // Get session IDs for selected tools
-                const selectedToolNames = chatSettings.selectedTools ?? [];
+                const selectedTools = chatSettings.selectedTools ?? [];
+                const selectedSpaces = chatSettings.selectedSpaces ?? [];
+                const selectedToolsAndSpaces = [...selectedTools, ...selectedSpaces];
                 const sessionIds: string[] = [];
 
-                if (selectedToolNames.length > 0) {
+                if (selectedToolsAndSpaces.length > 0) {
                     // Get sessions for selected tools
                     const currentUserSessions = store.state.userData[currentUser ?? '']?.mcpSessions ?? [];
                     const mcpServers = store.state.mcpServers;
 
-                    for (const toolName of selectedToolNames) {
+                    for (const toolName of selectedToolsAndSpaces) {
                         // Find which server has this tool
                         const serverWithTool = mcpServers.find(server =>
                             server.tools.some(tool => tool.name === toolName)
@@ -146,7 +148,8 @@ function RouteComponent() {
                     currentMcpServer: chatSettings?.currentMcpServer ?? '',
                     sessionId: chatSettings.sessionId,
                     agentMode: chatSettings?.agentMode ?? false,
-                    selectedTools: chatSettings?.selectedTools ?? []
+                    selectedTools: chatSettings?.selectedTools ?? [],
+                    selectedSpaces: chatSettings?.selectedSpaces ?? []
                 };
 
                 storeActions.createChat(currentUser ?? '', contextId, message, settings);
@@ -189,7 +192,8 @@ function RouteComponent() {
                     currentMcpModel: chatSettings?.currentMcpModel ?? '',
                     currentMcpServer: chatSettings?.currentMcpServer ?? '',
                     agentMode: chatSettings?.agentMode ?? false,
-                    selectedTools: chatSettings?.selectedTools ?? []
+                    selectedTools: chatSettings?.selectedTools ?? [],
+                    selectedSpaces: chatSettings?.selectedSpaces ?? []
                 };
 
                 storeActions.createChat(currentUser ?? '', contextId, message, settings);

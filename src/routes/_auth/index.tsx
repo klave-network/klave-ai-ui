@@ -1,8 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Bot, Hammer, Layers, MessageCirclePlus } from 'lucide-react';
 
 import {
-    getAttestations,
     getModels as getMcpModels,
     getMcpServerCapabilities,
     getMcpServers,
@@ -26,8 +25,8 @@ export const Route = createFileRoute('/_auth/')({
         const mcpModels = await getMcpModels();
         const ragSets = await getRagList();
         const mcpServers = await getMcpServers();
-        const attestations = await getAttestations();
-        console.log('Attestations:', attestations);
+        // const attestations = await getAttestations();
+
         storeActions.addModels(currentUser, [...models]);
         storeActions.addMcpModels(mcpModels);
         storeActions.addMcpServers(mcpServers);
@@ -104,21 +103,29 @@ function RouteComponent() {
                             Your data is processed securely, ensuring privacy without compromise.
                         </p>
                         <div className="flex items-center gap-2">
-                            <Button variant="outline">
-                                <MessageCirclePlus />
-                                New Chat
+                            <Button variant="outline" asChild>
+                                <Link search to="/chat">
+                                    <MessageCirclePlus />
+                                    New Chat
+                                </Link>
                             </Button>
-                            <Button variant="outline">
-                                <Bot />
-                                View Models
+                            <Button variant="outline" asChild>
+                                <Link search to="/models">
+                                    <Bot />
+                                    View Models
+                                </Link>
                             </Button>
-                            <Button variant="outline">
-                                <Layers />
-                                View Spaces
+                            <Button variant="outline" asChild>
+                                <Link search to="/spaces">
+                                    <Layers />
+                                    View Spaces
+                                </Link>
                             </Button>
-                            <Button variant="outline">
-                                <Hammer />
-                                View Tools
+                            <Button variant="outline" asChild>
+                                <Link search to="/tools">
+                                    <Hammer />
+                                    View Tools
+                                </Link>
                             </Button>
                         </div>
                     </div>

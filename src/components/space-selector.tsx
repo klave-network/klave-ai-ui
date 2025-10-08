@@ -25,7 +25,7 @@ export function SpaceSelector() {
     const isDisabled = chatExists;
 
     // Get current selections from chat settings
-    const selectedTools = currentChat?.chatSettings?.selectedTools ?? chatSettings?.selectedTools ?? [];
+    const selectedSpaces = currentChat?.chatSettings?.selectedSpaces ?? chatSettings?.selectedSpaces ?? [];
 
     // Get all available tools from RAG servers only (is_rag: true)
     const ragServers = mcpServers.filter(server => server.description?.is_rag === true);
@@ -42,23 +42,23 @@ export function SpaceSelector() {
             return;
 
         try {
-            const currentSelections = selectedTools || [];
+            const currentSelections = selectedSpaces || [];
             let newSelections: string[];
 
             if (currentSelections.includes(toolName)) {
-                // Remove tool
+                // Remove space
                 newSelections = currentSelections.filter(t => t !== toolName);
                 toast.success(`Space "${toolName}" deselected`);
             }
             else {
-                // Add tool
+                // Add space
                 newSelections = [...currentSelections, toolName];
                 toast.success(`Space "${toolName}" selected`);
             }
 
             storeActions.updateChatSettings(currentUser, {
                 ...chatSettings,
-                selectedTools: newSelections
+                selectedSpaces: newSelections
             });
         }
         catch (error) {
@@ -71,9 +71,8 @@ export function SpaceSelector() {
         return null;
     }
 
-    // Count only selected spaces (tools from RAG servers)
-    const selectedSpaceNames = allSpaceTools.map(tool => tool.name);
-    const selectedCount = selectedTools.filter(tool => selectedSpaceNames.includes(tool)).length;
+    // Count only selected spaces
+    const selectedCount = selectedSpaces.length;
 
     return (
         <DropdownMenu>
@@ -106,7 +105,7 @@ export function SpaceSelector() {
                             {server.tools.map(tool => (
                                 <DropdownMenuCheckboxItem
                                     key={`${server.id}-${tool.name}`}
-                                    checked={selectedTools.includes(tool.name)}
+                                    checked={selectedSpaces.includes(tool.name)}
                                     onCheckedChange={() => handleSpaceToggle(tool.name)}
                                     className="pl-6"
                                 >

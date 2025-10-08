@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -45,6 +46,8 @@ type NewSpaceDialogProps = {
 };
 
 export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
+    const navigate = useNavigate();
+
     const [open, setOpen] = useState(false);
     const [selectedChunkingStrategy, setSelectedChunkingStrategy] = useState<ChunkingStrategyType>(
         ChunkingStrategy.SENTENCE
@@ -184,6 +187,7 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
                 setSpaceName('');
                 setSelectedChunkingStrategy(ChunkingStrategy.SENTENCE);
                 setChunkSize(256);
+                navigate({ to: '/', search: true });
             }
 
             if (failCount === selectedFiles.size) {
