@@ -188,7 +188,7 @@ function RouteComponent() {
                 // Additional parameters for chunking and OCR
                 nb_chars_per_chunk: 2048,
                 overlap_ratio: 0.1,
-                chunking_strategy: selectedChunkingStrategy,
+                chunk_strategy: selectedChunkingStrategy,
                 ocr_id: ocr[0].ocr_id ?? '',
                 perform_ocr: useOcr,
                 batch_size: 100
