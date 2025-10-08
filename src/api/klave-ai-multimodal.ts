@@ -1,12 +1,10 @@
 import type {
-    AddRagPromptResult,
     ChunkResult,
     Component,
     ContextInput,
     FrameInput,
     Model,
     PromptInput,
-    PromptInputRag,
     Tokenizer
 } from '@/lib/types';
 
@@ -224,31 +222,6 @@ export async function inferenceAddPrompt(args: PromptInput): Promise<any> {
             tx =>
                 new Promise((resolve, reject) => {
                     tx.onResult((result: any) => {
-                        resolve(result);
-                    });
-                    tx.onError((error) => {
-                        reject(error);
-                    });
-                    tx.send().catch(reject);
-                })
-        );
-}
-
-export async function inferenceAddRagPrompt(args: PromptInputRag): Promise<AddRagPromptResult> {
-    return waitForConnection()
-        .then(() =>
-            secretariumHandler.request(
-                KLAVE_AI_MULTIMODAL_FQDN,
-                'inference_rag_add_prompt',
-                args,
-                `inference_rag_add_prompt-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
-                KLAVE_AI_MULTIMODAL_NODE
-            )
-        )
-        .then(
-            tx =>
-                new Promise((resolve, reject) => {
-                    tx.onResult((result: AddRagPromptResult) => {
                         resolve(result);
                     });
                     tx.onError((error) => {

@@ -156,7 +156,7 @@ export async function ragAddDocument(args: {
     document: any;
     nb_chars_per_chunk: number;
     overlap_ratio: number;
-    chunking_strategy: ChunkingStrategyType;
+    chunk_strategy: ChunkingStrategyType;
     ocr_id: string;
     perform_ocr: boolean;
     batch_size: number;

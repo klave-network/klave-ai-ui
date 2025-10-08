@@ -153,13 +153,13 @@ export async function getMcpServerCapabilities(args: { server_id: string }): Pro
         );
 }
 
-export async function getMcpTools(): Promise<any> {
+export async function getMcpTools(args: { session_id: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
                 KLAVE_AI_MCP_CLIENT_FQDN,
                 'mcp_tool_list',
-                {},
+                args,
                 `mcp_tool_list-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
                 KLAVE_AI_MCP_CLIENT_NODE
             )
@@ -254,6 +254,35 @@ export async function mcpSessionStatus(args: { session_id: string }): Promise<an
         );
 }
 
+export async function mcpSessionUpdate(args: {
+    session_id: string;
+    tool_name: string;
+    enabled: boolean;
+}): Promise<any> {
+    return waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                KLAVE_AI_MCP_CLIENT_FQDN,
+                'mcp_session_update',
+                args,
+                `mcp_session_update-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                KLAVE_AI_MCP_CLIENT_NODE
+            )
+        )
+        .then(
+            tx =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
+}
+
 export async function closeMcpSession(args: { session_id: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
@@ -280,7 +309,11 @@ export async function closeMcpSession(args: { session_id: string }): Promise<any
 }
 
 // LLM Context Management
-export async function createLlmContext(args: { context: ContextInput; session_ids: string[] }): Promise<any> {
+export async function createLlmContext(args: {
+    context: ContextInput;
+    session_ids: string[];
+    token_id: string;
+}): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -305,7 +338,7 @@ export async function createLlmContext(args: { context: ContextInput; session_id
         );
 }
 
-export async function deleteLlmContext(args: { context_name: string }): Promise<any> {
+export async function deleteLlmContext(args: { context_name: string; token_id: string }): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -330,7 +363,11 @@ export async function deleteLlmContext(args: { context_name: string }): Promise<
         );
 }
 
-export async function addLlmContextTools(args: { context_name: string; session_ids: string[] }): Promise<any> {
+export async function addLlmContextTools(args: {
+    context_name: string;
+    session_ids: string[];
+    token_id: string;
+}): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -355,7 +392,11 @@ export async function addLlmContextTools(args: { context_name: string; session_i
         );
 }
 
-export async function sendLlmContextPrompt(args: { context_name: string; user_prompt: string }): Promise<any> {
+export async function sendLlmContextPrompt(args: {
+    context_name: string;
+    user_prompt: string;
+    token_id: string;
+}): Promise<any> {
     return waitForConnection()
         .then(() =>
             secretariumHandler.request(
@@ -380,7 +421,10 @@ export async function sendLlmContextPrompt(args: { context_name: string; user_pr
         );
 }
 
-export async function getLlmContextResponse(args: { context_name: string; nb_pieces?: number }, resolveCallback: (result: McpChunkResult) => boolean): Promise<void> {
+export async function getLlmContextResponse(
+    args: { context_name: string; token_id: string; nb_pieces?: number },
+    resolveCallback: (result: McpChunkResult) => boolean
+): Promise<void> {
     await waitForConnection();
     if (args.nb_pieces === undefined || args.nb_pieces < 1)
         args.nb_pieces = 5; // Default to 5 pieces if not specified
@@ -408,4 +452,29 @@ export async function getLlmContextResponse(args: { context_name: string; nb_pie
 
         tx.send().catch(reject);
     });
+}
+
+export async function getAttestations(): Promise<any> {
+    return waitForConnection()
+        .then(() =>
+            secretariumHandler.request(
+                KLAVE_AI_MCP_CLIENT_FQDN,
+                'attestation_get_all',
+                {},
+                `attestation_get_all-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+                KLAVE_AI_MCP_CLIENT_NODE
+            )
+        )
+        .then(
+            tx =>
+                new Promise((resolve, reject) => {
+                    tx.onResult((result: any) => {
+                        resolve(result);
+                    });
+                    tx.onError((error) => {
+                        reject(error);
+                    });
+                    tx.send().catch(reject);
+                })
+        );
 }
