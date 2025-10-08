@@ -53,13 +53,13 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
         ChunkingStrategy.SENTENCE
     );
     const [spaceName, setSpaceName] = useState<string>('');
-    const [chunkSize, setChunkSize] = useState<number>(256);
+    const [chunkSize, setChunkSize] = useState<number>(2048);
     const [isProcessing, setIsProcessing] = useState(false);
 
     // Reset chunk size to default when switching away from fixed chunking strategy
     useEffect(() => {
         if (selectedChunkingStrategy !== ChunkingStrategy.FIXED) {
-            setChunkSize(256);
+            setChunkSize(2048);
         }
     }, [selectedChunkingStrategy]);
 
@@ -102,7 +102,7 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
                 },
                 nb_chars_per_chunk: chunkSize,
                 overlap_ratio: 0.1,
-                chunking_strategy: selectedChunkingStrategy,
+                chunk_strategy: selectedChunkingStrategy,
                 ocr_id: ocrId,
                 perform_ocr: useOcr,
                 batch_size: 100
@@ -155,7 +155,8 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
                 database_id,
                 rag_name: `rag_uat_${spaceName.trim() || `rag_uat_${Date.now()}`}`,
                 model_name: 'Qwen3-Embedding-8B',
-                tool_name: `tool_rag_uat_${spaceName.trim() || `rag_uat_${Date.now()}`}`
+                tool_name: `tool_rag_uat_${spaceName.trim() || `rag_uat_${Date.now()}`}`,
+                chunk_length: 2048
             });
 
             const ocr = await getOcrList();
@@ -186,7 +187,7 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
                 setOpen(false);
                 setSpaceName('');
                 setSelectedChunkingStrategy(ChunkingStrategy.SENTENCE);
-                setChunkSize(256);
+                setChunkSize(2048);
                 navigate({ to: '/', search: true });
             }
 
@@ -284,6 +285,7 @@ export function NewSpaceDialog({ selectedFiles, files }: NewSpaceDialogProps) {
                                         <SelectItem value="128">128</SelectItem>
                                         <SelectItem value="192">192</SelectItem>
                                         <SelectItem value="256">256</SelectItem>
+                                        <SelectItem value="2048">2048</SelectItem>
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
