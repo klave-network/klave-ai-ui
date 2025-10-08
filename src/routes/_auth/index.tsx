@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Bot, Hammer, Layers, MessageCirclePlus } from 'lucide-react';
 
 import {
     getAttestations,
@@ -13,6 +14,7 @@ import {
 } from '@/api/klave-ai-multimodal';
 import { getRagList } from '@/api/klave-ai-rag-mcp-server';
 import { LoadingDots } from '@/components/loading-dots';
+import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { store, storeActions } from '@/store';
 
@@ -89,10 +91,37 @@ function RouteComponent() {
             </header>
 
             <div className="flex flex-col items-center h-full">
-                <div className="flex flex-col gap-6 items-center justify-center h-full w-full">
-                    <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">
-                        Welcome to Klave AI
-                    </h2>
+                <div className="flex flex-col items-center justify-center h-full w-full">
+                    <div className="flex flex-col gap-4">
+                        <h2 className="font-owners font-medium tracking-wide text-2xl md:text-3xl">
+                            Welcome to
+                            {' '}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-klave-cyan to-klave-blue">Klave AI</span>
+                        </h2>
+                        <p className="text-muted-foreground">
+                            Experience AI-powered conversations with end-to-end confidentiality.
+                            <br />
+                            Your data is processed securely, ensuring privacy without compromise.
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Button variant="outline">
+                                <MessageCirclePlus />
+                                New Chat
+                            </Button>
+                            <Button variant="outline">
+                                <Bot />
+                                View Models
+                            </Button>
+                            <Button variant="outline">
+                                <Layers />
+                                View Spaces
+                            </Button>
+                            <Button variant="outline">
+                                <Hammer />
+                                View Tools
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
