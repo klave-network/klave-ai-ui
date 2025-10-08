@@ -27,11 +27,17 @@ export function useStreamedResponse({
     const fullResponseRef = useRef('');
     const reasoningRef = useRef('');
     const chatSettings = useCurrentUserChatSettings();
+    const toolCallInProgressRef = useRef(false);
 
     // Handler for MCP server response (pieces-based format from test.js)
     const handleMcpStreamResult = (result: McpChunkResult): boolean => {
-        if (!isMountedRef.current)
+        // console.log('📦 Received result:', JSON.stringify(result, null, 2));
+        // console.log('🔍 isMountedRef.current:', isMountedRef.current);
+
+        if (!isMountedRef.current) {
+            // console.log('⚠️ Not mounted, returning true to stop stream');
             return true;
+        }
 
         // Process pieces array (new format from backend)
         if (typeof result === 'object' && result.pieces && result.pieces.length > 0) {
@@ -48,24 +54,39 @@ export function useStreamedResponse({
                 }
                 else if (piece.type === 'ToolCalls') {
                     // Handle tool call
-                    console.log(`Tool call detected: ${piece.content}`);
                     try {
                         const toolCallData = JSON.parse(piece.content);
-                        setLoading(false);
+                        // DON'T set loading to false or isMountedRef to false - we want to continue after tool execution
+                        // Set flag to indicate tool call is in progress
+                        toolCallInProgressRef.current = true;
                         if (onToolCallRequired) {
                             onToolCallRequired(toolCallData);
                         }
-                        return true; // Stop streaming, wait for tool execution
+                        else {
+                            console.warn('⚠️ onToolCallRequired is not defined!');
+                        }
+                        return true; // Stop this stream, will restart after tool execution
                     }
                     catch (e) {
-                        console.error('Failed to parse tool call:', e);
+                        console.error('❌ Failed to parse tool call:', e);
                     }
                 }
             }
         }
+        else {
+            // console.log('No pieces in result or result is not an object');
+        }
 
-        // Check if response is complete
+        // Check if response is complete (only after all pieces processed)
         if (result.complete) {
+            // If a tool call is in progress, don't complete - we're waiting for the next iteration
+            if (toolCallInProgressRef.current) {
+                toolCallInProgressRef.current = false; // Reset flag for next iteration
+                // Don't call onComplete, don't set loading to false, don't set isMountedRef to false
+                // Just return true to stop this stream - the next one will start when triggerKey changes
+                return true;
+            }
+
             setLoading(false);
             onComplete(fullResponseRef.current, reasoningRef.current);
             isMountedRef.current = false;
@@ -101,6 +122,10 @@ export function useStreamedResponse({
     };
 
     useEffect(() => {
+        // console.log(`🚀 useEffect TRIGGERED! triggerKey: ${triggerKey}, context: ${context_name}`);
+        // console.log(`🔄 Starting stream iteration (triggerKey: ${triggerKey}, context: ${context_name})`);
+        // console.log(`📊 Effect deps - context_name: ${context_name}, triggerKey: ${triggerKey}`);
+        // console.log(`🔧 toolCallInProgressRef.current: ${toolCallInProgressRef.current}`);
         isMountedRef.current = true;
         setLoading(true);
         setError(null);
@@ -108,11 +133,16 @@ export function useStreamedResponse({
         const streamFn = chatSettings.agentMode ? getLlmContextResponse : inferenceGetResponse;
         const handler = chatSettings.agentMode ? handleMcpStreamResult : handleMultimodalStreamResult;
 
-        streamFn({ context_name, token_id: '', nb_pieces: 5 }, handler as any).catch((err) => {
-            console.error('Stream error:', err);
-            setError('Failed to stream response');
-            setLoading(false);
-        });
+        streamFn({ context_name, token_id: '', nb_pieces: 5 }, handler as any)
+            .then(() => {
+                console.log('Stream Promise resolved (returned true from handler)');
+            })
+            .catch((err) => {
+                console.error('❌ Stream error:', err);
+                setError('Failed to stream response');
+                setLoading(false);
+                isMountedRef.current = false;
+            });
 
         return () => {
             isMountedRef.current = false;

@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { CopyIcon, Hammer, Lightbulb } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 import { getQuote, isConnected as isKlaveConnected, verifyQuote } from '@/api/klave';
 import { callMcpTool, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client';
@@ -174,13 +175,14 @@ function RouteComponent() {
     // Handle MCP tool calls - following test.js pattern
     const handleToolCallRequired = useCallback(
         async (toolCall: unknown) => {
-            if (processingToolCall)
+            if (processingToolCall) {
+                // Already processing a tool call, skipping...
                 return;
+            }
 
             setProcessingToolCall(true);
 
             try {
-                console.log('🔧 Processing tool call:', toolCall);
                 const toolCallData = toolCall as { name: string; arguments: unknown };
 
                 // Find the session ID for the tool being called
@@ -212,8 +214,6 @@ function RouteComponent() {
                     arguments: toolCallData.arguments
                 });
 
-                console.log('✅ Tool call result received:', toolResult);
-
                 // Store the tool result in the message
                 const newToolResult = {
                     toolName: toolCallData.name,
@@ -221,7 +221,6 @@ function RouteComponent() {
                     timestamp: Date.now()
                 };
 
-                console.log('📦 Storing tool result to message:', newToolResult);
                 storeActions.addToolResult(currentUser, chatId, streamingMessageId, newToolResult);
 
                 // Step 2: Send the tool result back to the LLM context (matches test.js)
@@ -231,11 +230,11 @@ function RouteComponent() {
                     token_id: ''
                 });
 
-                console.log('📤 Tool result sent back to LLM, continuing stream...');
-
                 // Step 3: Increment trigger key to restart streaming (matches test.js loop pattern)
                 setProcessingToolCall(false);
-                setStreamTriggerKey(prev => prev + 1);
+                setStreamTriggerKey((prev) => {
+                    return prev + 1;
+                });
             }
             catch (error) {
                 console.error('❌ Error processing tool call:', error);
@@ -263,44 +262,20 @@ function RouteComponent() {
                         const isStreaming = streamingMessageId === id && role === 'ai';
                         return (
                             <Fragment key={id}>
-                                <div
-                                    className={`w-fit mb-2 px-4 py-2 rounded-xl ${
-                                        role === 'user' ? 'bg-klave-blue/20 ml-auto' : 'mr-auto'
-                                    }`}
-                                >
-                                    {isStreaming
-                                        ? (
-                                                <StreamedResponse
-                                                    key={`stream-${id}`}
-                                                    context_name={`context_${chatId}`}
-                                                    onComplete={(fullResponse, reasoning) => handleStreamComplete(id, fullResponse, reasoning)}
-                                                    onToolCallRequired={handleToolCallRequired}
-                                                    triggerKey={streamTriggerKey}
-                                                />
-                                            )
-                                        : (
-                                                <div className="flex flex-col">
-                                                    <div className="prose">
-                                                        <ReactMarkdown>{content}</ReactMarkdown>
-                                                    </div>
-                                                    {role === 'ai' && (
-                                                        <div className="mt-2">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="size-6 hover:cursor-pointer"
-                                                                onClick={() => copyToClipboard(content, 'Chat response')}
-                                                            >
-                                                                <CopyIcon className="h-3.5 w-3.5" />
-                                                                <span className="sr-only">Copy Chat response</span>
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                </div>
+                                {/* Only show streaming container when actually streaming */}
+                                {isStreaming && (
+                                    <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
+                                        <StreamedResponse
+                                            key={`stream-${id}`}
+                                            context_name={`context_${chatId}`}
+                                            onComplete={(fullResponse, reasoning) => handleStreamComplete(id, fullResponse, reasoning)}
+                                            onToolCallRequired={handleToolCallRequired}
+                                            triggerKey={streamTriggerKey}
+                                        />
+                                    </div>
+                                )}
 
-                                {/* Display reasoning content in accordion */}
+                                {/* Display reasoning content in accordion (FIRST) */}
                                 {!isStreaming && reasoningContent && reasoningContent.trim() && (
                                     <div className="w-full mb-2">
                                         <Accordion type="single" collapsible className="w-full">
@@ -320,7 +295,7 @@ function RouteComponent() {
                                     </div>
                                 )}
 
-                                {/* Display tool results from message history */}
+                                {/* Display tool results from message history (SECOND) */}
                                 {!isStreaming && toolResults && toolResults.length > 0 && (
                                     <div className="w-full mb-2">
                                         <Accordion type="multiple" className="w-full space-y-2">
@@ -398,6 +373,36 @@ function RouteComponent() {
                                         </Accordion>
                                     </div>
                                 )}
+
+                                {/* Display message content (THIRD/LAST) */}
+                                {!isStreaming && content && (
+                                    <div className={`w-fit mb-2 px-4 py-2 rounded-xl ${
+                                        role === 'user' ? 'bg-klave-blue/20 ml-auto' : 'mr-auto'
+                                    }`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <div className="prose">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {content}
+                                                </ReactMarkdown>
+                                            </div>
+                                            {role === 'ai' && (
+                                                <div className="mt-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-6 hover:cursor-pointer"
+                                                        onClick={() => copyToClipboard(content, 'Chat response')}
+                                                    >
+                                                        <CopyIcon className="h-3.5 w-3.5" />
+                                                        <span className="sr-only">Copy Chat response</span>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
                                 {toolCalled && !isStreaming && !processingToolCall && (
                                     <div className="text-xs flex items-center gap-2 px-4 mb-2">
                                         <h2 className="font-semibold">Tools called: </h2>

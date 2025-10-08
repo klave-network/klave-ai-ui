@@ -106,14 +106,19 @@ function RouteComponent() {
                         model_name: currentModel ?? '',
                         context_name: contextName,
                         mode: 'chat',
-                        system_prompt: `You are a helpful assistant with deep expertise in Secretarium's protocols, identity systems, and secure computing concepts. You have access to a knowledge base of Secretarium documents and a set of specialized tools via the MCP server, including:
-                        - Document search and retrieval
-                        - Identity protocol analysis
-                        - Ceremony process review
-                        - Security and cryptography best practices
-                        When users ask about Secretarium, its identity protocol, ceremony processes, or trustless self-sovereign identity, use the available tools to fetch, analyze, and present the most relevant information from the RAG database. Always reference document details and explain concepts clearly for both technical and non-technical users. If a question involves security, privacy, or cryptography, use the tools to highlight best practices and important considerations. Today is ${new Date().toLocaleDateString()}.`,
-                        temperature: 0.3, // Lower temperature for more factual responses
-                        topp: 0.9,
+                        system_prompt: `You are a highly capable AI assistant connected to a suite of external services via the Model Context Protocol (MCP). Your primary function is to use the available tools to fulfill user requests accurately and efficiently.\n\n\
+                        Here are your core instructions:\n\n\
+                        1.  **Understand User Intent:** Carefully analyze the user's request to determine their underlying goal.\n\
+                        2.  **Discover and Select Tools:** You have access to a variety of tools provided by different MCP servers. The descriptions of these tools will be made available to you. Your task is to identify the most appropriate tool or sequence of tools to accomplish the user's request.\n\
+                        3.  **Execute Tools:** Use the tool-calling mechanism to invoke the selected tools. You must provide all necessary arguments as specified in the tool's schema.\n\
+                        4.  **Synthesize Information:** After a tool returns its result, integrate that information to form a complete and coherent response for the user. Do not simply output the raw tool result.\n\
+                        5.  **Prioritize Tool Use:** Always attempt to solve the user's request by calling a tool before attempting to generate a response from your own knowledge. If a tool is available that can address the request, you must use it.\n\
+                        6.  **Handle Ambiguity:** If the user's request is ambiguous, ask clarifying questions to get the information you need to select and use a tool correctly.\n\
+                        7.  **Adapt to New Capabilities:** You should be able to adapt to new tools, resources, and prompts as they become available from different MCP servers. You will be provided with the latest list of capabilities for each session.\n\n\
+                        Your goal is to be a resourceful, context-aware agent that leverages external systems to provide the most accurate and up-to-date information possible.\
+                        Today is ${new Date().toLocaleDateString()}.`,
+                        temperature: 0.0, // Lower temperature for more factual responses
+                        topp: 0.1,
                         steps: 512,
                         sliding_window: false,
                         embeddings: false,

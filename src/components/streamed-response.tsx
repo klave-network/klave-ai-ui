@@ -39,6 +39,7 @@ export function StreamedResponse({
 
     // Reset iteration counter when context changes
     useEffect(() => {
+        // console.log(`🔄 StreamedResponse context changed to: ${context_name}`);
         iterationRef.current = 0;
     }, [context_name]);
 
