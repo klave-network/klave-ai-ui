@@ -4,6 +4,14 @@ import { clsx } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
+import DeepSeekLogo from '@/assets/deepseek.svg';
+import HuggingFaceLogo from '@/assets/hugging_face.svg';
+import MetaLogo from '@/assets/meta.svg';
+import MicrosoftLogo from '@/assets/microsoft.svg';
+import MistralLogo from '@/assets/mistral.svg';
+import OpenAiLogo from '@/assets/openai_light.svg';
+import QwenLogo from '@/assets/qwen_light.svg';
+
 // Handle copy to clipboard
 export function copyToClipboard(text: string, field: string) {
     navigator.clipboard.writeText(text).then(() => {
@@ -136,37 +144,37 @@ export function getModelLogo(modelName: string): string | null {
 
     // OpenAI models
     if (lowerName.includes('gpt') || lowerName.includes('openai')) {
-        return '/src/assets/openai_light.svg';
+        return OpenAiLogo;
     }
 
     // DeepSeek models
     if (lowerName.includes('deepseek')) {
-        return '/src/assets/deepseek.svg';
+        return DeepSeekLogo;
     }
 
     // Meta models (Llama)
     if (lowerName.includes('llama') || lowerName.includes('meta')) {
-        return '/src/assets/meta.svg';
+        return MetaLogo;
     }
 
     // Microsoft models (Phi)
     if (lowerName.includes('phi') || lowerName.includes('microsoft')) {
-        return '/src/assets/microsoft.svg';
+        return MicrosoftLogo;
     }
 
     // Mistral models
     if (lowerName.includes('mistral') || lowerName.includes('mixtral')) {
-        return '/src/assets/mistral.svg';
+        return MistralLogo;
     }
 
     // Qwen models
     if (lowerName.includes('qwen')) {
-        return '/src/assets/qwen_light.svg';
+        return QwenLogo;
     }
 
     // HuggingFace models
     if (lowerName.includes('smolvlm')) {
-        return '/src/assets/hugging_face.svg';
+        return HuggingFaceLogo;
     }
 
     return null;
