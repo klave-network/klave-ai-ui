@@ -20,7 +20,8 @@ import type { AttestationComponent } from '@/lib/types';
 
 // TODO: Replace with API call in the future
 // Example: const attestationData = await fetchAttestationData();
-import attestationData from '@/assets/attestation.json';
+import attestationData1 from '@/assets/attestation-1.json';
+import attestationData2 from '@/assets/attestation-2.json';
 import { AttestationFlow } from '@/components/attestation-flow';
 import {
     Accordion,
@@ -38,6 +39,7 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { useSecurityData } from '@/contexts/security-context';
+import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
@@ -55,15 +57,21 @@ function collectAllComponents(component: AttestationComponent): AttestationCompo
 export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { toggleSidebar } = useSidebar('right');
     const { securityData } = useSecurityData();
+    const chatSettings = useCurrentUserChatSettings();
 
     const currentTime = securityData?.currentTime ?? 0;
     const challenge = securityData?.challenge ?? [];
     const quote = securityData?.quote;
     const verification = securityData?.verification;
 
+    // Use attestation_1.json for GPT-OSS, otherwise use attestation_2.json
+    const attestationData = chatSettings.agentMode
+        ? attestationData1
+        : attestationData2;
+
     const allComponents = React.useMemo(
         () => collectAllComponents(attestationData as AttestationComponent),
-        []
+        [attestationData]
     );
 
     if (!quote || !verification) {

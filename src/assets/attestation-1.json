@@ -82,14 +82,14 @@
             "childComponent": []
         },
         {
-            "componentName": "PipeDream MCP Server",
-            "description": "PipeDream external MCP server",
+            "componentName": "Pipedream-Polygon-Mcp",
+            "description": "Pipedream MCP server for Polygon Financial API",
             "quote": null,
             "childComponent": []
         },
         {
-            "componentName": "Klave RAG Agent #1",
-            "description": "RAG Agent running within SGX",
+            "componentName": "Secretarium-Knowledge-Base",
+            "description": "Klave MCP server for Secretarium RAG",
             "quote": {
                 "version": "V3",
                 "header": {
@@ -126,8 +126,8 @@
             },
             "childComponent": [
                 {
-                    "componentName": "Klave QWEN-3 Inference Engine",
-                    "description": "QWEN-3 inference engine running within TDX",
+                    "componentName": "Klave Qwen3 Inference Engine",
+                    "description": "Qwen3-Embedding-8B running within TDX",
                     "quote": {
                         "version": "V4",
                         "header": {
