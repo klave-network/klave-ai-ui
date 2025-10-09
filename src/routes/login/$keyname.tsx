@@ -9,8 +9,8 @@ import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { createUser, getUser } from '@/api/klave-drive';
-import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
+import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -140,7 +140,7 @@ function RouteComponent() {
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col justify-center items-center text-center mb-4">
-                        <LoadingDots />
+                        <Spinner />
                     </div>
                     <form onSubmit={handleLogin} className="hidden">
                         <div className="grid gap-6">

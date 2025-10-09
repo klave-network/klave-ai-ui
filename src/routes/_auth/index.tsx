@@ -12,7 +12,7 @@ import {
     getModels as getMultimodalModels
 } from '@/api/klave-ai-multimodal';
 import { getRagList } from '@/api/klave-ai-rag-mcp-server';
-import { LoadingDots } from '@/components/loading-dots';
+import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { store, storeActions } from '@/store';
@@ -70,11 +70,9 @@ export const Route = createFileRoute('/_auth/')({
     },
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
                 <span>Initializing Klave AI</span>
-                <div className="flex flex-col justify-center items-center text-center mb-4">
-                    <LoadingDots />
-                </div>
+                <Spinner />
             </div>
         </div>
     )

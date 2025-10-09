@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-import { LoadingDots } from '@/components/loading-dots';
+import { Spinner } from '@/components/spinner';
 import { useStreamedResponse } from '@/hooks/use-streamed-response';
 
 type StreamedResponseProps = {
@@ -47,13 +48,15 @@ export function StreamedResponse({
         <div className="whitespace-pre-wrap">
             {loading && wordCount < 5
                 ? (
-                        <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
                             <span className="animate-pulse">Generating...</span>
-                            <LoadingDots />
+                            <Spinner />
                         </div>
                     )
                 : (
-                        <ReactMarkdown>{response}</ReactMarkdown>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {response}
+                        </ReactMarkdown>
                     )}
             {error && (
                 <span className="text-red-600">

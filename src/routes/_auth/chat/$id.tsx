@@ -9,7 +9,7 @@ import { getQuote, isConnected as isKlaveConnected, verifyQuote } from '@/api/kl
 import { callMcpTool, sendLlmContextPrompt } from '@/api/klave-ai-mcp-client';
 import { inferenceAddPrompt } from '@/api/klave-ai-multimodal';
 import { ChatInput } from '@/components/chat-input';
-import { LoadingDots } from '@/components/loading-dots';
+import { Spinner } from '@/components/spinner';
 import { StreamedResponse } from '@/components/streamed-response';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
@@ -76,11 +76,9 @@ export const Route = createFileRoute('/_auth/chat/$id')({
     },
     pendingComponent: () => (
         <div className="min-h-screen grid place-items-center">
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
                 <span>Creating chat</span>
-                <div className="flex flex-col justify-center items-center text-center mb-4">
-                    <LoadingDots />
-                </div>
+                <Spinner />
             </div>
         </div>
     )
@@ -415,10 +413,10 @@ function RouteComponent() {
 
                     {/* Show tool processing indicator */}
                     {processingToolCall && (
-                        <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto bg-blue-50">
-                            <div className="flex flex-col">
-                                <span className="animate-pulse text-blue-600">Calling MCP tool...</span>
-                                <LoadingDots />
+                        <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
+                            <div className="flex items-center gap-2">
+                                <span className="animate-pulse text-klave-blue font-mono">Calling MCP tool...</span>
+                                <Spinner />
                             </div>
                         </div>
                     )}

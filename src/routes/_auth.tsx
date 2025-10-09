@@ -4,8 +4,8 @@ import { z } from 'zod';
 
 import { AppSidebar } from '@/components/app-sidebar';
 import { AttestationSidebar } from '@/components/attestation-sidebar';
-import { LoadingDots } from '@/components/loading-dots';
 import { Logo } from '@/components/logo';
+import { Spinner } from '@/components/spinner';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { SecurityProvider } from '@/contexts/security-context';
@@ -40,10 +40,9 @@ export const Route = createFileRoute('/_auth')({
                         <CardHeader className="text-center">
                             <CardTitle className="text-xl mb-5 flex flex-col text-center justify-center">
                                 <Logo className="mb-8" />
-                                <span className="text-gray-400">Loading</span>
-                                <br />
-                                <div className="flex flex-col justify-center items-center text-center mb-4">
-                                    <LoadingDots />
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-400">Loading</span>
+                                    <Spinner />
                                 </div>
                             </CardTitle>
                         </CardHeader>
