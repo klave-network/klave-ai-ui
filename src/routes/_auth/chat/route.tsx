@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
+import { createFileRoute, Outlet, useLocation, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import { ChatSettingsModal } from '@/components/chat-settings-modal';
@@ -7,7 +7,7 @@ import { ModelSelector } from '@/components/model-selector';
 import { SpaceSelector } from '@/components/space-selector';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
+import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
 
 export const Route = createFileRoute('/_auth/chat')({
     component: RouteComponent
@@ -16,9 +16,13 @@ export const Route = createFileRoute('/_auth/chat')({
 function RouteComponent() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
+    const params = useParams({ strict: false });
+    const currentUser = useCurrentUser() ?? '';
     const chatSettings = useCurrentUserChatSettings();
+    const currentChat = useUserChat(currentUser, params?.id ?? '');
+    const chatExists = Boolean(currentChat);
 
-    const isAgentMode = chatSettings?.agentMode ?? false;
+    const isAgentMode = chatExists ? Boolean(currentChat?.chatSettings?.agentMode) : Boolean(chatSettings.agentMode);
 
     useEffect(() => {
         const handleScroll = () => {

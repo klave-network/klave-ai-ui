@@ -262,7 +262,7 @@ function RouteComponent() {
                             <Fragment key={id}>
                                 {/* Only show streaming container when actually streaming */}
                                 {isStreaming && (
-                                    <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
+                                    <div className="w-full mb-2">
                                         <StreamedResponse
                                             key={`stream-${id}`}
                                             context_name={`context_${chatId}`}

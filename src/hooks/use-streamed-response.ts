@@ -13,6 +13,13 @@ type UseStreamedResponseProps = {
     triggerKey?: number; // Used to re-trigger streaming after tool execution
 };
 
+type ToolCallInfo = {
+    name: string;
+    arguments: unknown;
+    timestamp: number;
+    isProcessing: boolean;
+};
+
 export function useStreamedResponse({
     context_name,
     onComplete,
@@ -21,6 +28,7 @@ export function useStreamedResponse({
 }: UseStreamedResponseProps) {
     const [response, setResponse] = useState('');
     const [reasoningContent, setReasoningContent] = useState('');
+    const [streamingToolCalls, setStreamingToolCalls] = useState<ToolCallInfo[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const isMountedRef = useRef(true);
@@ -28,6 +36,7 @@ export function useStreamedResponse({
     const reasoningRef = useRef('');
     const chatSettings = useCurrentUserChatSettings();
     const toolCallInProgressRef = useRef(false);
+    const previousContextRef = useRef(context_name);
 
     // Handler for MCP server response (pieces-based format from test.js)
     const handleMcpStreamResult = (result: McpChunkResult): boolean => {
@@ -56,6 +65,15 @@ export function useStreamedResponse({
                     // Handle tool call
                     try {
                         const toolCallData = JSON.parse(piece.content);
+                        // Add this tool call to the accumulated list
+                        const newToolCall: ToolCallInfo = {
+                            name: toolCallData.name,
+                            arguments: toolCallData.arguments,
+                            timestamp: Date.now(),
+                            isProcessing: true
+                        };
+                        setStreamingToolCalls(prev => [...prev, newToolCall]);
+
                         // DON'T set loading to false or isMountedRef to false - we want to continue after tool execution
                         // Set flag to indicate tool call is in progress
                         toolCallInProgressRef.current = true;
@@ -82,6 +100,12 @@ export function useStreamedResponse({
             // If a tool call is in progress, don't complete - we're waiting for the next iteration
             if (toolCallInProgressRef.current) {
                 toolCallInProgressRef.current = false; // Reset flag for next iteration
+                // Mark the last tool call as no longer processing
+                setStreamingToolCalls(prev =>
+                    prev.map((tc, idx) =>
+                        idx === prev.length - 1 ? { ...tc, isProcessing: false } : tc
+                    )
+                );
                 // Don't call onComplete, don't set loading to false, don't set isMountedRef to false
                 // Just return true to stop this stream - the next one will start when triggerKey changes
                 return true;
@@ -126,6 +150,15 @@ export function useStreamedResponse({
         // console.log(`🔄 Starting stream iteration (triggerKey: ${triggerKey}, context: ${context_name})`);
         // console.log(`📊 Effect deps - context_name: ${context_name}, triggerKey: ${triggerKey}`);
         // console.log(`🔧 toolCallInProgressRef.current: ${toolCallInProgressRef.current}`);
+
+        // If context changed, reset everything (new message)
+        if (previousContextRef.current !== context_name) {
+            setStreamingToolCalls([]);
+            previousContextRef.current = context_name;
+        }
+        // Otherwise, we're continuing the same message (after tool execution)
+        // so we keep the accumulated tool calls
+
         isMountedRef.current = true;
         setLoading(true);
         setError(null);
@@ -154,6 +187,7 @@ export function useStreamedResponse({
     return {
         response,
         reasoningContent,
+        streamingToolCalls,
         loading,
         error,
         wordCount

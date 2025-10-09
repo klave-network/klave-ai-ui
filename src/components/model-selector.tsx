@@ -26,33 +26,31 @@ export function ModelSelector() {
     const navigate = useNavigate();
     const params = useParams({ strict: false });
     const currentUser = useCurrentUser() ?? '';
+    const chatSettings = useCurrentUserChatSettings();
+    const currentChat = useUserChat(currentUser, params?.id ?? '');
+    const chatExists = Boolean(currentChat);
+
+    const isAgentMode = chatExists ? Boolean(currentChat?.chatSettings?.agentMode) : Boolean(chatSettings.agentMode);
 
     const isVideoChat = location.pathname.includes('/lense');
-    const isAgentChat = location.pathname.includes('/agent');
     const isChatView
         = location.pathname === '/chat' || location.pathname === '/chat/lense' || location.pathname === '/chat/agent';
 
     const llModels = useLlModels();
     const vlModels = useVlModels();
     const mcpModels = useMcpModels();
-    const globalChatSettings = useCurrentUserChatSettings();
 
-    const isAgent = isAgentChat || Boolean(globalChatSettings?.agentMode);
-    const models = isVideoChat ? vlModels : isAgent ? mcpModels : llModels;
-
-    const currentChat = useUserChat(currentUser, params?.id ?? '');
-
-    const chatExists = Boolean(currentChat);
+    const models = isVideoChat ? vlModels : isAgentMode ? mcpModels : llModels;
 
     // Safely determine baseSettings without casting
-    let baseSettings = globalChatSettings ?? {};
+    let baseSettings = chatSettings ?? {};
     if (chatExists && currentChat) {
         baseSettings = currentChat.chatSettings ?? baseSettings;
     }
 
     const selectedModel = isVideoChat
         ? baseSettings.currentVlModel ?? models[0]?.name ?? ''
-        : isAgent
+        : isAgentMode
             ? baseSettings.currentMcpModel ?? models[0]?.name ?? ''
             : baseSettings.currentLlModel ?? models[0]?.name ?? '';
 

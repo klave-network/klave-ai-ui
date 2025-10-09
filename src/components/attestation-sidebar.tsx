@@ -1,8 +1,8 @@
 import { Utils } from '@secretarium/connector';
+import { useParams } from '@tanstack/react-router';
 import {
     BadgeCheck,
     BrainCircuit,
-    Cpu,
     FileDigit,
     Info,
     Landmark,
@@ -39,7 +39,7 @@ import {
     SidebarMenuItem
 } from '@/components/ui/sidebar';
 import { useSecurityData } from '@/contexts/security-context';
-import { useCurrentUserChatSettings } from '@/hooks/use-klave-ai-store';
+import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { KLAVE_AI_MULTIMODAL_FQDN } from '@/lib/constants';
 
@@ -55,9 +55,16 @@ function collectAllComponents(component: AttestationComponent): AttestationCompo
 }
 
 export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+    // @TODO make this into a reusable component
+    const params = useParams({ strict: false });
+    const currentUser = useCurrentUser() ?? '';
+    const chatSettings = useCurrentUserChatSettings();
+    const currentChat = useUserChat(currentUser, params?.id ?? '');
+    const chatExists = Boolean(currentChat);
+
+    const isAgentMode = chatExists ? Boolean(currentChat?.chatSettings?.agentMode) : Boolean(chatSettings.agentMode);
     const { toggleSidebar } = useSidebar('right');
     const { securityData } = useSecurityData();
-    const chatSettings = useCurrentUserChatSettings();
 
     const currentTime = securityData?.currentTime ?? 0;
     const challenge = securityData?.challenge ?? [];
@@ -65,7 +72,7 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
     const verification = securityData?.verification;
 
     // Use attestation_1.json for GPT-OSS, otherwise use attestation_2.json
-    const attestationData = chatSettings.agentMode
+    const attestationData = isAgentMode
         ? attestationData1
         : attestationData2;
 
@@ -185,11 +192,28 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                         </AccordionContent>
                     </AccordionItem>
 
+                    <AccordionItem value="verification-flow-diagram" className="border rounded-md p-2">
+                        <AccordionTrigger>
+                            <div className="flex gap-2 items-center">
+                                <Workflow className="size-4" />
+                                <span>Verification Flow Diagram</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground w-full h-[500px]">
+                            {/* Pass attestation data from API or JSON file */}
+                            <AttestationFlow data={attestationData as AttestationComponent} />
+                        </AccordionContent>
+                    </AccordionItem>
+
+                    <p className="text-xs text-muted-foreground">
+                        Hardware attestation information for each component.
+                    </p>
+
                     <AccordionItem value="attestation" className="border rounded-md p-2">
                         <AccordionTrigger>
                             <div className="flex gap-2 items-center">
-                                <Cpu className="size-4" />
-                                <span>Secure hardware attestation</span>
+                                <BrainCircuit className="size-4" />
+                                <span>{isAgentMode ? 'Klave AI Agent #1' : 'Klave AI Agent #2'}</span>
                             </div>
                         </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground">
@@ -305,25 +329,8 @@ export function AttestationSidebar({ ...props }: React.ComponentProps<typeof Sid
                         </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="verification-flow-diagram" className="border rounded-md p-2">
-                        <AccordionTrigger>
-                            <div className="flex gap-2 items-center">
-                                <Workflow className="size-4" />
-                                <span>Verification Flow Diagram</span>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground w-full h-[500px]">
-                            {/* Pass attestation data from API or JSON file */}
-                            <AttestationFlow data={attestationData as AttestationComponent} />
-                        </AccordionContent>
-                    </AccordionItem>
-
-                    <p className="text-xs text-muted-foreground">
-                        Hardware attestation information for each component.
-                    </p>
-
                     {/* Component Details */}
-                    {allComponents.map(component => (
+                    {allComponents.slice(1).map(component => (
                         <AccordionItem
                             key={component.componentName}
                             value={component.componentName}
