@@ -40,59 +40,71 @@ export function useStreamedResponse({
 
     // Handler for MCP server response (pieces-based format from test.js)
     const handleMcpStreamResult = (result: McpChunkResult): boolean => {
-        // console.log('📦 Received result:', JSON.stringify(result, null, 2));
-        // console.log('🔍 isMountedRef.current:', isMountedRef.current);
-
         if (!isMountedRef.current) {
-            // console.log('⚠️ Not mounted, returning true to stop stream');
             return true;
         }
+
+        // Accumulate in local variables to avoid race conditions in production builds
+        let newContent = '';
+        let newReasoning = '';
+        let hasToolCall = false;
+        let toolCallData: any = null;
 
         // Process pieces array (new format from backend)
         if (typeof result === 'object' && result.pieces && result.pieces.length > 0) {
             for (const piece of result.pieces) {
                 if (piece.type === 'ReasoningContent') {
-                    // Append to reasoning content
-                    reasoningRef.current += piece.content;
-                    setReasoningContent(reasoningRef.current);
+                    newReasoning += piece.content;
                 }
                 else if (piece.type === 'Content') {
-                    // Append content to response
-                    fullResponseRef.current += piece.content;
-                    setResponse(fullResponseRef.current);
+                    newContent += piece.content;
                 }
                 else if (piece.type === 'ToolCalls') {
                     // Handle tool call
                     try {
-                        const toolCallData = JSON.parse(piece.content);
-                        // Add this tool call to the accumulated list
-                        const newToolCall: ToolCallInfo = {
-                            name: toolCallData.name,
-                            arguments: toolCallData.arguments,
-                            timestamp: Date.now(),
-                            isProcessing: true
-                        };
-                        setStreamingToolCalls(prev => [...prev, newToolCall]);
-
-                        // DON'T set loading to false or isMountedRef to false - we want to continue after tool execution
-                        // Set flag to indicate tool call is in progress
-                        toolCallInProgressRef.current = true;
-                        if (onToolCallRequired) {
-                            onToolCallRequired(toolCallData);
-                        }
-                        else {
-                            console.warn('⚠️ onToolCallRequired is not defined!');
-                        }
-                        return true; // Stop this stream, will restart after tool execution
+                        toolCallData = JSON.parse(piece.content);
+                        hasToolCall = true;
                     }
                     catch (e) {
                         console.error('❌ Failed to parse tool call:', e);
                     }
                 }
             }
+
+            // Update refs and state with accumulated values
+            if (newReasoning) {
+                reasoningRef.current += newReasoning;
+                setReasoningContent(reasoningRef.current);
+            }
+            if (newContent) {
+                fullResponseRef.current += newContent;
+                setResponse(fullResponseRef.current);
+            }
+
+            // Handle tool call after processing all pieces
+            if (hasToolCall && toolCallData) {
+                const newToolCall: ToolCallInfo = {
+                    name: toolCallData.name,
+                    arguments: toolCallData.arguments,
+                    timestamp: Date.now(),
+                    isProcessing: true
+                };
+                setStreamingToolCalls(prev => [...prev, newToolCall]);
+
+                // DON'T set loading to false or isMountedRef to false - we want to continue after tool execution
+                // Set flag to indicate tool call is in progress
+                toolCallInProgressRef.current = true;
+                if (onToolCallRequired) {
+                    onToolCallRequired(toolCallData);
+                }
+                else {
+                    console.warn('⚠️ onToolCallRequired is not defined!');
+                }
+                return true; // Stop this stream, will restart after tool execution
+            }
         }
         else {
-            // console.log('No pieces in result or result is not an object');
+            console.log('⚠️ No pieces in result or result is not an object');
         }
 
         // Check if response is complete (only after all pieces processed)
@@ -111,9 +123,15 @@ export function useStreamedResponse({
                 return true;
             }
 
+            // Use the current ref values (which have been properly accumulated)
+            const finalResponse = fullResponseRef.current;
+            const finalReasoning = reasoningRef.current;
+
             setLoading(false);
-            onComplete(fullResponseRef.current, reasoningRef.current);
             isMountedRef.current = false;
+
+            // Call onComplete with the final accumulated values
+            onComplete(finalResponse, finalReasoning);
             return true;
         }
 
@@ -146,11 +164,6 @@ export function useStreamedResponse({
     };
 
     useEffect(() => {
-        // console.log(`🚀 useEffect TRIGGERED! triggerKey: ${triggerKey}, context: ${context_name}`);
-        // console.log(`🔄 Starting stream iteration (triggerKey: ${triggerKey}, context: ${context_name})`);
-        // console.log(`📊 Effect deps - context_name: ${context_name}, triggerKey: ${triggerKey}`);
-        // console.log(`🔧 toolCallInProgressRef.current: ${toolCallInProgressRef.current}`);
-
         // If context changed, reset everything (new message)
         if (previousContextRef.current !== context_name) {
             setStreamingToolCalls([]);
@@ -158,6 +171,13 @@ export function useStreamedResponse({
         }
         // Otherwise, we're continuing the same message (after tool execution)
         // so we keep the accumulated tool calls
+
+        // CRITICAL: Reset tool call flag when starting a new stream iteration
+        // This ensures that after a tool call completes and we start streaming again,
+        // the completion handler will properly call onComplete
+        if (triggerKey > 0) {
+            toolCallInProgressRef.current = false;
+        }
 
         isMountedRef.current = true;
         setLoading(true);
@@ -169,6 +189,7 @@ export function useStreamedResponse({
         streamFn({ context_name, token_id: '', nb_pieces: 5 }, handler as any)
             .then(() => {
                 console.log('Stream Promise resolved (returned true from handler)');
+                console.log('Final state - content length:', fullResponseRef.current.length, 'reasoning length:', reasoningRef.current.length);
             })
             .catch((err) => {
                 console.error('❌ Stream error:', err);

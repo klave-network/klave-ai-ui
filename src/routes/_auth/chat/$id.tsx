@@ -156,8 +156,9 @@ function RouteComponent() {
     }, [userPrompt, chatId, currentUser, chat?.chatSettings.agentMode]);
 
     const handleStreamComplete = (messageId: string, fullResponse: string, reasoningContent: string) => {
-        if (!chat || !currentUser)
+        if (!chat || !currentUser) {
             return;
+        }
 
         storeActions.updateMessage(currentUser, chatId, messageId, {
             content: fullResponse,
@@ -167,6 +168,9 @@ function RouteComponent() {
         // Only stop streaming if we're not waiting for a tool call response
         if (streamingMessageId === messageId) {
             setStreamingMessageId('');
+        }
+        else {
+            console.log('Not clearing streamingMessageId - mismatch:', streamingMessageId, 'vs', messageId);
         }
     };
 
