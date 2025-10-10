@@ -25,7 +25,6 @@ import {
     FormLabel,
     FormMessage
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -37,6 +36,8 @@ import {
 import { SliderTooltip } from '@/components/ui/slider-tooltip';
 import { useCurrentUser, useCurrentUserChatSettings, useUserChat } from '@/hooks/use-klave-ai-store';
 import { storeActions } from '@/store';
+
+import { Textarea } from './ui/textarea';
 
 const formSchema = z.object({
     systemPrompt: z.string().min(1, 'System prompt is required'),
@@ -154,7 +155,7 @@ export function ChatSettingsModal() {
                                 <FormItem>
                                     <FormLabel>System prompt</FormLabel>
                                     <FormControl>
-                                        <Input
+                                        <Textarea
                                             placeholder="Enter your system prompt"
                                             disabled={!isInChatView}
                                             {...field}
