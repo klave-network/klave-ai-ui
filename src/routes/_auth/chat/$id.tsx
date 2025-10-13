@@ -260,7 +260,7 @@ function RouteComponent() {
             {/* Chat */}
             <div className="flex-1 overflow-auto pb-32">
                 <div className="max-w-2xl mx-auto w-full">
-                    {chat.messages.map(({ id, role, content, toolCalled, toolResults, reasoningContent }) => {
+                    {chat.messages.map(({ id, role, content, toolResults, reasoningContent }) => {
                         const isStreaming = streamingMessageId === id && role === 'ai';
                         return (
                             <Fragment key={id}>
@@ -273,6 +273,7 @@ function RouteComponent() {
                                             onComplete={(fullResponse, reasoning) => handleStreamComplete(id, fullResponse, reasoning)}
                                             onToolCallRequired={handleToolCallRequired}
                                             triggerKey={streamTriggerKey}
+                                            processingToolCall={processingToolCall}
                                         />
                                     </div>
                                 )}
@@ -286,7 +287,7 @@ function RouteComponent() {
                                                     <span className="flex items-center gap-2 ">
                                                         <Lightbulb className="size-4" />
                                                         {' '}
-                                                        Thinking...
+                                                        Reasoning process
                                                     </span>
                                                 </AccordionTrigger>
                                                 <AccordionContent className="text-xs text-gray-700 whitespace-pre-wrap">
@@ -324,7 +325,7 @@ function RouteComponent() {
                                                                 ? (
                                                                         <div className="space-y-2">
                                                                             <div className="text-xs font-semibold text-indigo-900 mb-2">
-                                                                                📚 Retrieved
+                                                                                Retrieved
                                                                                 {' '}
                                                                                 {toolResult.result.content.length}
                                                                                 {' '}
@@ -336,8 +337,6 @@ function RouteComponent() {
                                                                                     return (
                                                                                         <div key={itemIdx} className="bg-gray-50 rounded p-2 border border-gray-200">
                                                                                             <div className="text-xs font-medium text-indigo-800 mb-1 flex items-center gap-1">
-                                                                                                📄
-                                                                                                {' '}
                                                                                                 {data.filename}
                                                                                                 <span className="text-gray-500">
                                                                                                     • Chunk
@@ -404,26 +403,9 @@ function RouteComponent() {
                                         </div>
                                     </div>
                                 )}
-
-                                {toolCalled && !isStreaming && !processingToolCall && (
-                                    <div className="text-xs flex items-center gap-2 px-4 mb-2">
-                                        <h2 className="font-semibold">Tools called: </h2>
-                                        <div className="text-xs bg-blue-200 rounded-lg px-2 py-1">{toolCalled}</div>
-                                    </div>
-                                )}
                             </Fragment>
                         );
                     })}
-
-                    {/* Show tool processing indicator */}
-                    {processingToolCall && (
-                        <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
-                            <div className="flex items-center gap-2">
-                                <span className="animate-pulse text-klave-blue font-mono">Calling MCP tool...</span>
-                                <Spinner />
-                            </div>
-                        </div>
-                    )}
 
                     <div ref={messagesEndRef} />
                 </div>

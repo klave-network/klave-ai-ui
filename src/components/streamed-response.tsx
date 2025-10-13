@@ -10,6 +10,7 @@ import { useStreamedResponse } from '@/hooks/use-streamed-response';
 type StreamedResponseProps = {
     context_name: string;
     onComplete: (fullResponse: string, reasoningContent: string) => void;
+    processingToolCall: boolean;
     onToolCallRequired?: (toolCall: unknown) => void;
     triggerKey?: number; // Used to re-trigger streaming after tool execution
 };
@@ -17,6 +18,7 @@ type StreamedResponseProps = {
 export function StreamedResponse({
     context_name,
     onComplete,
+    processingToolCall,
     onToolCallRequired,
     triggerKey = 0
 }: StreamedResponseProps) {
@@ -84,7 +86,7 @@ export function StreamedResponse({
                                             <Hammer className="size-4" />
                                             {toolCall.name}
                                         </span>
-                                        {toolCall.isProcessing && <Spinner />}
+                                        {toolCall.isProcessing && <Spinner height={16} width={16} />}
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
@@ -103,11 +105,11 @@ export function StreamedResponse({
             {/* Display streaming response */}
             {(response || loading || error) && (
                 <div className="w-fit mb-2 px-4 py-2 rounded-xl mr-auto">
-                    <div className="whitespace-pre-wrap">
+                    <div className="prose">
                         {loading && wordCount < 5
                             ? (
                                     <div className="flex items-center gap-2">
-                                        <span className="animate-pulse">Generating...</span>
+                                        <span className="animate-pulse text-sm">{processingToolCall ? 'Calling MCP tool...' : 'Generating...'}</span>
                                         <Spinner />
                                     </div>
                                 )
