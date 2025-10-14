@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -40,6 +41,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function NewMcpServerDialog() {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -89,6 +91,7 @@ export function NewMcpServerDialog() {
             toast.success('MCP server added successfully');
             form.reset();
             setOpen(false);
+            navigate({ to: '/', search: true });
         }
         catch (error) {
             toast.error('Failed to add MCP server');
