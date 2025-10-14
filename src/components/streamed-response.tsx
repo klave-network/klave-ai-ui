@@ -86,7 +86,7 @@ export function StreamedResponse({
                                             <Hammer className="size-4" />
                                             {toolCall.name}
                                         </span>
-                                        {toolCall.isProcessing && <Spinner height={16} width={16} />}
+                                        {toolCall.isProcessing && <Spinner />}
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>
@@ -110,7 +110,6 @@ export function StreamedResponse({
                             ? (
                                     <div className="flex items-center gap-2">
                                         <span className="animate-pulse text-sm">{processingToolCall ? 'Calling MCP tool...' : 'Generating...'}</span>
-                                        <Spinner />
                                     </div>
                                 )
                             : (
